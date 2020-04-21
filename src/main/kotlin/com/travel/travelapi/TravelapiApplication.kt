@@ -1,10 +1,12 @@
 package com.travel.travelapi
 
+import org.mybatis.spring.annotation.MapperScan
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.ComponentScan
 
-@ComponentScan(basePackages = ["com.travel.travelapi.controllers"])
+@MapperScan("com.travel.travelapi.services")
+@ComponentScan(basePackages = ["com.travel.travelapi.controllers","com.travel.travelapi.services", "com.travel.travelapi.models"])
 @SpringBootApplication
 class TravelapiApplication
 
