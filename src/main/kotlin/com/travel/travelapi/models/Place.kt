@@ -1,23 +1,26 @@
 package com.travel.travelapi.models
 
-import com.travel.travelapi.pojos.Category
-import com.travel.travelapi.pojos.Parking
-import com.travel.travelapi.pojos.Review
-import com.travel.travelapi.pojos.WorkingSchedule
-import java.time.Duration
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.core.type.WritableTypeId
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
 
-data class Place (val name: String,
-                  val description: String,
-                  val placeId: Int,
-                  val averageTimeSpent: String,
-                  val latitude: Float,
-                  val longitude: Float,
-                  val address: String,
-                  val country: String,
-                  val city: String,
-                  val phoneNumber: String,
-                  val website: String/*,
-                  val categories: List<Category>,
-                  val parking: List<Parking>,
-                  val reviews: List<Review>,
-                  val schedule: List<WorkingSchedule>*/)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class Place (val name: String? = null,
+                  val description: String? = null,
+                  val placeId: Int? = null,
+                  val averageTimeSpent: String? =  null,
+                  val latitude: Float? = null,
+                  val longitude: Float? = null,
+                  val address: String? = null,
+                  val country: String? = null,
+                  val city: String? = null,
+                  val phoneNumber: String? = null,
+                  val website: String? = null){
+
+    var categories: List<Category>? = null
+    var parking: List<Parking>? = null
+    var reviews: List<Review>? = null
+    var schedule: List<WorkingSchedule>? = null
+
+}

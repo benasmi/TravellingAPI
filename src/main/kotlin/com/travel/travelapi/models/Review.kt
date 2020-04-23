@@ -1,4 +1,4 @@
-package com.travel.travelapi.pojos
+package com.travel.travelapi.models
 
 data class Review(val reviewId: Int,
                   val review: String,

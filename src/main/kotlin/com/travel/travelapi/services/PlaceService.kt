@@ -11,4 +11,5 @@ interface PlaceService {
 
     @Select("SELECT * from PLACE")
     fun selectAll(): List<Place>
+
 }
