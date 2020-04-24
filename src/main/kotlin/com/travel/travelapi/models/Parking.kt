@@ -1,8 +1,7 @@
 package com.travel.travelapi.models
 
 
-data class Parking(val fk_placeId: Int? = null,
-                   val fk_apiPlaceId: Int? = null,
+data class Parking(val fk_apiPlaceId: Int? = null,
                    val latitude: Float? = null,
                    val longitude: Float? = null,
                    val address: String? = null,

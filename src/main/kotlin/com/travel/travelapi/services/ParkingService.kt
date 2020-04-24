@@ -7,12 +7,11 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ParkingService {
 
-    //todo: change parking logic with interim tables
-    @Select("SELECT * FROM PARKING WHERE fk_placeId=#{id}")
-    fun selectParkingLocationsById(@Param("id") id: Int): List<Parking>
+    @Select("SELECT * FROM PARKING WHERE address LIKE #{p.address}")
+    fun getAllParkingInfo(): List<Parking>
 
-    @Insert("INSERT INTO PARKING (fk_placeId, latitude, longitude, address, priority) VALUES (#{p.fk_placeId}, #{p.latitude},#{p.longitude}, #{p.address}, #{p.priority})")
-    fun insertParkingForPlace(@Param("p") p: Parking)
+    @Insert("INSERT INTO PARKING (latitude, longitude, address, priority) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.priority})")
+    fun insertParking(@Param("p") p: Parking)
 
     @Delete("DELETE FROM PARKING WHERE parkingId=#{p.parkingId}")
     fun deleteParking(@Param("p") p: Parking)

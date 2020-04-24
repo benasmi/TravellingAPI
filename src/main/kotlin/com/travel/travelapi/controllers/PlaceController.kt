@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 class PlaceController(@Autowired private val service: PlaceService,
                       @Autowired private val categoryController: CategoryPlaceController,
                       @Autowired private val workingScheduleService: WorkingScheduleController,
-                      @Autowired private val parkingService: ParkingController,
+                      @Autowired private val parkingPlaceController: ParkingPlaceController,
                       @Autowired private val reviewService: ReviewController,
                       @Autowired private val photoPlaceController: PhotoPlaceController,
                       @Autowired private val tagPlaceController: TagPlaceController){
@@ -29,7 +29,7 @@ class PlaceController(@Autowired private val service: PlaceService,
             if(full){
                 for (value: Place in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
-                    value.parking = parkingService.getParkingLocationsById(value.placeId)
+                    value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
                     value.reviews = reviewService.getReviewsById(value.placeId)
                     value.schedule = workingScheduleService.getWorkingScheduleById(value.placeId)
                     value.photos = photoPlaceController.getPhotosById(value.placeId)
