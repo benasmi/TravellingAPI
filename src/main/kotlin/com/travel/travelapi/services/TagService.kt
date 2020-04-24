@@ -2,8 +2,7 @@ package com.travel.travelapi.services
 
 import com.travel.travelapi.models.Category
 import com.travel.travelapi.models.Tag
-import org.apache.ibatis.annotations.Param
-import org.apache.ibatis.annotations.Select
+import org.apache.ibatis.annotations.*
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -12,6 +11,12 @@ interface TagService {
     @Select("SELECT * FROM TAG")
     fun selectAllTags(): List<Tag>
 
-    @Select("INSERT INTO TAG (name) VALUES (#{t.name})")
+    @Insert("INSERT INTO TAG (name) VALUES (#{t.name})")
     fun insertTag(@Param("t") t: Tag)
+
+    @Delete("DELETE FROM TAG WHERE tagId=#{t.tagId}")
+    fun deleteTag(@Param("t") t: Tag)
+
+    @Update("UPDATE CATEGORY SET name=#{t.tagId} WHERE categoryId=#{t.tagId}")
+    fun updateTag(@Param("t") t: Tag)
 }

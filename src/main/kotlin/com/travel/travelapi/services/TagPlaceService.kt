@@ -3,6 +3,7 @@ package com.travel.travelapi.services
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.models.Tag
 import com.travel.travelapi.models.TagPlace
+import org.apache.ibatis.annotations.Delete
 import org.apache.ibatis.annotations.Insert
 import org.apache.ibatis.annotations.Param
 import org.apache.ibatis.annotations.Select
@@ -19,4 +20,6 @@ interface TagPlaceService {
     @Insert("INSERT INTO TAG_PLACE (fk_tagId, fk_placeId) VALUES (#{t.fk_tagId}, #{t.fk_placeId})")
     fun insertTagForPlace(@Param("t") t: TagPlace)
 
+    @Delete("DELETE FROM TAG_PLACE WHERE fk_tagId=#{t.tagId} AND fk_placeId=#{t.fk_placeId} ")
+    fun deleteTag(@Param("t") t: TagPlace)
 }

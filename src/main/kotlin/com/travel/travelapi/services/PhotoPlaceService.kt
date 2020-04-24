@@ -1,11 +1,7 @@
 package com.travel.travelapi.services
 
-import com.travel.travelapi.models.CategoryPlace
-import com.travel.travelapi.models.Photo
-import com.travel.travelapi.models.PhotoPlace
-import org.apache.ibatis.annotations.Insert
-import org.apache.ibatis.annotations.Param
-import org.apache.ibatis.annotations.Select
+import com.travel.travelapi.models.*
+import org.apache.ibatis.annotations.*
 import org.springframework.stereotype.Repository
 
 @Repository
@@ -17,4 +13,11 @@ interface PhotoPlaceService {
 
     @Insert("INSERT INTO PHOTO_PLACE (fk_placeId, fk_photoId, isFeatured, indexInList) VALUES (#{p.fk_photoId}, #{p.fk_placeId}, #{p.isFeatured}, #{p.indexInList})")
     fun insertPhotoForPlace(@Param("p") p: PhotoPlace)
+
+    @Update("UPDATE PHOTO_PLACE SET indexInList=#{p.indexInList} WHERE fk_photoId=#{p.fk_photoId}")
+    fun updatePhotoIndexing(@Param("p") p: PhotoPlace)
+
+    @Delete("DELETE FROM PHOTO_PLACE WHERE fk_photoId=#{p.fk_photoId}")
+    fun deletePhotoFromPlace(@Param("p") p: PhotoPlace)
+
 }

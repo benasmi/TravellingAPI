@@ -12,4 +12,5 @@ interface ReviewService {
     @Select("SELECT * FROM REVIEW WHERE fk_placeId=#{id} limit #{lim}")
     fun selectReviewsById(@Param("id") id: Int, @Param("lim") lim: Int=Int.MAX_VALUE): List<Review>
 
+
 }
