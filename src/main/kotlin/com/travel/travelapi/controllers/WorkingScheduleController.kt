@@ -2,7 +2,6 @@ package com.travel.travelapi.controllers
 
 import com.fasterxml.jackson.annotation.JsonView
 import com.travel.travelapi.TestView
-import com.travel.travelapi.models.TagPlace
 import com.travel.travelapi.models.WorkingSchedule
 import com.travel.travelapi.services.WorkingScheduleService
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +19,6 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
      * @param placeId of a place
      * @return working schedule information related to place
      */
-    @JsonView(TestView.Public::class)
     @ResponseBody fun getWorkingScheduleById(placeId: Int): List<WorkingSchedule>{
         return workingScheduleService.selectWorkingScheduleById(placeId)
     }
@@ -34,4 +32,16 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
             workingScheduleService.insertWorkingScheduleForPlace(ws)
         }
     }
+
+    /**
+     * Update working schedule for a place
+     */
+    @RequestMapping("/update")
+    fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>){
+        for(ws: WorkingSchedule in workingSchedules){
+            workingScheduleService.updateWorkingSchedule(ws)
+        }
+    }
+
+
 }

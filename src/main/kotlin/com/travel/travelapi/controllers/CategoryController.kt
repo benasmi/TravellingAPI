@@ -24,8 +24,26 @@ class CategoryController(@Autowired private val categoryService: CategoryService
      * Insert category
      */
     @PostMapping("/insert")
-    fun insertCategory(@RequestBody c: Category){
-        categoryService.insertCategory(c)
+    fun insertCategory(@RequestBody categories: List<Category>){
+        for(c: Category in categories)
+            categoryService.insertCategory(c)
     }
 
+    /**
+     * Delete categories
+     */
+    @PostMapping("/delete")
+    fun deleteCategory(@RequestBody categories: List<Category>){
+        for(c: Category in categories)
+            categoryService.deleteCategory(c)
+    }
+
+    /**
+     * Update categories
+     */
+    @PostMapping("/update")
+    fun updateCategory(@RequestBody categories: List<Category>){
+        for(c: Category in categories)
+            categoryService.updateCategory(c)
+    }
 }

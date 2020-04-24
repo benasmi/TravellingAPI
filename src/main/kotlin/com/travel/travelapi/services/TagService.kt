@@ -17,6 +17,6 @@ interface TagService {
     @Delete("DELETE FROM TAG WHERE tagId=#{t.tagId}")
     fun deleteTag(@Param("t") t: Tag)
 
-    @Update("UPDATE CATEGORY SET name=#{t.tagId} WHERE categoryId=#{t.tagId}")
+    @Update("UPDATE TAG SET name=#{t.tagId} WHERE tagId=#{t.tagId}")
     fun updateTag(@Param("t") t: Tag)
 }

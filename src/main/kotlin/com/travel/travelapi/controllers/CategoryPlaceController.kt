@@ -35,4 +35,14 @@ class CategoryPlaceController(@Autowired private val categoryPlaceService: Categ
         }
     }
 
+    /**
+     * Map category to a place
+     */
+    @RequestMapping("/delete")
+    fun deleteCategory(@RequestBody categoryPlace: List<CategoryPlace>){
+        for(c: CategoryPlace in categoryPlace)
+            categoryPlaceService.deleteCategoryForPlace(c)
+
+    }
+
 }

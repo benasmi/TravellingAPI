@@ -20,5 +20,6 @@ interface CategoryPlaceService {
     fun insertCategoryForPlace(@Param("c") c: CategoryPlace)
 
     @Delete("DELETE FROM CATEGORY_PLACE WHERE fk_categoryId=#{c.fk_categoryId} AND fk_placeId=#{c.fk_placeId} ")
-    fun deleteTag(@Param("c") c: CategoryPlace)
+    fun deleteCategoryForPlace(@Param("c") c: CategoryPlace)
+
 }

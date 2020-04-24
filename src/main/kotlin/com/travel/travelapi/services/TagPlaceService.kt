@@ -21,5 +21,5 @@ interface TagPlaceService {
     fun insertTagForPlace(@Param("t") t: TagPlace)
 
     @Delete("DELETE FROM TAG_PLACE WHERE fk_tagId=#{t.tagId} AND fk_placeId=#{t.fk_placeId} ")
-    fun deleteTag(@Param("t") t: TagPlace)
+    fun deleteTagForPlace(@Param("t") t: TagPlace)
 }

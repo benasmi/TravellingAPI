@@ -1,7 +1,6 @@
 package com.travel.travelapi.services
 
 import com.travel.travelapi.models.Review
-import com.travel.travelapi.models.WorkingSchedule
 import org.apache.ibatis.annotations.Param
 import org.apache.ibatis.annotations.Select
 import org.springframework.stereotype.Repository

@@ -20,4 +20,5 @@ interface PhotoPlaceService {
     @Delete("DELETE FROM PHOTO_PLACE WHERE fk_photoId=#{p.fk_photoId}")
     fun deletePhotoFromPlace(@Param("p") p: PhotoPlace)
 
+    //todo: Think of photo indexing
 }
