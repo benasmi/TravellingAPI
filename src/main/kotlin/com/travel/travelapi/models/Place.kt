@@ -22,5 +22,7 @@ data class Place (val name: String? = null,
     var parking: List<Parking>? = null
     var reviews: List<Review>? = null
     var schedule: List<WorkingSchedule>? = null
+    var photos: List<Photo>? = null
+    var tags: List<Tag>? = null
 
 }

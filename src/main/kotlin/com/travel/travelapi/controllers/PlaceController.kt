@@ -13,7 +13,9 @@ class PlaceController(@Autowired private val service: PlaceService,
                       @Autowired private val categoryController: CategoryPlaceController,
                       @Autowired private val workingScheduleService: WorkingScheduleController,
                       @Autowired private val parkingService: ParkingController,
-                      @Autowired private val reviewService: ReviewController){
+                      @Autowired private val reviewService: ReviewController,
+                      @Autowired private val photoPlaceController: PhotoPlaceController,
+                      @Autowired private val tagPlaceController: TagPlaceController){
 
 
     /**
@@ -30,6 +32,8 @@ class PlaceController(@Autowired private val service: PlaceService,
                     value.parking = parkingService.getParkingLocationsById(value.placeId)
                     value.reviews = reviewService.getReviewsById(value.placeId)
                     value.schedule = workingScheduleService.getWorkingScheduleById(value.placeId)
+                    value.photos = photoPlaceController.getPhotosById(value.placeId)
+                    value.tags = tagPlaceController.getTagsById(value.placeId)
                 }
             }
         return places
