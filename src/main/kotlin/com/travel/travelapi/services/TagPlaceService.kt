@@ -20,6 +20,6 @@ interface TagPlaceService {
     @Insert("INSERT INTO TAG_PLACE (fk_tagId, fk_placeId) VALUES (#{t.fk_tagId}, #{t.fk_placeId})")
     fun insertTagForPlace(@Param("t") t: TagPlace)
 
-    @Delete("DELETE FROM TAG_PLACE WHERE fk_tagId=#{t.tagId} AND fk_placeId=#{t.fk_placeId} ")
+    @Delete("DELETE FROM TAG_PLACE WHERE fk_tagId=#{t.fk_tagId} AND fk_placeId=#{t.fk_placeId} ")
     fun deleteTagForPlace(@Param("t") t: TagPlace)
 }

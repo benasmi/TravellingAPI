@@ -1,22 +1,19 @@
 package com.travel.travelapi.services
 
-import com.travel.travelapi.models.Category
-import com.travel.travelapi.models.CategoryPlace
-import com.travel.travelapi.models.Parking
-import com.travel.travelapi.models.ParkingPlace
-import org.apache.ibatis.annotations.Delete
-import org.apache.ibatis.annotations.Insert
-import org.apache.ibatis.annotations.Param
-import org.apache.ibatis.annotations.Select
+import com.travel.travelapi.models.*
+import org.apache.ibatis.annotations.*
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ParkingPlaceService{
-    @Select("SELECT * FROM PARKING c WHERE c.parkingId IN \n" +
-            "   (SELECT cp.fk_parkingId FROM PARKING_PLACE cp WHERE cp.fk_placeId=#{id})")
+    @Select("SELECT DISTINCT p.* from PARKING p \n" +
+            "INNER JOIN PARKING_PLACE pp on p.parkingId = pp.fk_parkingId WHERE pp.fk_placeId=#{id} ORDER BY pp.priority ASC")
     fun selectByPlaceId(@Param("id") id: Int): List<Parking>
 
-    @Insert("INSERT INTO PARKING_PLACE (fk_parkingId, fk_placeId) VALUES (#{p.fk_parkingId}, #{p.fk_placeId})")
+    @Update("UPDATE PARKING_PLACE SET priority=#{p.priority} WHERE fk_parkingId=#{p.fk_parkingId} AND fk_placeId=#{p.fk_placeId}")
+    fun updateParkingIndexing(@Param("p") p: ParkingPlace)
+
+    @Insert("INSERT INTO PARKING_PLACE (fk_parkingId, fk_placeId, priority) VALUES (#{p.fk_parkingId}, #{p.fk_placeId}, #{p.priority})")
     fun insertParkingForPlace(@Param("p") p: ParkingPlace)
 
     @Delete("DELETE FROM PARKING_PLACE WHERE fk_placeId=#{p.fk_placeId} AND fk_parkingId=#{p.fk_parkingId} ")

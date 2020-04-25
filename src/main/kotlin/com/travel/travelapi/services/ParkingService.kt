@@ -7,16 +7,16 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ParkingService {
 
-    @Select("SELECT * FROM PARKING WHERE address LIKE #{p.address}")
-    fun getAllParkingInfo(): List<Parking>
+    @Select("SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10")
+    fun getAllParkingInfo(@Param("p") p: Parking): List<Parking>
 
-    @Insert("INSERT INTO PARKING (latitude, longitude, address, priority) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.priority})")
+    @Insert("INSERT INTO PARKING (latitude, longitude, address) VALUES (#{p.latitude},#{p.longitude}, #{p.address})")
     fun insertParking(@Param("p") p: Parking)
 
     @Delete("DELETE FROM PARKING WHERE parkingId=#{p.parkingId}")
     fun deleteParking(@Param("p") p: Parking)
 
-    @Update("UPDATE PARKING SET latitude=#{p.latitude}, longitude=#{p.longitude}, address=#{p.address}, priority=#{p.priority} WHERE parkingId=#{p.parkingId}")
+    @Update("UPDATE PARKING SET latitude=#{p.latitude}, longitude=#{p.longitude}, address=#{p.address} WHERE parkingId=#{p.parkingId}")
     fun updateParking(@Param("p") p: Parking)
 
 }

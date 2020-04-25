@@ -10,25 +10,24 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class ParkingController(@Autowired private val parkingService: ParkingService) {
 
+    /**
+     * Update parking
+     */
+    @PostMapping("/all")
+    fun insertParking(@RequestBody parking: Parking): List<Parking>{
+        return parkingService.getAllParkingInfo(parking)
+    }
 
     /**
      * Insert parking
      */
-    @RequestMapping("/insert")
+    @PostMapping("/insert")
     fun insertParkingForPlace(@RequestBody parking: List<Parking>){
         for(p: Parking in parking){
             parkingService.insertParking(p)
         }
     }
 
-    /**
-     * Update parking
-     */
-    @GetMapping("/all")
-    fun insertParking(@RequestBody parking: List<Parking>){
-        for(c: Parking in parking)
-            parkingService.getAllParkingInfo()
-    }
 
     /**
      * Delete parking

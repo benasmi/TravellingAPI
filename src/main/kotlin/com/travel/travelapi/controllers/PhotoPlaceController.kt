@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RequestMapping("/photo")
+@RequestMapping("/photoplace")
 @RestController
 class PhotoPlaceController (@Autowired private val photoPlaceService: PhotoPlaceService){
 
@@ -26,9 +26,30 @@ class PhotoPlaceController (@Autowired private val photoPlaceService: PhotoPlace
      * Map photo to a place
      */
     @RequestMapping("/insert")
-    fun insertTagForPlace(@RequestBody photos: List<PhotoPlace>){
+    fun insertPhotoForPlace(@RequestBody photos: List<PhotoPlace>){
         for(p: PhotoPlace in photos){
             photoPlaceService.insertPhotoForPlace(p)
         }
     }
+
+    /**
+     * Update photo priority
+     */
+    @RequestMapping("/update")
+    fun updatePhotoIndexesForPlace(@RequestBody photos: List<PhotoPlace>){
+        for(p: PhotoPlace in photos){
+            photoPlaceService.updatePhotoIndexing(p)
+        }
+    }
+
+    /**
+     * Delete photo from place
+     */
+    @RequestMapping("/delete")
+    fun deletePhotoFromPlace(@RequestBody photos: List<PhotoPlace>){
+        for(p: PhotoPlace in photos){
+            photoPlaceService.deletePhotoFromPlace(p)
+        }
+    }
+
 }
