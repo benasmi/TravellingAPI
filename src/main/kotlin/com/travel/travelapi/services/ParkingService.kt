@@ -11,6 +11,7 @@ interface ParkingService {
     fun getAllParkingInfo(@Param("p") p: Parking): List<Parking>
 
     @Insert("INSERT INTO PARKING (latitude, longitude, address) VALUES (#{p.latitude},#{p.longitude}, #{p.address})")
+    @Options(useGeneratedKeys = true, keyColumn = "parkingId", keyProperty = "parkingId")
     fun insertParking(@Param("p") p: Parking)
 
     @Delete("DELETE FROM PARKING WHERE parkingId=#{p.parkingId}")

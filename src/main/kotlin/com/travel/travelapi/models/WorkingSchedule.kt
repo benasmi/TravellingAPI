@@ -1,10 +1,6 @@
 package com.travel.travelapi.models
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.annotation.JsonView
-import com.travel.travelapi.TestView
 import java.sql.Time
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

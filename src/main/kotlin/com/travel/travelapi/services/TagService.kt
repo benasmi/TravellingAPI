@@ -12,6 +12,7 @@ interface TagService {
     fun selectAllTags(): List<Tag>
 
     @Insert("INSERT INTO TAG (name) VALUES (#{t.name})")
+    @Options(useGeneratedKeys = true, keyProperty = "tagId", keyColumn = "tagId")
     fun insertTag(@Param("t") t: Tag)
 
     @Delete("DELETE FROM TAG WHERE tagId=#{t.tagId}")

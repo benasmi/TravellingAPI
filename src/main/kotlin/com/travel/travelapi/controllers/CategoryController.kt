@@ -5,6 +5,7 @@ import com.travel.travelapi.services.CategoryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 @RestController
@@ -24,11 +25,14 @@ class CategoryController(@Autowired private val categoryService: CategoryService
      * Insert category
      */
     @PostMapping("/insert")
-    fun insertCategory(@RequestBody categories: List<Category>){
-        for(c: Category in categories)
+    fun insertCategory(@RequestBody categories: List<Category>): List<Int>{
+        val inserted: ArrayList<Int> = ArrayList()
+        for(c: Category in categories){
             categoryService.insertCategory(c)
+            inserted.add(c.categoryId!!)
+        }
+        return inserted
     }
-
     /**
      * Delete categories
      */

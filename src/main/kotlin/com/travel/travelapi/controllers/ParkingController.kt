@@ -14,7 +14,7 @@ class ParkingController(@Autowired private val parkingService: ParkingService) {
      * Update parking
      */
     @PostMapping("/all")
-    fun insertParking(@RequestBody parking: Parking): List<Parking>{
+    fun getParking(@RequestBody parking: Parking): List<Parking>{
         return parkingService.getAllParkingInfo(parking)
     }
 
@@ -22,10 +22,13 @@ class ParkingController(@Autowired private val parkingService: ParkingService) {
      * Insert parking
      */
     @PostMapping("/insert")
-    fun insertParkingForPlace(@RequestBody parking: List<Parking>){
+    fun insertParkingForPlace(@RequestBody parking: List<Parking>): List<Int>{
+        val inserted = ArrayList<Int>()
         for(p: Parking in parking){
             parkingService.insertParking(p)
+            inserted.add(p.parkingId!!)
         }
+        return inserted
     }
 
 

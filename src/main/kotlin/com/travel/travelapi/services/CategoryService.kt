@@ -10,8 +10,9 @@ interface CategoryService {
     @Select("SELECT * FROM CATEGORY")
     fun selectAllCategories(): List<Category>
 
-    @Insert("INSERT INTO CATEGORY (name) VALUES (#{c.name})")
-    fun insertCategory(@Param("c") c: Category)
+    @Insert("INSERT INTO CATEGORY (name) VALUES (#{c.name});")
+    @Options(useGeneratedKeys = true, keyProperty = "categoryId", keyColumn = "categoryId")
+    fun insertCategory(@Param("c") c: Category): Int
 
     @Delete("DELETE FROM CATEGORY WHERE categoryId=#{c.categoryId}")
     fun deleteCategory(@Param("c") c: Category)

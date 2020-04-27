@@ -1,15 +1,13 @@
 package com.travel.travelapi.controllers
 
-import com.travel.travelapi.models.Category
-import com.travel.travelapi.models.CategoryPlace
-import com.travel.travelapi.models.Place
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/place")
-class PlaceController(@Autowired private val service: PlaceService,
+class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val categoryController: CategoryPlaceController,
                       @Autowired private val workingScheduleService: WorkingScheduleController,
                       @Autowired private val parkingPlaceController: ParkingPlaceController,
@@ -24,8 +22,8 @@ class PlaceController(@Autowired private val service: PlaceService,
      *
      */
     @GetMapping("/all")
-    fun parking(@RequestParam full: Boolean = false): List<Place> {
-        val places: List<Place> = service.selectAll()
+    fun getPlaces(@RequestParam full: Boolean = false): List<Place> {
+        val places: List<Place> = placeService.selectAll()
             if(full){
                 for (value: Place in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
@@ -37,5 +35,18 @@ class PlaceController(@Autowired private val service: PlaceService,
                 }
             }
         return places
+    }
+
+    /**
+     *
+     */
+    @PostMapping("/insert")
+    fun insertPlaces(@RequestBody places: List<Place>): List<Int>{
+        val inserted = ArrayList<Int>()
+        for(p: Place in places){
+            placeService.insertPlace(p)
+            inserted.add(p.placeId!!)
+        }
+        return inserted
     }
 }

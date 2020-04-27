@@ -22,10 +22,13 @@ class TagController(@Autowired private val tagService: TagService) {
      * Insert tags
      */
     @PostMapping("/insert")
-    fun insertTag(@RequestBody tags: List<Tag>){
-        for(t: Tag in tags)
+    fun insertTag(@RequestBody tags: List<Tag>): List<Int>{
+        val inserted = ArrayList<Int>()
+        for(t: Tag in tags){
             tagService.insertTag(t)
-
+            inserted.add(t.tagId!!)
+        }
+        return inserted
     }
 
     /**

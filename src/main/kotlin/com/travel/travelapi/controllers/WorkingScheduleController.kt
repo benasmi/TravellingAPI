@@ -1,7 +1,5 @@
 package com.travel.travelapi.controllers
 
-import com.fasterxml.jackson.annotation.JsonView
-import com.travel.travelapi.TestView
 import com.travel.travelapi.models.WorkingSchedule
 import com.travel.travelapi.services.WorkingScheduleService
 import org.springframework.beans.factory.annotation.Autowired
