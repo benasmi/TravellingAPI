@@ -1,7 +1,13 @@
 package com.travel.travelapi.services
 
 import com.travel.travelapi.models.Place
+
 import org.apache.ibatis.annotations.*
+
+import com.travel.travelapi.models.PlaceLocal
+import org.apache.ibatis.annotations.Mapper
+import org.apache.ibatis.annotations.Select
+
 import org.springframework.stereotype.Repository
 import org.springframework.stereotype.Service
 
@@ -9,14 +15,10 @@ import org.springframework.stereotype.Service
 interface PlaceService {
 
     @Select("SELECT * from PLACE")
-    fun selectAll(): List<Place>
+    fun selectAll(): List<PlaceLocal>
 
     @Insert("INSERT INTO PLACE (description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website)" +
             "VALUES (#{description}, #{averageTimeSpent}, #{latitude}, #{longitude}, #{address}, #{country}, #{city}, #{phoneNumber}, #{website)}")
     @Options(useGeneratedKeys = true, keyProperty = "placeId", keyColumn = "placeId")
-    fun insertPlace(@Param("p") p: Place)
-
-
-
-
+    fun insertPlace(@Param("p") p: PlaceLocal)
 }

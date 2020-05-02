@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/parking")
 @RestController
-class ParkingController(@Autowired private val parkingService: ParkingService) {
+class
+
+ParkingController(@Autowired private val parkingService: ParkingService) {
 
     /**
      * Update parking
