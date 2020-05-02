@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class ParkingController(@Autowired private val parkingService: ParkingService) {
+class
+
+ParkingController(@Autowired private val parkingService: ParkingService) {
 
     /**
      * @param placeId of a place

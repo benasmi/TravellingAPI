@@ -3,6 +3,7 @@ package com.travel.travelapi.controllers
 import com.travel.travelapi.models.Category
 import com.travel.travelapi.models.CategoryPlace
 import com.travel.travelapi.models.Place
+import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -24,10 +25,10 @@ class PlaceController(@Autowired private val service: PlaceService,
      *
      */
     @GetMapping("/all")
-    fun parking(@RequestParam full: Boolean = false): List<Place> {
-        val places: List<Place> = service.selectAll()
+    fun parking(@RequestParam full: Boolean = false): List<PlaceLocal> {
+        val places: List<PlaceLocal> = service.selectAll()
             if(full){
-                for (value: Place in places) {
+                for (value: PlaceLocal in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
                     value.parking = parkingService.getParkingLocationsById(value.placeId)
                     value.reviews = reviewService.getReviewsById(value.placeId)
