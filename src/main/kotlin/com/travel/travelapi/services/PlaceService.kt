@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service
 @Repository
 interface PlaceService {
 
-    @Select("SELECT * from PLACE")
-    fun selectAll(): List<PlaceLocal>
+    @Select("SELECT * from PLACE WHERE placeId IN (#{ids})")
+    fun selectAll(@Param("ids") ids: String): List<PlaceLocal>
 
     @Insert("INSERT INTO PLACE (description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website)" +
             "VALUES (#{description}, #{averageTimeSpent}, #{latitude}, #{longitude}, #{address}, #{country}, #{city}, #{phoneNumber}, #{website)}")
