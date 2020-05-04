@@ -13,12 +13,6 @@ class SphinxService{
      *
      */
     fun searchPlacesByKeyword(keyword: String):List<String>{
-        val ids = ArrayList<String>()
-        SphinxQL.executeQuery("SELECT * FROM places WHERE MATCH ('${keyword}')")?.let {
-            while (it.next()) {
-                ids.add(it.getString(1))
-            }
-        }
-        return ids
+        return  SphinxQL.executeQuery("SELECT * FROM places WHERE MATCH ('${keyword}')")
     }
 }
