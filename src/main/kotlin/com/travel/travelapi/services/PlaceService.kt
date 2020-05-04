@@ -20,7 +20,10 @@ interface PlaceService {
             " #{item}" +
             "</foreach>" +
             "</script>")
-    fun selectAll(@Param("ids") ids: List<String>): Page<PlaceLocal>
+    fun search(@Param("ids") ids: List<String>): Page<PlaceLocal>
+
+    @Select("SELECT * FROM PLACE")
+    fun selectAll(): Page<PlaceLocal>
 
 
     @Insert("INSERT INTO PLACE (description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website)" +
