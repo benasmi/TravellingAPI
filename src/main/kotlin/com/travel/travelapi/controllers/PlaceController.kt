@@ -41,8 +41,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                   @RequestParam(required = false, defaultValue = "10") s: Int): PageInfo<PlaceLocal> {
         val ids = sphinxService.searchPlacesByKeyword(keyword)
         PageHelper.startPage<PlaceLocal>(p,s)
-        //val t = ids.joinToString(",").
-        val places: Page<PlaceLocal> = placeService.selectAll(ids.joinToString(","))
+        val places: Page<PlaceLocal> = placeService.selectAll(ids)
             if(full){
                 for (value: PlaceLocal in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
