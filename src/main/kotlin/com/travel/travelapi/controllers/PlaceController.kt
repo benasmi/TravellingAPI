@@ -46,10 +46,10 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             places = placeService.selectAll()
         }else{
             val ids = sphinxService.searchPlacesByKeyword(keyword)
-            places = placeService.search(ids)
+            places = if(ids.isNotEmpty())
+                placeService.search(ids)
+            else Page<PlaceLocal>()
         }
-
-
             if(full){
                 for (value: PlaceLocal in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
