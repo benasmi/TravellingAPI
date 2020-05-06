@@ -36,12 +36,20 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      */
     @GetMapping("/search")
     fun getPlaces(@RequestParam(required = false) full: Boolean = false,
-                  @RequestParam(required = true) keyword: String,
+                  @RequestParam(required = true, defaultValue = "") keyword: String,
                   @RequestParam(required = false, defaultValue = "1") p: Int,
                   @RequestParam(required = false, defaultValue = "10") s: Int): PageInfo<PlaceLocal> {
-        val ids = sphinxService.searchPlacesByKeyword(keyword)
-        PageHelper.startPage<PlaceLocal>(p,s)
-        val places: Page<PlaceLocal> = placeService.search(ids)
+
+        val places: Page<PlaceLocal>
+        PageHelper.startPage<PlaceLocal>(p, s)
+        if(keyword == ""){
+            places = placeService.selectAll()
+        }else{
+            val ids = sphinxService.searchPlacesByKeyword(keyword)
+            places = placeService.search(ids)
+        }
+
+
             if(full){
                 for (value: PlaceLocal in places) {
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
@@ -56,25 +64,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return PageInfo(places)
     }
 
-    @RequestMapping("/all")
-    fun getAllPlaces(@RequestParam(required = false) full: Boolean = false,
-                  @RequestParam(required = false, defaultValue = "1") p: Int,
-                  @RequestParam(required = false, defaultValue = "10") s: Int): PageInfo<PlaceLocal> {
-        PageHelper.startPage<PlaceLocal>(p,s)
-        val places: Page<PlaceLocal> = placeService.selectAll()
-        if(full){
-            for (value: PlaceLocal in places) {
-                value.categories = categoryController.getCategoriesById(value.placeId!!)
-                value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
-                value.reviews = reviewService.getReviewsById(value.placeId)
-                value.schedule = workingScheduleService.getWorkingScheduleById(value.placeId)
-                value.photos = photoPlaceController.getPhotosById(value.placeId)
-                value.tags = tagPlaceController.getTagsById(value.placeId)
-            }
-        }
-
-        return PageInfo(places)
-    }
 
 
 
