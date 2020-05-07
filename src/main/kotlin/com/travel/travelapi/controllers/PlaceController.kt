@@ -7,10 +7,7 @@ import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.services.PlaceService
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 
 @RestController
@@ -35,6 +32,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
     @GetMapping("/search")
+    @CrossOrigin(origins = ["http://localhost:3000"])
     fun getPlaces(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(required = true, defaultValue = "") keyword: String,
                   @RequestParam(required = false, defaultValue = "1") p: Int,
