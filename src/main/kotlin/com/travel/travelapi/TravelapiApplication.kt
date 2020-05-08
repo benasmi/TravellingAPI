@@ -2,13 +2,11 @@ package com.travel.travelapi
 
 import org.mybatis.spring.annotation.MapperScan
 import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.jdbc.DataSourceBuilder
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.Primary
-import javax.sql.DataSource
+import org.springframework.web.reactive.config.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @MapperScan("com.travel.travelapi.services")
@@ -19,5 +17,5 @@ class TravelapiApplication
 fun main(args: Array<String>) {
 	runApplication<TravelapiApplication>(*args)
 
-
 }
+
