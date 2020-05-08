@@ -13,6 +13,7 @@ class TagController(@Autowired private val tagService: TagService) {
     /**
      * Get all tags
      */
+    @CrossOrigin(origins = ["http://localhost:3000"])
     @GetMapping("/all")
     fun getAllTags(): List<Tag>{
         return tagService.selectAllTags()
