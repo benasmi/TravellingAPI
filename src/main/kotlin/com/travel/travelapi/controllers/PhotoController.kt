@@ -40,7 +40,7 @@ class PhotoController(
 
     fun saveImageFile(image: MultipartFile): String{
         val extension = image.originalFilename!!.substring(image.originalFilename!!.lastIndexOf(".") + 1)
-        val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp")
+        val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
         if(!allowedExtensions.contains(extension))
             throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
         val generatedName = generateUniqueFileName() + '.' + extension
