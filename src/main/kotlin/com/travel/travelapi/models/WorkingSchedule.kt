@@ -7,5 +7,4 @@ import java.sql.Time
 data class WorkingSchedule(val fk_placeId: Int?=null,
                            val dayOfWeek: Int? = null,
                            val openTime: Time? = null,
-                           val closeTime: Time? = null,
-                           val isClosed: Boolean? = null)
+                           val closeTime: Time? = null)
