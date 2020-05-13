@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface WorkingScheduleService {
-    @Select("SELECT dayOfWeek,openTime,closeTime,isClosed FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}")
+    @Select("SELECT dayOfWeek,openTime,closeTime FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}")
     fun selectWorkingScheduleById(@Param("id") id: Int): List<WorkingSchedule>
 
     @Insert("INSERT INTO WORKING_SCHEDULE (fk_placeId, dayOfWeek,openTime,closeTime,isClosed) VALUES (#{ws.fk_placeId}, #{ws.dayOfWeek},#{ws.openTime}, #{ws.closeTime}, #{ws.isClosed})")
