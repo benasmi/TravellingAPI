@@ -1,11 +1,23 @@
 package com.travel.travelapi.services
 
+import com.github.pagehelper.Page
 import com.travel.travelapi.models.Parking
+import com.travel.travelapi.models.PlaceLocal
 import org.apache.ibatis.annotations.*
 import org.springframework.stereotype.Repository
 
 @Repository
 interface ParkingService {
+
+
+    @Select("<script>" +
+            "SELECT * FROM PARKING WHERE parkingId IN " +
+            "<foreach item='item' index='index' collection='ids'" +
+            " open='(' separator=',' close=')'>" +
+            " #{item}" +
+            "</foreach>" +
+            "</script>")
+    fun search(@Param("ids") ids: List<String>): List<Parking>
 
     @Select("SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10")
     fun getAllParkingInfo(@Param("p") p: Parking): List<Parking>

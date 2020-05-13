@@ -32,7 +32,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
     @GetMapping("/search")
-    @CrossOrigin(origins = ["http://localhost:3000"])
     fun getPlaces(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(required = true, defaultValue = "") keyword: String,
                   @RequestParam(required = false, defaultValue = "1") p: Int,

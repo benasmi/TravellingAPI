@@ -3,6 +3,8 @@ package com.travel.travelapi.controllers
 import com.travel.travelapi.models.Category
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.services.ParkingService
+import com.travel.travelapi.sphinx.SphinxQL
+import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
@@ -11,7 +13,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class
 
-ParkingController(@Autowired private val parkingService: ParkingService) {
+ParkingController(@Autowired private val parkingService: ParkingService,
+                  @Autowired private val sphinxService: SphinxService) {
 
     /**
      * Update parking
@@ -25,15 +28,15 @@ ParkingController(@Autowired private val parkingService: ParkingService) {
      * Insert parking
      */
     @PostMapping("/insert")
-    fun insertParkingForPlace(@RequestBody parking: List<Parking>): List<Int>{
-        val inserted = ArrayList<Int>()
+    fun insertParkingForPlace(@RequestBody parking: List<Parking>): List<Parking>{
+        //val inserted = ArrayList<Int>()
         for(p: Parking in parking){
             parkingService.insertParking(p)
-            inserted.add(p.parkingId!!)
+            //inserted.add(p.parkingId!!)
         }
-        return inserted
+        //return inserted
+        return parking
     }
-
 
     /**
      * Delete parking
@@ -51,6 +54,13 @@ ParkingController(@Autowired private val parkingService: ParkingService) {
     fun updateCategory(@RequestBody parking: List<Parking>){
         for(c: Parking in parking)
             parkingService.updateParking(c)
+    }
+
+    @GetMapping("/search")
+    fun getNearestParkingByLatLng(@RequestParam lat: Double, @RequestParam lng: Double):List<Parking>{
+        val ids: List<String> = sphinxService.searchParkingByLatLng(lat,lng)
+
+        return if(ids.isEmpty()) ArrayList() else parkingService.search(ids)
     }
 
 }
