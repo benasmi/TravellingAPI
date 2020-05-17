@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-class PlaceApi(val apiPlaceId: String? = null,
+class PlaceApi(val placeId: String? = null,
                val apiTypeId: Int? = null,
                name: String? = null,
                description: String? = null,
@@ -15,7 +15,8 @@ class PlaceApi(val apiPlaceId: String? = null,
                country: String? = null,
                city: String? = null,
                phoneNumber: String? = null,
-               website: String? = null): Place(name, description, averageTimeSpent, latitude, longitude, address ,country, city, phoneNumber, website){
+               website: String? = null,
+                overallStarRating: Double? = null): Place(name, description, averageTimeSpent, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating){
 
     fun merge(place: PlaceApi){
         description = place.description ?: description
