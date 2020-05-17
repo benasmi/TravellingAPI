@@ -65,7 +65,7 @@ class FacebookPlaceDeserializer: JsonDeserializer<SearchApiResponseObject>() {
                     val closeTimeItem = workingDays.find{value -> value.get("key").asText() == (apiDaysOfWeek[i] + "_1_" + "close") }
 
                     if(openTimeItem != null && closeTimeItem != null){
-                        val dayOfWeek = WorkingSchedule(null, i, Time.valueOf(openTimeItem.get("value").asText()!! + ":00"), Time.valueOf(closeTimeItem.get("value").asText()!! + ":00"))
+                        val dayOfWeek = WorkingSchedule(null, i, openTimeItem.get("value").asText()!!, closeTimeItem.get("value").asText()!!, false)
                         schedule.add(dayOfWeek)
                     }
                 }

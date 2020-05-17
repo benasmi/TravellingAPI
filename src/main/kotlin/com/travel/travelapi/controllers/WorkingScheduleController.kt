@@ -3,10 +3,7 @@ package com.travel.travelapi.controllers
 import com.travel.travelapi.models.WorkingSchedule
 import com.travel.travelapi.services.WorkingScheduleService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/ws")
 @RestController
@@ -35,11 +32,12 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
      * Update working schedule for a place
      */
     @RequestMapping("/update")
-    fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>){
+    fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>, @RequestParam(name = "p") id: Int){
+        workingScheduleService.deleteSchedule(id)
         for(ws: WorkingSchedule in workingSchedules){
-            workingScheduleService.updateWorkingSchedule(ws)
+            ws.fk_placeId = id
+            workingScheduleService.insertWorkingScheduleForPlace(ws)
         }
     }
-
 
 }

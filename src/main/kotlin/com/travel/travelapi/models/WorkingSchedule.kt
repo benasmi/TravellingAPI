@@ -6,5 +6,6 @@ import java.sql.Time
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class WorkingSchedule(var fk_placeId: Int? = null,
                            var dayOfWeek: Int? = null,
-                           var openTime: Time? = null,
-                           var closeTime: Time? = null)
+                           var openTime: String? = null,
+                           var closeTime: String? = null,
+                           var isClosed: Boolean? = null)

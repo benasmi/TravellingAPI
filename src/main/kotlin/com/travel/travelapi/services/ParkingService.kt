@@ -22,7 +22,7 @@ interface ParkingService {
     @Select("SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10")
     fun getAllParkingInfo(@Param("p") p: Parking): List<Parking>
 
-    @Insert("INSERT INTO PARKING (latitude, longitude, address) VALUES (#{p.latitude},#{p.longitude}, #{p.address})")
+    @Insert("INSERT INTO PARKING (latitude, longitude, address, city, country) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.city}, #{p.country})")
     @Options(useGeneratedKeys = true, keyColumn = "parkingId", keyProperty = "parkingId")
     fun insertParking(@Param("p") p: Parking)
 
