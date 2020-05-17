@@ -21,4 +21,8 @@ interface CategoryPlaceService {
 
     @Delete("DELETE FROM CATEGORY_PLACE WHERE fk_categoryId=#{c.fk_categoryId} AND fk_placeId=#{c.fk_placeId} ")
     fun deleteCategoryForPlace(@Param("c") c: CategoryPlace)
+
+    @Delete("DELETE FROM CATEGORY_PLACE WHERE fk_placeId=#{id}")
+    fun deleteCategoryForPlaceById(@Param("id") id: Int)
+
 }

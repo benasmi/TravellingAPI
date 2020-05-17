@@ -1,13 +1,11 @@
 package com.travel.travelapi.controllers
 
-import com.travel.travelapi.models.CategoryPlace
-import com.travel.travelapi.models.Parking
-import com.travel.travelapi.models.ParkingPlace
-import com.travel.travelapi.models.PhotoPlace
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.ParkingPlaceService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/parkingplace")
@@ -32,15 +30,6 @@ class ParkingPlaceController(@Autowired private val parkingPlaceService: Parking
     }
 
     /**
-     * Update parking priority
-     */
-    @RequestMapping("/update")
-    fun updatePhotoIndexesForPlace(@RequestBody parkingInfo: List<ParkingPlace>){
-        for(p: ParkingPlace in parkingInfo)
-            parkingPlaceService.updateParkingIndexing(p)
-    }
-
-    /**
      * Delete parking from place
      */
     @RequestMapping("/delete")
@@ -48,6 +37,20 @@ class ParkingPlaceController(@Autowired private val parkingPlaceService: Parking
         for(p: ParkingPlace in parkingInfo)
             parkingPlaceService.deleteCategoryForPlace(p)
 
+    }
+
+    /**
+     * Update place parking
+     */
+    @RequestMapping("/update")
+    fun updateParkingForPlace(@RequestBody parkingPlaces: List<Parking>, @RequestParam(name="p") id: Int){
+        parkingPlaceService.deleteParkingForPlaceById(id)
+
+        val parking = ArrayList<ParkingPlace>()
+        parkingPlaces.forEachIndexed { index, p ->
+            parking.add(ParkingPlace(id, p.parkingId, index))
+        }
+        insertParking(parking)
     }
 
 }

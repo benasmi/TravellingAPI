@@ -4,10 +4,7 @@ import com.travel.travelapi.models.Tag
 import com.travel.travelapi.models.TagPlace
 import com.travel.travelapi.services.TagPlaceService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/tagsplace")
@@ -30,10 +27,26 @@ class TagPlaceController (@Autowired private val tagPlaceService: TagPlaceServic
             tagPlaceService.insertTagForPlace(t)
     }
 
+    /**
+     * Update place tags
+     */
+    @RequestMapping("/update")
+    fun updateTagForPlace(@RequestBody tagPlaces: List<Tag>, @RequestParam(name="p") id: Int){
+        tagPlaceService.deleteTagForPlaceById(id)
+
+        val tags = ArrayList<TagPlace>()
+        for(t: Tag in tagPlaces)
+            tags.add(TagPlace(t.tagId,id))
+
+        insertTagForPlace(tags)
+
+    }
+
     @PostMapping("/delete")
     fun deleteTagForPlace(@RequestBody tagPlaces: List<TagPlace>){
         for(t: TagPlace in tagPlaces)
             tagPlaceService.deleteTagForPlace(t)
     }
+
 
 }

@@ -18,4 +18,8 @@ interface ParkingPlaceService{
 
     @Delete("DELETE FROM PARKING_PLACE WHERE fk_placeId=#{p.fk_placeId} AND fk_parkingId=#{p.fk_parkingId} ")
     fun deleteCategoryForPlace(@Param("p") p: ParkingPlace)
+
+    @Delete("DELETE FROM PARKING_PLACE WHERE fk_placeId=#{id}")
+    fun deleteParkingForPlaceById(@Param("id") id: Int)
+
 }

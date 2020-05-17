@@ -61,7 +61,41 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return PageInfo(places)
     }
 
+    @PostMapping("/update")
+    fun updatePlace(@RequestBody p: PlaceLocal){
+        placeService.updatePlace(p)
+    }
 
+    /**
+     * @return place by id
+     * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info
+     * @param keyword of a place
+     * @param p is page number
+     * @param s is page size
+     *
+     * If @param p and @param s are not present, default values are p=1 and s=10
+     */
+    @GetMapping("/getplace")
+    fun getPlaceById(@RequestParam(required = false) full: Boolean = false,
+                  @RequestParam(name="p") id: Int): PlaceLocal {
 
+        val place = placeService.selectById(id)
+        if(full){
+            place.categories = categoryController.getCategoriesById(id)
+            place.parking = parkingPlaceController.getParkingLocationsById(id)
+            place.reviews = reviewService.getReviewsById(id)
+            place.schedule = workingScheduleService.getWorkingScheduleById(id)
+            place.photos = photoPlaceController.getPhotosById(id)
+            place.tags = tagPlaceController.getTagsById(id)
+        }
+
+        return place
+    }
+
+    @PostMapping("/insert")
+    fun insertPlace(@RequestBody p: PlaceLocal): Int{
+        placeService.insertPlace(p)
+        return p.placeId!!;
+    }
 
 }

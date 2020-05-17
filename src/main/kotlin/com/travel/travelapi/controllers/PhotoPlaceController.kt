@@ -1,13 +1,11 @@
 package com.travel.travelapi.controllers
 
-import com.travel.travelapi.models.Category
-import com.travel.travelapi.models.Photo
-import com.travel.travelapi.models.PhotoPlace
-import com.travel.travelapi.models.TagPlace
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.PhotoPlaceService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RequestMapping("/photoplace")
@@ -33,16 +31,6 @@ class PhotoPlaceController (@Autowired private val photoPlaceService: PhotoPlace
     }
 
     /**
-     * Update photo priority
-     */
-    @RequestMapping("/update")
-    fun updatePhotoIndexesForPlace(@RequestBody photos: List<PhotoPlace>){
-        for(p: PhotoPlace in photos){
-            photoPlaceService.updatePhotoIndexing(p)
-        }
-    }
-
-    /**
      * Delete photo from place
      */
     @RequestMapping("/delete")
@@ -50,6 +38,21 @@ class PhotoPlaceController (@Autowired private val photoPlaceService: PhotoPlace
         for(p: PhotoPlace in photos){
             photoPlaceService.deletePhotoFromPlace(p)
         }
+    }
+
+    /**
+     * Update place categories
+     */
+    @RequestMapping("/update")
+    fun updateTagForPlace(@RequestBody photoPlaces: List<Photo>, @RequestParam(name="p") id: Int){
+        photoPlaceService.deletePhotoForPlaceById(id)
+
+        val photos = ArrayList<PhotoPlace>()
+        photoPlaces.forEachIndexed { index, p ->
+            photos.add(PhotoPlace(p.photoId,id,index))
+        }
+
+        insertPhotoForPlace(photos)
     }
 
 }
