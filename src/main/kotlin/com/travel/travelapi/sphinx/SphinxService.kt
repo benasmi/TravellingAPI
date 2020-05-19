@@ -22,7 +22,7 @@ class SphinxService{
      * @return list of ids that match keyword(-s)
      *
      */
-    fun searchParkingByLatLng(lat: Double, lng: Double):List<String>{
+    fun searchParkingSphinx(lat: Double, lng: Double):List<String>{
         val latToRad = Math.toRadians(lat)
         val lngToRad = Math.toRadians(lng)
         return  SphinxQL.executeQuery("SELECT *, GEODIST(${latToRad}, ${lngToRad}, latitude, longitude) as distance FROM parking WHERE distance < 10000 ORDER BY distance ASC LIMIT 0,100;")

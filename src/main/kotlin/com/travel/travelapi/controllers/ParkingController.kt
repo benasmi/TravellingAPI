@@ -1,12 +1,9 @@
 package com.travel.travelapi.controllers
 
-import com.travel.travelapi.models.Category
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.services.ParkingService
-import com.travel.travelapi.sphinx.SphinxQL
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/parking")
@@ -56,11 +53,17 @@ ParkingController(@Autowired private val parkingService: ParkingService,
             parkingService.updateParking(c)
     }
 
+    //Searches with sphinx
     @GetMapping("/search")
     fun getNearestParkingByLatLng(@RequestParam lat: Double, @RequestParam lng: Double):List<Parking>{
-        val ids: List<String> = sphinxService.searchParkingByLatLng(lat,lng)
+        val ids: List<String> = sphinxService.searchParkingSphinx(lat,lng)
 
         return if(ids.isEmpty()) ArrayList() else parkingService.search(ids)
     }
 
+    @GetMapping("/searchAdmin")
+    fun searchAdmin(@RequestParam lat: Double, @RequestParam lng: Double):List<Parking> {
+
+        return parkingService.searchParking(lat, lng)
+    }
 }

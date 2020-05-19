@@ -32,4 +32,11 @@ interface ParkingService {
     @Update("UPDATE PARKING SET latitude=#{p.latitude}, longitude=#{p.longitude}, address=#{p.address} WHERE parkingId=#{p.parkingId}")
     fun updateParking(@Param("p") p: Parking)
 
+    @Select("SELECT *, ( 6371 * acos( cos( radians(#{latitude}) ) * cos( radians( latitude ) ) " +
+            "* cos( radians( longitude ) - radians(#{longitude}) ) + sin( radians(#{latitude}) ) * sin(radians(latitude)) ) ) AS distance " +
+            "FROM PARKING " +
+            "HAVING distance < 10 " +
+            "ORDER BY distance ")
+    fun searchParking(@Param("latitude") latitude: Double, @Param("longitude") longitude: Double): List<Parking>
+
 }
