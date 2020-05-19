@@ -61,6 +61,42 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return PageInfo(places)
     }
 
+    /**
+     * @return all places that match given query for admin
+     * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info
+     * @param keyword of a place
+     * @param p is page number
+     * @param s is page size
+     *
+     * If @param p and @param s are not present, default values are p=1 and s=10
+     */
+    @GetMapping("/searchadmin")
+    fun getPlacesAdmin(@RequestParam(required = false) full: Boolean = false,
+                  @RequestParam(required = true, defaultValue = "") keyword: String,
+                  @RequestParam(required = false, defaultValue = "1") p: Int,
+                  @RequestParam(required = false, defaultValue = "10") s: Int): PageInfo<PlaceLocal> {
+
+        val places: Page<PlaceLocal>
+        PageHelper.startPage<PlaceLocal>(p, s)
+        if(keyword == ""){
+            places = placeService.selectAll()
+        }else{
+            places = placeService.selectAllAdmin(keyword)
+        }
+        if(full){
+            for (value: PlaceLocal in places) {
+                value.categories = categoryController.getCategoriesById(value.placeId!!)
+                value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
+                value.reviews = reviewService.getReviewsById(value.placeId)
+                value.schedule = workingScheduleService.getWorkingScheduleById(value.placeId)
+                value.photos = photoPlaceController.getPhotosById(value.placeId)
+                value.tags = tagPlaceController.getTagsById(value.placeId)
+            }
+        }
+
+        return PageInfo(places)
+    }
+
     @PostMapping("/update")
     fun updatePlace(@RequestBody p: PlaceLocal){
         placeService.updatePlace(p)
