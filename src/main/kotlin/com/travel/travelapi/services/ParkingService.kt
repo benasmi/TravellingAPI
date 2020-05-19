@@ -36,7 +36,7 @@ interface ParkingService {
             "* cos( radians( longitude ) - radians(#{longitude}) ) + sin( radians(#{latitude}) ) * sin(radians(latitude)) ) ) AS distance " +
             "FROM PARKING " +
             "HAVING distance < 10 " +
-            "ORDER BY distance ")
+            "ORDER BY distance LIMIT 10")
     fun searchParking(@Param("latitude") latitude: Double, @Param("longitude") longitude: Double): List<Parking>
 
 }
