@@ -128,6 +128,11 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return place
     }
 
+    @GetMapping("/delete")
+    fun deletePlace(@RequestParam("p") id: Int){
+        placeService.deletePlace(id)
+    }
+
     @PostMapping("/insert")
     fun insertPlace(@RequestBody p: PlaceLocal): Int{
         placeService.insertPlace(p)

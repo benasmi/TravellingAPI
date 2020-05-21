@@ -10,7 +10,6 @@ interface TagService {
 
     fun selectAllTags(): List<Tag>
 
-
     fun insertTag(@Param("t") t: Tag)
 
     fun deleteTag(@Param("t") t: Tag)

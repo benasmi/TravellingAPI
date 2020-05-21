@@ -24,4 +24,6 @@ interface PlaceService {
     fun updatePlace(@Param("p") p: PlaceLocal)
 
     fun insertPlace(@Param("p") p: PlaceLocal)
+
+    fun deletePlace(@Param("id") id: Int)
 }
