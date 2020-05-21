@@ -36,11 +36,14 @@ interface PlaceService {
 
     @Update("UPDATE PLACE SET name=#{p.name}, description=#{p.description}," +
             " city=#{p.city}, country=#{p.country}, latitude=#{p.latitude}, longitude=#{p.longitude}, address=#{p.address}," +
-            " phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublished=#{p.isPublished} WHERE placeId=#{p.placeId}")
+            " phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublic=#{p.isPublic}, isVerified=#{p.isVerified} WHERE placeId=#{p.placeId}")
     fun updatePlace(@Param("p") p: PlaceLocal)
 
-    @Insert("INSERT INTO PLACE (name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isPublished)" +
-            "VALUES (#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isPublished})")
+    @Insert("INSERT INTO PLACE (name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule)" +
+            "VALUES (#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule})")
     @Options(useGeneratedKeys = true, keyProperty = "placeId", keyColumn = "placeId")
     fun insertPlace(@Param("p") p: PlaceLocal)
+
+    @Delete("DELETE FROM PLACE WHERE placeId=#{id}")
+    fun deletePlace(@Param("id") id: Int)
 }
