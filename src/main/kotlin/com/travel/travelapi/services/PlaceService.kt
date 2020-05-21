@@ -39,8 +39,8 @@ interface PlaceService {
             " phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublic=#{p.isPublic}, isVerified=#{p.isVerified} WHERE placeId=#{p.placeId}")
     fun updatePlace(@Param("p") p: PlaceLocal)
 
-    @Insert("INSERT INTO PLACE (name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule)" +
-            "VALUES (#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule})")
+    @Insert("INSERT INTO PLACE (name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic)" +
+            "VALUES (#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic})")
     @Options(useGeneratedKeys = true, keyProperty = "placeId", keyColumn = "placeId")
     fun insertPlace(@Param("p") p: PlaceLocal)
 
