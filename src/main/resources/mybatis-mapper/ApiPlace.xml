@@ -1,0 +1,10 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.ApiPlace">
+
+    <select id="selectApiPlaceById" resultType="com.travel.travelapi.models.PlaceApi">
+        SELECT apiPlaceId, fk_typeId as apiTypeId, description FROM API_PLACE WHERE apiPlaceId = #{id}
+    </select>
+
+</mapper>

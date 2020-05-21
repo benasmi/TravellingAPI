@@ -1,0 +1,17 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.WorkingScheduleService">
+
+    <select id="selectWorkingScheduleById" resultType="com.travel.travelapi.models.WorkingSchedule">
+        SELECT dayOfWeek,openTime,closeTime, isClosed FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}
+    </select>
+
+    <insert id="insertWorkingScheduleForPlace">
+        INSERT INTO WORKING_SCHEDULE (fk_placeId, dayOfWeek,openTime,closeTime,isClosed) VALUES (#{ws.fk_placeId}, #{ws.dayOfWeek},#{ws.openTime}, #{ws.closeTime}, #{ws.isClosed})
+    </insert>
+
+    <delete id="deleteSchedule">
+        DELETE FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}
+    </delete>
+</mapper>

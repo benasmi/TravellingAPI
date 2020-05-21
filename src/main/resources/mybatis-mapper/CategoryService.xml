@@ -1,0 +1,22 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.CategoryService">
+
+    <select id="selectAllCategories" resultType="com.travel.travelapi.models.Category">
+        SELECT * FROM CATEGORY
+    </select>
+
+    <insert id="insertCategory" useGeneratedKeys = "true" keyProperty = "categoryId" keyColumn = "categoryId">
+        INSERT INTO CATEGORY (name) VALUES (#{c.name})
+    </insert>
+
+    <delete id="deleteCategory">
+        DELETE FROM CATEGORY WHERE categoryId=#{c.categoryId}
+    </delete>
+
+    <update id="updateCategory">
+        UPDATE CATEGORY SET name=#{c.name} WHERE categoryId=#{c.categoryId}
+    </update>
+
+</mapper>

@@ -9,6 +9,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ApiPlace {
 
-    @Select("SELECT apiPlaceId, fk_typeId as apiTypeId, description FROM API_PLACE WHERE apiPlaceId = #{id}")
     fun selectApiPlaceById(@Param("id") id: String): PlaceApi?
 }

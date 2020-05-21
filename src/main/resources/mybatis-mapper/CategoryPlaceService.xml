@@ -1,0 +1,27 @@
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.CategoryPlaceService">
+
+    <select id="selectByPlaceId" resultType="com.travel.travelapi.models.Category">
+        SELECT * FROM CATEGORY c WHERE c.categoryId IN (SELECT cp.fk_categoryId FROM CATEGORY_PLACE cp WHERE cp.fk_placeId=#{id})
+    </select>
+
+    <!--    NOT TESTED-->
+    <insert id="insertCategoryForPlace">
+        INSERT INTO CATEGORY_PLACE (fk_categoryId, fk_placeId) VALUES (#{c.fk_categoryId}, #{c.fk_placeId})
+    </insert>
+
+    <!--    NOT TESTED-->
+    <delete id="deleteCategoryForPlace">
+        DELETE FROM CATEGORY_PLACE WHERE fk_categoryId=#{c.fk_categoryId} AND fk_placeId=#{c.fk_placeId}
+    </delete>
+
+    <!--    NOT TESTED-->
+    <delete id="deleteCategoryForPlaceById">
+        DELETE FROM CATEGORY_PLACE WHERE fk_placeId=#{id}
+    </delete>
+
+
+</mapper>

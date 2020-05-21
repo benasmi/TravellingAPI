@@ -1,0 +1,21 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.TagPlaceService">
+
+    <select id="selectTagsById" resultType="com.travel.travelapi.models.Tag">
+        SELECT * FROM TAG c WHERE c.tagId IN (SELECT cp.fk_tagId FROM TAG_PLACE cp WHERE cp.fk_placeId=#{id})
+    </select>
+
+    <insert id="insertTagForPlace">
+        INSERT INTO TAG_PLACE (fk_tagId, fk_placeId) VALUES (#{t.fk_tagId}, #{t.fk_placeId})
+    </insert>
+
+    <delete id="deleteTagForPlace">
+        DELETE FROM TAG_PLACE WHERE fk_tagId=#{t.fk_tagId} AND fk_placeId=#{t.fk_placeId}
+    </delete>
+
+    <delete id="deleteTagForPlaceById">
+        DELETE FROM TAG_PLACE WHERE fk_placeId=#{id}
+    </delete>
+</mapper>

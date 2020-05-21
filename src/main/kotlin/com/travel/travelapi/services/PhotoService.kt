@@ -10,8 +10,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface PhotoService {
 
-    @Insert("INSERT INTO PHOTO (url, date) VALUES (#{p.url}, now())")
-    @Options(useGeneratedKeys = true, keyProperty = "photoId", keyColumn = "photoId")
     fun insertPhoto(@Param("p") p: Photo)
 
 }

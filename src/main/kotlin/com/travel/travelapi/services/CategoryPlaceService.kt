@@ -12,17 +12,13 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CategoryPlaceService {
 
-    @Select("SELECT * FROM CATEGORY c WHERE c.categoryId IN \n" +
-            "   (SELECT cp.fk_categoryId FROM CATEGORY_PLACE cp WHERE cp.fk_placeId=#{id})")
+
     fun selectByPlaceId(@Param("id") id: Int): List<Category>
 
-    @Insert("INSERT INTO CATEGORY_PLACE (fk_categoryId, fk_placeId) VALUES (#{c.fk_categoryId}, #{c.fk_placeId})")
     fun insertCategoryForPlace(@Param("c") c: CategoryPlace)
 
-    @Delete("DELETE FROM CATEGORY_PLACE WHERE fk_categoryId=#{c.fk_categoryId} AND fk_placeId=#{c.fk_placeId} ")
     fun deleteCategoryForPlace(@Param("c") c: CategoryPlace)
 
-    @Delete("DELETE FROM CATEGORY_PLACE WHERE fk_placeId=#{id}")
     fun deleteCategoryForPlaceById(@Param("id") id: Int)
 
 }

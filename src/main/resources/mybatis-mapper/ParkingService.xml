@@ -1,0 +1,33 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.ParkingService">
+
+    <select id="search" resultType="com.travel.travelapi.models.Parking">
+    SELECT * FROM PARKING WHERE parkingId IN
+    <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>
+    #{item}
+    </foreach>
+    </select>
+
+<!--    UNTESTED-->
+    <select id="getAllParkingInfo" resultType="com.travel.travelapi.models.Parking">
+        SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10
+    </select>
+
+    <insert id="insertParking" useGeneratedKeys = "true" keyColumn = "parkingId" keyProperty = "parkingId">
+        INSERT INTO PARKING (latitude, longitude, address, city, country) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.city}, #{p.country})
+    </insert>
+
+    <delete id="deleteParking">
+        DELETE FROM PARKING WHERE parkingId=#{p.parkingId}
+    </delete>
+
+    <delete id="updateParking">
+        UPDATE PARKING SET latitude=#{p.latitude}, longitude=#{p.longitude}, address=#{p.address} WHERE parkingId=#{p.parkingId}
+    </delete>
+
+    <select id="searchParking" resultType="com.travel.travelapi.models.Parking">
+        SELECT *, ( 6371 * acos( cos( radians(#{latitude}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{longitude}) ) + sin( radians(#{latitude}) ) * sin(radians(latitude)) ) ) AS distance FROM PARKING HAVING distance &lt; 10 ORDER BY distance LIMIT 10
+    </select>
+</mapper>

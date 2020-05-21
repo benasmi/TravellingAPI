@@ -35,7 +35,7 @@ class ParkingPlaceController(@Autowired private val parkingPlaceService: Parking
     @RequestMapping("/delete")
     fun deleteParking(@RequestBody parkingInfo: List<ParkingPlace>){
         for(p: ParkingPlace in parkingInfo)
-            parkingPlaceService.deleteCategoryForPlace(p)
+            parkingPlaceService.deleteParkingForPlace(p)
 
     }
 

@@ -1,0 +1,25 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.PhotoPlaceService">
+
+    <select id="selectPhotosById" resultType="com.travel.travelapi.models.Photo">
+        SELECT DISTINCT p.* from PHOTO p INNER JOIN PHOTO_PLACE pp on p.photoId = pp.fk_photoId WHERE pp.fk_placeId=#{id} ORDER BY pp.indexInList ASC
+    </select>
+
+    <insert id="insertPhotoForPlace">
+        INSERT INTO PHOTO_PLACE (fk_photoId, fk_placeId, indexInList) VALUES (#{p.fk_photoId}, #{p.fk_placeId}, #{p.indexInList})
+    </insert>
+
+    <update id="updatePhotoIndexing">
+        UPDATE PHOTO_PLACE SET indexInList=#{p.indexInList} WHERE fk_photoId=#{p.fk_photoId}
+    </update>
+
+    <delete id="deletePhotoFromPlace">
+        DELETE FROM PHOTO_PLACE WHERE fk_photoId=#{p.fk_photoId} AND fk_placeId=#{p.fk_placeId}
+    </delete>
+
+    <delete id="deletePhotoForPlaceById">
+        DELETE FROM PHOTO_PLACE WHERE fk_placeId=#{id}
+    </delete>
+</mapper>
