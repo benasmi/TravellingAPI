@@ -1,6 +1,8 @@
 package com.travel.travelapi.models
 
 class PlaceLocal(val placeId: Int? = null,
+                 var totalReviews: Int? = null,
+                 val timeAdded: String? = null,
                  hasSchedule: Boolean? = null,
                  isPublic: Boolean? = null,
                  isVerified: Boolean? = null,
@@ -14,4 +16,4 @@ class PlaceLocal(val placeId: Int? = null,
                  city: String? = null,
                  phoneNumber: String? = null,
                  website: String? = null,
-                 overallStarRating: Double? = null): Place(name, description, hasSchedule, isPublic, isVerified, averageTimeSpent, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating)
+                 overallStarRating: Float? = null): Place(name, description, hasSchedule, isPublic, isVerified, averageTimeSpent, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating)

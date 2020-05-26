@@ -17,7 +17,8 @@ interface PlaceService {
 
     fun selectAll(): Page<PlaceLocal>
 
-    fun selectAllAdmin(@Param("keyword") keyword: String) : Page<PlaceLocal>
+    fun selectAllAdmin(@Param("keyword") keyword: String,
+                       @Param("filterOptions") filterOptions: List<String>) : Page<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
 

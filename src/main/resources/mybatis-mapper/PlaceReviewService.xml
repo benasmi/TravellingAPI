@@ -1,0 +1,41 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.PlaceReviewService">
+
+<select id="selectReviewsByPlace" resultType="com.travel.travelapi.models.PlaceReview">
+          SELECT pr.fk_placeId, pr.fk_reviewId, r.review, r.title, r.rating, r.upvotes, u.name, u.surname, p.url as photoUrl FROM PLACE_REVIEW pr
+INNER JOIN REVIEW r ON pr.fk_reviewId = r.reviewId
+INNER JOIN USERS u ON r.fk_userToken = u.userToken
+LEFT JOIN PHOTO p ON u.fk_photoId = p.photoId
+WHERE pr.fk_placeId = #{id}
+    </select>
+
+
+    <select id="getReviewsById" resultType="com.travel.travelapi.models.PlaceReview">
+          SELECT pr.fk_placeId, pr.fk_reviewId, r.review, r.title, r.rating, r.upvotes, u.name, u.surname, r.timeAdded, p.url as photoUrl FROM PLACE_REVIEW pr
+INNER JOIN REVIEW r ON pr.fk_reviewId = r.reviewId
+INNER JOIN USERS u ON r.fk_userToken = u.userToken
+LEFT JOIN PHOTO p ON u.fk_photoId = p.photoId
+WHERE pr.fk_placeId = #{id}
+        <if test="orderOption == 'newest'">
+                ORDER BY r.timeAdded
+        </if>
+        <if test="orderOption == 'oldest'">
+            ORDER BY r.timeAdded DESC
+        </if>
+        <if test="orderOption == 'mostRated'">
+            ORDER BY r.upvotes DESC
+        </if>
+    </select>
+
+<select id="getReviewsCountsByPlace" resultType="int">
+     SELECT COUNT(pr.fk_placeId) as total FROM `PLACE_REVIEW` pr WHERE fk_placeId=#{id}
+    </select>
+
+<select id="getReviewsAverageRating" resultType="Float">
+     SELECT IFNULL((SELECT AVG(r.rating) FROM PLACE_REVIEW pr
+INNER JOIN REVIEW r ON pr.fk_reviewId = r.reviewId
+WHERE pr.fk_placeId = #{id}),0) as rating
+    </select>
+</mapper>

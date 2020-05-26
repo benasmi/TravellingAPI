@@ -16,14 +16,11 @@ abstract class Place (var name: String? = null,
                   var city: String? = null,
                   var phoneNumber: String? = null,
                   var website: String? = null,
-                  var overallStarRating: Double? = null){
+                  var overallStarRating: Float? = null){
 
     var categories: List<Category>? = null
     var parking: List<Parking>? = null
-    var reviews: List<Review>? = null
     var schedule: List<WorkingSchedule>? = null
     var photos: List<Photo>? = null
     var tags: List<Tag>? = null
-
-
 }

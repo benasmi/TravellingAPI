@@ -42,13 +42,4 @@ class TagController(@Autowired private val tagService: TagService) {
 
     }
 
-    /**
-     * Update tags
-     */
-    @PostMapping("/update")
-    fun updateTag(@RequestBody tags: List<Tag>){
-        for(t: Tag in tags)
-            tagService.updateTag(t)
-    }
-
 }

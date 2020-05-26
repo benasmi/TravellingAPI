@@ -3,6 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.travel.travelapi.services.PlaceService">
 
+
     <select id="selectAll"  resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT * FROM PLACE
     </select>
@@ -14,8 +15,24 @@
         </foreach>
     </select>
 
+
+
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
+        <if test="keyword!= ''">
             SELECT * FROM PLACE WHERE MATCH (name,description,city,country) AGAINST (#{keyword} IN NATURAL LANGUAGE MODE)
+        </if>
+
+        <if test="keyword == ''">
+            SELECT * FROM PLACE WHERE 1
+        </if>
+        <foreach item='item' index='index' collection='filterOptions'>
+            <if test="item == 'unverified'">
+                AND isVerified=0
+            </if>
+            <if test="item == 'unpublished'">
+                AND isPublic=0
+            </if>
+        </foreach>
     </select>
 
     <select id="selectById" resultType="com.travel.travelapi.models.PlaceLocal">

@@ -53,7 +53,7 @@ class FacebookPlaceDeserializer: JsonDeserializer<SearchApiResponseObject>() {
             }
 
             if(item.has("overall_star_rating")){
-                place.overallStarRating = item.get("overall_star_rating").asDouble()
+                place.overallStarRating = item.get("overall_star_rating").asDouble().toFloat()
             }
 
             if(item.has("hours")){

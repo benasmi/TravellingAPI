@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.*
 
 @RequestMapping("/parking")
 @RestController
-class
-
-ParkingController(@Autowired private val parkingService: ParkingService,
+class ParkingController(@Autowired private val parkingService: ParkingService,
                   @Autowired private val sphinxService: SphinxService) {
 
     /**
@@ -26,12 +24,9 @@ ParkingController(@Autowired private val parkingService: ParkingService,
      */
     @PostMapping("/insert")
     fun insertParkingForPlace(@RequestBody parking: List<Parking>): List<Parking>{
-        //val inserted = ArrayList<Int>()
         for(p: Parking in parking){
             parkingService.insertParking(p)
-            //inserted.add(p.parkingId!!)
         }
-        //return inserted
         return parking
     }
 

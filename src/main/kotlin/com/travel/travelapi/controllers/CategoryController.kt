@@ -4,7 +4,6 @@ import com.travel.travelapi.models.Category
 import com.travel.travelapi.services.CategoryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 
@@ -42,12 +41,4 @@ class CategoryController(@Autowired private val categoryService: CategoryService
             categoryService.deleteCategory(c)
     }
 
-    /**
-     * Update categories
-     */
-    @PostMapping("/update")
-    fun updateCategory(@RequestBody categories: List<Category>){
-        for(c: Category in categories)
-            categoryService.updateCategory(c)
-    }
 }
