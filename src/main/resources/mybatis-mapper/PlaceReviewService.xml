@@ -33,7 +33,7 @@ WHERE pr.fk_placeId = #{id}
      SELECT COUNT(pr.fk_placeId) as total FROM `PLACE_REVIEW` pr WHERE fk_placeId=#{id}
     </select>
 
-<select id="getReviewsAverageRating" resultType="Float">
+<select id="getReviewsAverageRating" resultType="double">
      SELECT IFNULL((SELECT AVG(r.rating) FROM PLACE_REVIEW pr
 INNER JOIN REVIEW r ON pr.fk_reviewId = r.reviewId
 WHERE pr.fk_placeId = #{id}),0) as rating

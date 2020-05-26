@@ -6,9 +6,6 @@ import com.fasterxml.jackson.annotation.JsonInclude
 abstract class Place (var name: String? = null,
                   var description: String? = null,
                   val hasSchedule: Boolean? = null,
-                  val isPublic: Boolean? = null,
-                  val isVerified: Boolean? = null,
-                  var averageTimeSpent: String? =  null,
                   var latitude: Float? = null,
                   var longitude: Float? = null,
                   var address: String? = null,
@@ -16,7 +13,7 @@ abstract class Place (var name: String? = null,
                   var city: String? = null,
                   var phoneNumber: String? = null,
                   var website: String? = null,
-                  var overallStarRating: Float? = null){
+                  var overallStarRating: Double? = null){
 
     var categories: List<Category>? = null
     var parking: List<Parking>? = null

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository
 interface PlaceReviewService {
     fun selectReviewsByPlace(@Param("id") id: Int): List<PlaceReview>
     fun getReviewsCountsByPlace(@Param("id") id: Int): Int
-    fun getReviewsAverageRating(@Param("id") id: Int): Float
+    fun getReviewsAverageRating(@Param("id") id: Int): Double
 
     fun getReviewsById(@Param("id") id: Int, @Param("orderOption") orderOption: String = "newest"): Page<PlaceReviewInfo>
 }
