@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo
 import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.services.PlaceReviewService
 import com.travel.travelapi.services.PlaceService
+import com.travel.travelapi.services.SourcePlaceService
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
@@ -21,6 +22,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val placeReviewService: PlaceReviewService,
                       @Autowired private val photoPlaceController: PhotoPlaceController,
                       @Autowired private val tagPlaceController: TagPlaceController,
+                      @Autowired private val sourcePlaceController: SourcePlaceController,
                       @Autowired private val sphinxService: SphinxService){
 
 
@@ -105,6 +107,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             place.overallStarRating = placeReviewService.getReviewsAverageRating(id)
             place.photos = photoPlaceController.getPhotosById(id)
             place.tags = tagPlaceController.getTagsById(id)
+            place.sources = sourcePlaceController.getSourcesById(id)
         }
 
         return place
@@ -131,9 +134,8 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId)
                 value.photos = photoPlaceController.getPhotosById(value.placeId)
                 value.tags = tagPlaceController.getTagsById(value.placeId)
+                value.sources = sourcePlaceController.getSourcesById(value.placeId)
             }
         }
     }
-
-
 }

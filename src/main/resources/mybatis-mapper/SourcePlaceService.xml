@@ -1,0 +1,28 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.SourcePlaceService">
+
+
+    <select id="getPlaceSourcesById"  resultType="com.travel.travelapi.models.Source">
+        SELECT s.sourceId, s.name, s.url FROM `SOURCE_PLACE` sp
+        INNER JOIN `SOURCE` s ON sp.fk_sourceId = s.sourceId
+        WHERE sp.fk_placeId = #{id}
+    </select>
+
+    <!--    NOT TESTED-->
+    <insert id="insertSource">
+        INSERT INTO SOURCE_PLACE (fk_sourceId, fk_placeId) VALUES (#{s.fk_sourceId}, #{s.fk_placeId})
+    </insert>
+
+    <!--    NOT TESTED-->
+    <delete id="deleteSource">
+        DELETE FROM SOURCE_PLACE WHERE fk_sourceId=#{s.fk_sourceId} AND fk_placeId=#{s.fk_placeId}
+    </delete>
+
+    <!--    NOT TESTED-->
+    <delete id="deleteSourcesById">
+        DELETE FROM SOURCE_PLACE WHERE fk_placeId=#{id}
+    </delete>
+
+</mapper>

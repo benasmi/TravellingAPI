@@ -40,14 +40,14 @@
     </select>
 
     <update id="updatePlace" >
-        UPDATE PLACE SET name=#{p.name}, description=#{p.description}, city=#{p.city}, country=#{p.country}, latitude=#{p.latitude},
+        UPDATE PLACE SET averageTimeSpent=#{p.averageTimeSpent}, price=#{p.price}, name=#{p.name}, description=#{p.description}, city=#{p.city}, country=#{p.country}, latitude=#{p.latitude},
         longitude=#{p.longitude}, address=#{p.address}, phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublic=#{p.isPublic}, isVerified=#{p.isVerified}
         WHERE placeId=#{p.placeId}
     </update>
 
     <insert id="insertPlace" useGeneratedKeys="true" keyProperty="placeId" keyColumn="placeId">
-        INSERT INTO PLACE (name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic)
-        VALUES (#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic})
+        INSERT INTO PLACE (price, name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic)
+        VALUES (#{p.price},#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic})
     </insert>
 
     <delete id="deletePlace">

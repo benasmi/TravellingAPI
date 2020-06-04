@@ -8,7 +8,7 @@ class PlaceLocal(val placeId: Int? = null,
                  var isVerified: Boolean? = null,
                  name: String? = null,
                  description: String? = null,
-                 var averageTimeSpent: String? = null,
+                 var averageTimeSpent: Int? = null,
                  latitude: Float? = null,
                  longitude: Float? = null,
                  address: String? = null,
@@ -16,5 +16,7 @@ class PlaceLocal(val placeId: Int? = null,
                  city: String? = null,
                  phoneNumber: String? = null,
                  website: String? = null,
-                 overallStarRating: Double? = null): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating)
+                 overallStarRating: Double? = null,
+                 price: String? = null): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating, price)
+
 

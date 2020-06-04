@@ -1,0 +1,16 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.SourceService">
+
+
+    <select id="selectAll"  resultType="com.travel.travelapi.models.Source">
+        SELECT * FROM SOURCE
+    </select>
+
+    <insert id="insertSource" useGeneratedKeys = "true" keyProperty = "sourceId" keyColumn = "sourceId">
+        INSERT INTO SOURCE (name,url) VALUES (#{s.name}, #{s.url})
+    </insert>
+
+
+</mapper>

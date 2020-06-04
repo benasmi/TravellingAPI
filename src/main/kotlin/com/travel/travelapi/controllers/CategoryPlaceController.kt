@@ -44,7 +44,6 @@ class CategoryPlaceController(@Autowired private val categoryPlaceService: Categ
     fun deleteCategory(@RequestBody categoryPlace: List<CategoryPlace>){
         for(c: CategoryPlace in categoryPlace)
             categoryPlaceService.deleteCategoryForPlace(c)
-
     }
 
     /**

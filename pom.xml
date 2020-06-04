@@ -86,6 +86,13 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 			<version>2.2.6.RELEASE</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>6.13.0</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.google.maps/google-maps-services -->
 		<dependency>
 			<groupId>com.google.maps</groupId>
