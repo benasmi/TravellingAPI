@@ -9,6 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
@@ -33,7 +34,7 @@ public class FirebaseConfig {
         FileInputStream serviceAccount =
                 null;
         try {
-            serviceAccount = new FileInputStream("/Users/b/Desktop/GitProjects/TravellingAPI/src/main/resources/serviceAccount.json");
+            serviceAccount = new FileInputStream(ResourceUtils.getFile("classpath:serviceAccount.json"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
