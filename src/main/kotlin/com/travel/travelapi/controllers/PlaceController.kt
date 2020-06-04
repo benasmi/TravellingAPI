@@ -100,7 +100,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         if(full){
             place.categories = categoryController.getCategoriesById(id)
             place.parking = parkingPlaceController.getParkingLocationsById(id)
-//            place.schedule = workingScheduleService.getWorkingScheduleById(id)
+            place.schedule = workingScheduleService.getWorkingSchedulesById(id)
             place.totalReviews = placeReviewService.getReviewsCountsByPlace(id)
             place.overallStarRating = placeReviewService.getReviewsAverageRating(id)
             place.photos = photoPlaceController.getPhotosById(id)
@@ -126,7 +126,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             for (value: PlaceLocal in places) {
                 value.categories = categoryController.getCategoriesById(value.placeId!!)
                 value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
-//                value.schedule = workingScheduleService.getWorkingScheduleById(value.placeId)
+                value.schedule = workingScheduleService.getWorkingSchedulesById(value.placeId)
                 value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
                 value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId)
                 value.photos = photoPlaceController.getPhotosById(value.placeId)

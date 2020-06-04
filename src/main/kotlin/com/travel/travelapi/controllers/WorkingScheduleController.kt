@@ -30,8 +30,8 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
     /**
      * Insert working schedule for a place
      */
-    @RequestMapping("/{placeId}/update")
-    fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>, @PathVariable("placeId") placeId: Int){
+    @RequestMapping("/update")
+    fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>, @RequestParam("id") placeId: Int){
         try{
             workingScheduleService.updateWorkingScheduleForPlace(workingSchedules, placeId)
         }catch(ex: Exception){
