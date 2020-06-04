@@ -3,15 +3,25 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.travel.travelapi.services.WorkingScheduleService">
 
-    <select id="selectWorkingScheduleById" resultType="com.travel.travelapi.models.WorkingSchedule">
-        SELECT dayOfWeek,openTime,closeTime, isClosed FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}
+    <select id="selectWorkingSchedulesById" resultType="com.travel.travelapi.models.WorkingSchedule">
+        SELECT id, isDefault, DATE_FORMAT(from_date, '%m-%d') as `from`, DATE_FORMAT(to_date, '%c-%e') as `to`, fk_placeId as `placeId` FROM WORKING_SCHEDULES WHERE fk_placeId=#{targetPlaceId}
     </select>
 
-    <insert id="insertWorkingScheduleForPlace">
-        INSERT INTO WORKING_SCHEDULE (fk_placeId, dayOfWeek,openTime,closeTime,isClosed) VALUES (#{ws.fk_placeId}, #{ws.dayOfWeek},#{ws.openTime}, #{ws.closeTime}, #{ws.isClosed})
-    </insert>
+    <select id="selectPeriodsById" resultType="com.travel.travelapi.models.Period">
+        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime FROM PERIODS WHERE fk_scheduleId=#{id}
+    </select>
 
-    <delete id="deleteSchedule">
-        DELETE FROM WORKING_SCHEDULE WHERE fk_placeId=#{id}
-    </delete>
+
+    <insert id="updateWorkingScheduleForPlace">
+        DELETE FROM WORKING_SCHEDULES WHERE fk_placeId=#{placeId};
+        <foreach item="ws" index="i1" collection="wsList" >
+            INSERT INTO WORKING_SCHEDULES (fk_placeId, from_date, to_date, isDefault) VALUES (#{placeId}, (STR_TO_DATE(#{ws.from},'%m-%d')),(STR_TO_DATE(#{ws.to},'%m-%d')), #{ws.isDefault});
+
+        INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime) VALUES
+        <foreach item="p" index="i2" collection="ws.periods"  separator="," close=";">
+                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime})
+            </foreach>
+        </foreach>
+
+    </insert>
 </mapper>

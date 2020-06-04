@@ -87,7 +87,7 @@ class PlaceApi(var placeId: String? = null,
             if(response.openingHours.periods != null){
                 val schedule = ArrayList<WorkingSchedule>()
                 for(i in 0..6 ){
-                    schedule.add(WorkingSchedule(null, i, null, null, true))
+//                    schedule.add(WorkingSchedule(null, i, null, null, true))
                 }
                 response.openingHours.periods?.forEach  lit@{ period ->
                     var dayOfWeek: Int? = null
@@ -102,7 +102,7 @@ class PlaceApi(var placeId: String? = null,
                     }
                     if(dayOfWeek == null)
                         return@lit
-                    schedule[dayOfWeek] = WorkingSchedule(null, dayOfWeek, period.open?.time?.toString(), period.close?.time?.toString(), false)
+//                    schedule[dayOfWeek] = WorkingSchedule(null, dayOfWeek, period.open?.time?.toString(), period.close?.time?.toString(), false)
                 }
 
                 placeApi.schedule = schedule
