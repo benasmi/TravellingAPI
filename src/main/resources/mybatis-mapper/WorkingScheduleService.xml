@@ -8,7 +8,7 @@
     </select>
 
     <select id="selectPeriodsById" resultType="com.travel.travelapi.models.Period">
-        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime FROM PERIODS WHERE fk_scheduleId=#{id}
+        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime, lastAccomodation FROM PERIODS WHERE fk_scheduleId=#{id}
     </select>
 
 
@@ -17,9 +17,9 @@
         <foreach item="ws" index="i1" collection="wsList" >
             INSERT INTO WORKING_SCHEDULES (fk_placeId, from_date, to_date, isDefault) VALUES (#{placeId}, (STR_TO_DATE(#{ws.from},'%m-%d')),(STR_TO_DATE(#{ws.to},'%m-%d')), #{ws.isDefault});
 
-        INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime) VALUES
+        INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime, lastAccomodation) VALUES
         <foreach item="p" index="i2" collection="ws.periods"  separator="," close=";">
-                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime})
+                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime}, #{p.lastAccomodation})
             </foreach>
         </foreach>
 

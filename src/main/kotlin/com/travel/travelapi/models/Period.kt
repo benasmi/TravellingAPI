@@ -9,4 +9,5 @@ data class Period(var id: Int,
                            var openDay: Int? = null,
                            var openTime: String? = null,
                             var closeDay: Int? = null,
-                            var closeTime: String? = null)
+                            var closeTime: String? = null,
+                            var lastAccomodation: String?)

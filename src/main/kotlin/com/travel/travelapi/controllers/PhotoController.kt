@@ -46,7 +46,7 @@ class PhotoController(
         val generatedName = generateUniqueFileName() + '.' + extension
         fileStorageService.storeFile(image, generatedName)
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/photo/")
+                .path("/photo/view/")
                 .path(generatedName)
                 .toUriString()
 
@@ -63,7 +63,7 @@ class PhotoController(
         return filename
     }
 
-    @GetMapping("/{fileName:.+}")
+    @GetMapping("/view/{fileName:.+}")
     fun serveFile(@PathVariable fileName: String?, request: HttpServletRequest): ResponseEntity<Resource?>? {
         // Load file as Resource
         val resource: Resource = fileStorageService.loadFileAsResource(fileName!!)
