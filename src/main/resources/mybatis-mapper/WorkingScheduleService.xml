@@ -19,7 +19,7 @@
 
         INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime, lastAccommodation) VALUES
         <foreach item="p" index="i2" collection="ws.periods"  separator="," close=";">
-                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime}, #{p.lastAccomodation})
+                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime}, #{p.lastAccommodation})
             </foreach>
         </foreach>
 
