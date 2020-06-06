@@ -31,11 +31,12 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .csrf()
                 .disable()
                 .authorizeRequests()
+                .antMatchers("/photo/{fileName:.+}").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        // Custom security filter
+
         httpSecurity.addFilterBefore(firebaseAuthenticationFilterBean(),
                 UsernamePasswordAuthenticationFilter::class.java)
     }

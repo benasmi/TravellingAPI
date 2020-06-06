@@ -33,6 +33,7 @@
                 AND isPublic=0
             </if>
         </foreach>
+    ORDER BY dateModified DESC
     </select>
 
     <select id="selectById" resultType="com.travel.travelapi.models.PlaceLocal">
