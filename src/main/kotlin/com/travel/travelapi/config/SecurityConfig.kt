@@ -13,6 +13,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 class SecurityConfig : WebSecurityConfigurerAdapter() {
+
     /**
      * Use to create instance of [FirebaseAuthenticationTokenFilter].
      *
@@ -31,7 +32,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/photo/{fileName:.+}").permitAll()
+                .antMatchers("/photo/view/**", "/placeApi/photo").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
