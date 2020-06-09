@@ -23,7 +23,8 @@ class PlaceApi(var placeId: String? = null,
                city: String? = null,
                phoneNumber: String? = null,
                website: String? = null,
-               overallStarRating: Double? = null): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating){
+               overallStarRating: Double? = null,
+               val type: String? = "1"): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating){
 
     companion object{
         fun CreateFromSearchResponseObject(response: PlacesSearchResult): PlaceApi{

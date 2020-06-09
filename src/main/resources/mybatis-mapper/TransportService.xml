@@ -1,0 +1,15 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.TransportService">
+
+
+    <select id="getLocalPlaceTransportFrom"  resultType="com.travel.travelapi.models.TransportFrom">
+        SELECT * FROM TRANSPORT_PLACE_TOUR WHERE fk_placeTourId=#{id}
+    </select>
+
+    <select id="getApiPlaceTransportFrom"  resultType="com.travel.travelapi.models.TransportFrom">
+        SELECT * FROM TRANSPORT_API_PLACE_TOUR WHERE fk_placeApiTourId=#{id}
+    </select>
+
+</mapper>

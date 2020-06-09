@@ -1,8 +1,14 @@
 package com.travel.travelapi.models
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes(
+        JsonSubTypes.Type(value = PlaceLocal::class, name = "0"),
+        JsonSubTypes.Type(value = PlaceApi::class, name = "1"))
 abstract class Place (
         var name: String? = null,
         var description: String? = null,

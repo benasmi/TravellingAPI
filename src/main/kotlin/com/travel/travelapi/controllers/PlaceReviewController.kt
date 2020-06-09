@@ -3,10 +3,7 @@ package com.travel.travelapi.controllers
 import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
-import com.travel.travelapi.models.Place
-import com.travel.travelapi.models.PlaceLocal
-import com.travel.travelapi.models.PlaceReview
-import com.travel.travelapi.models.PlaceReviewInfo
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.PlaceReviewService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping

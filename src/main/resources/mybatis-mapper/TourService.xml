@@ -1,0 +1,70 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.TourService">
+
+
+    <select id="getTourById"  resultType="com.travel.travelapi.models.Tour">
+        SELECT * FROM TOUR WHERE tourId=#{id}
+    </select>
+
+    <delete id="deleteTourById">
+        DELETE FROM TOUR WHERE tourId=#{id}
+    </delete>
+
+    <update id="updateTour" >
+        UPDATE TOUR SET name=#{tour.name}, description=#{tour.description}, isVerified=#{tour.isVerified}, isPublished=#{tour.isPublished}
+        WHERE tourId=#{id}
+    </update>
+
+    <select id="selectAllAdmin" resultType="com.travel.travelapi.models.Tour">
+        <if test="keyword!= ''">
+            SELECT * FROM TOUR WHERE MATCH (name,description) AGAINST (#{keyword} IN NATURAL LANGUAGE MODE)
+        </if>
+
+        <if test="keyword == ''">
+            SELECT * FROM TOUR WHERE 1
+        </if>
+
+        <foreach item='item' index='index' collection='filterOptions'>
+            <if test="item == 'unverified'">
+                AND isVerified=0
+            </if>
+            <if test="item == 'unpublished'">
+                AND isPublished=0
+            </if>
+        </foreach>
+        ORDER BY lastModified DESC
+    </select>
+
+    <insert id="insertTour">
+      INSERT INTO TOUR (name, description, isPublished, isVerified)
+       VALUES (#{tour.name}, #{tour.description}, #{tour.isPublished}, #{tour.isVerified});
+        SET @tourId = (SELECT LAST_INSERT_ID());
+      <foreach item="day" collection="tour.days" index="i">
+             INSERT INTO TOUR_DAY (day, fk_tourId, description) VALUES (#{i}, @tourId, #{day.description});
+             SET @tourDayId = (SELECT LAST_INSERT_ID());
+        <foreach item="p" collection="day.data" index="pos">
+            <if test="p.place.type == 0">
+                INSERT INTO PLACE_TOUR_DAY (fk_tourDayId, fk_placeId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
+                SET @placeInsertedId = (SELECT LAST_INSERT_ID());
+                <foreach item="t" collection="p.transport">
+                    INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId,fk_transportId) VALUES (@placeInsertedId, #{t.fk_transportId});
+                </foreach>
+            </if>
+            <if test="p.place.type == 1">
+                INSERT INTO API_PLACE (apiPlaceId, fk_typeId) VALUES (#{p.place.placeId}, 1)
+                ON DUPLICATE KEY UPDATE apiPlaceId = apiPlaceId;
+                INSERT INTO API_PLACE_TOUR (fk_tourDayId, fk_apiPlaceId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
+                SET @placeApiInsertedId = (SELECT LAST_INSERT_ID());
+                <foreach item="t" collection="p.transport">
+                    INSERT INTO TRANSPORT_API_PLACE_TOUR (fk_placeApiTourId,fk_transportId) VALUES (@placeApiInsertedId, #{t.fk_transportId});
+                </foreach>
+            </if>
+
+        </foreach>
+      </foreach>
+    </insert>
+
+</mapper>
+
