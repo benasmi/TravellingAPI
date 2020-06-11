@@ -109,7 +109,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             place.tags = tagPlaceController.getTagsById(id)
             place.sources = sourcePlaceController.getSourcesById(id)
         }
-
+        place.photos = photoPlaceController.getPhotosById(id)
         return place
     }
 
@@ -125,17 +125,17 @@ class PlaceController(@Autowired private val placeService: PlaceService,
     }
 
     private fun extendPlace(full: Boolean, places: Page<PlaceLocal>) {
-        if (full) {
             for (value: PlaceLocal in places) {
-                value.categories = categoryController.getCategoriesById(value.placeId!!)
-                value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
-                value.schedule = workingScheduleService.getWorkingSchedulesById(value.placeId)
-                value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
-                value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId)
-                value.photos = photoPlaceController.getPhotosById(value.placeId)
-                value.tags = tagPlaceController.getTagsById(value.placeId)
-                value.sources = sourcePlaceController.getSourcesById(value.placeId)
+             value.photos = photoPlaceController.getPhotosById(value.placeId!!)
+                if(full){
+                    value.categories = categoryController.getCategoriesById(value.placeId!!)
+                    value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
+                    value.schedule = workingScheduleService.getWorkingSchedulesById(value.placeId)
+                    value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
+                    value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId)
+                    value.tags = tagPlaceController.getTagsById(value.placeId)
+                    value.sources = sourcePlaceController.getSourcesById(value.placeId)
+                }
             }
-        }
     }
 }

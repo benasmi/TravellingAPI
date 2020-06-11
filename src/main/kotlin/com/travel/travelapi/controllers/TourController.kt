@@ -35,7 +35,6 @@ class TourController(@Autowired private val tourService: TourService,
         val tours = tourService.selectAllAdmin(keyword,filterOptions)
         return PageInfo(tours)
     }
-
     /**
      * Get tour by id
      * @param id of a tour

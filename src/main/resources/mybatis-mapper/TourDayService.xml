@@ -7,11 +7,13 @@
     <select id="getLocalPlacesByTourId"  resultType="com.travel.travelapi.models.TourLocalPlaceInfo">
         SELECT * FROM TOUR_DAY td INNER JOIN
             PLACE_TOUR_DAY ptd ON td.tourDayId = ptd.fk_tourDayId
+            WHERE fk_tourId=#{id}
     </select>
 
     <select id="getApiPlacesByTourId"  resultType="com.travel.travelapi.models.TourApiPlaceInfo">
         SELECT * FROM TOUR_DAY td INNER JOIN
                       API_PLACE_TOUR apt ON td.tourDayId = apt.fk_tourDayId
+        WHERE fk_tourId=#{id}
     </select>
 
     <select id="getTourDaysDetails"  resultType="com.travel.travelapi.models.TourDayDetails">
