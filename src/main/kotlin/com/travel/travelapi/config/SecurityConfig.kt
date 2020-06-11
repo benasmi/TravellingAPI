@@ -32,6 +32,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .csrf()
                 .disable()
                 .authorizeRequests()
+//                .antMatchers("/**").permitAll()
                 .antMatchers("/photo/view/**", "/placeApi/photo").permitAll()
                 .anyRequest().authenticated()
                 .and()

@@ -19,7 +19,7 @@
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.Tour">
         <if test="keyword!= ''">
-            SELECT * FROM TOUR WHERE MATCH (name,description) AGAINST (#{keyword}+'*' IN BOOLEAN MODE)
+            SELECT * FROM TOUR WHERE MATCH (name,description) AGAINST (CONCAT(#{keyword},'*') IN NATURAL LANGUAGE MODE)
         </if>
 
         <if test="keyword == ''">

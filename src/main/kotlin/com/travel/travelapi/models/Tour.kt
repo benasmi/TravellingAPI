@@ -14,7 +14,7 @@ data class Tour(val tourId: Int? = null,
 
 data class TourDayDetails(val description: String? = null)
 data class TransportFrom(val fk_transportId: Int? = null)
-data class TourDay(val description: String? = null, val data: ArrayList<TourDayInfo>)
+data class TourDay(val description: String? = null, val data: ArrayList<TourDayInfo>? = null)
 
 data class TourDayInfo(val place: Place? = null,
                        val transport: ArrayList<TransportFrom>? = null)

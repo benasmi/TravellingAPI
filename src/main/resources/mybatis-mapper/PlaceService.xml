@@ -19,7 +19,7 @@
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
         <if test="keyword!= ''">
-            SELECT * FROM PLACE WHERE MATCH (name,description,city,country) AGAINST (#{keyword}+'*' IN BOOLEAN MODE)
+            SELECT * FROM PLACE WHERE MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
         </if>
 
         <if test="keyword == ''">

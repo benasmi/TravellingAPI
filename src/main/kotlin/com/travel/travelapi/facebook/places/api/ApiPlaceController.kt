@@ -58,6 +58,7 @@ class ApiPlaceController(
               @RequestParam(required=false, name="maxWidth", defaultValue="500") maxWidth: Int?): ResponseEntity<ByteArray> {
 
         try {val photo = PlacesApi.photo(geoApiContext.getGeoApiContext(), photoRef).maxWidth(maxWidth!!).await()
+
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(photo.contentType))
                     .body(photo.imageData)

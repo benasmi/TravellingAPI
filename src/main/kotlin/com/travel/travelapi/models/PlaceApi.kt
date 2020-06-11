@@ -1,6 +1,8 @@
 package com.travel.travelapi.models
 
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.google.maps.GeoApiContext
 import com.google.maps.PlacesApi
 import com.google.maps.model.AddressComponent

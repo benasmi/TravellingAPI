@@ -4,20 +4,23 @@ import com.travel.travelapi.exceptions.FileStorageException
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.services.FileStorageService
 import com.travel.travelapi.services.PhotoService
+import org.imgscalr.Scalr.resize
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.awt.image.BufferedImage
+import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.text.ParseException
 import java.util.*
 import java.util.UUID
+import javax.imageio.ImageIO
 import javax.servlet.http.HttpServletRequest
 import kotlin.collections.ArrayList
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-
 
 @RestController
 @RequestMapping("/photo")
@@ -43,7 +46,7 @@ class PhotoController(
         val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
         if(!allowedExtensions.contains(extension))
             throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
-        val generatedName = generateUniqueFileName() + '.' + extension
+        val generatedName = "photoreference="+generateUniqueFileName() + '.' + extension
         fileStorageService.storeFile(image, generatedName)
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/photo/view/")
@@ -63,21 +66,42 @@ class PhotoController(
         return filename
     }
 
-    @GetMapping("/view/{fileName:.+}")
-    fun serveFile(@PathVariable fileName: String?, request: HttpServletRequest): ResponseEntity<Resource?>? {
+    @GetMapping("/view")
+    fun serveFile(@RequestParam(name = "size", defaultValue = "500") size: String,
+                  @RequestParam(name ="photoreference") fileName: String?, request: HttpServletRequest): ResponseEntity<ByteArray?>? {
         // Load file as Resource
         val resource: Resource = fileStorageService.loadFileAsResource(fileName!!)
+
+            var fileSize = 500
+            if(!size.equals("full")){
+                try {
+                    fileSize = Integer.parseInt(size)
+                }
+                catch (e: ParseException) {
+                    println("Size is not an integer")
+                }
+            }
+            val image: BufferedImage = if(!size.equals("full"))
+                resize(ImageIO.read(resource.file), fileSize) else
+                ImageIO.read(resource.file)
+
+            val baos = ByteArrayOutputStream()
+            ImageIO.write(image, "jpg", baos)
+            baos.flush()
+            val imageInByte: ByteArray = baos.toByteArray()
+            baos.close()
 
         // Try to determine file's content type
         var contentType: String? = null
         try {
-            contentType = request.servletContext.getMimeType(resource.getFile().getAbsolutePath())
+            contentType = request.servletContext.getMimeType(resource.file.getAbsolutePath())
         } catch (ex: IOException) {
             println("Could not determine file type.")
         }
 
         return ResponseEntity.ok()
-                .body<Resource?>(resource)
+                .contentType(MediaType.parseMediaType(contentType!!))
+                .body(imageInByte)
     }
 
 
