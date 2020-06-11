@@ -33,7 +33,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
                 .disable()
                 .authorizeRequests()
 //                .antMatchers("/**").permitAll()
-                .antMatchers("/photo/view/**", "/placeApi/photo").permitAll()
+                .antMatchers("/photo/view", "/placeApi/photo").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement()
