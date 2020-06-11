@@ -8,7 +8,7 @@ data class WorkingSchedule(var id: Int? = null,
                            var placeId: Int? = null,
                            var from: String? = null,
                            var to: String? = null,
-                           var isDefault: Boolean? = null) {
+                           var scheduleDefault: Boolean? = null) {
 
     var periods: List<Period>? = null
 }
