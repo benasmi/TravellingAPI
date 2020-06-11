@@ -46,12 +46,11 @@ class PhotoController(
         val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
         if(!allowedExtensions.contains(extension))
             throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
-        val generatedName = "photoreference="+generateUniqueFileName() + '.' + extension
+        val generatedName = generateUniqueFileName() + '.' + extension
         fileStorageService.storeFile(image, generatedName)
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/photo/view/")
-                .path(generatedName)
-                .toUriString()
+                .path("/photo/view")
+                .toUriString() + "?photoreference=$generatedName"
 
     }
 
