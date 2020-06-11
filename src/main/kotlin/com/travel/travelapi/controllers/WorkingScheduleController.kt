@@ -5,6 +5,7 @@ import com.travel.travelapi.models.WorkingSchedule
 import com.travel.travelapi.services.WorkingScheduleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
+import java.io.Console
 import java.sql.SQLException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -32,6 +33,7 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
      */
     @RequestMapping("/update")
     fun updateWorkingScheduleForPlace(@RequestBody workingSchedules: List<WorkingSchedule>, @RequestParam("id") placeId: Int){
+
         try{
             workingScheduleService.updateWorkingScheduleForPlace(workingSchedules, placeId)
         }catch(ex: Exception){
