@@ -102,8 +102,9 @@ class TourController(@Autowired private val tourService: TourService,
      * @param tour
      */
     @PostMapping("/insert")
-    fun insertTour(@RequestBody tour: Tour){
+    fun insertTour(@RequestBody tour: Tour): Int{
         tourService.insertTour(tour)
+        return tour.tourId!!
     }
 
 }

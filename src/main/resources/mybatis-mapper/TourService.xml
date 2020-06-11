@@ -37,7 +37,7 @@
         ORDER BY lastModified DESC
     </select>
 
-    <insert id="insertTour">
+    <insert id="insertTour" useGeneratedKeys="true" keyColumn="tourId" keyProperty="tourId">
       INSERT INTO TOUR (name, description, isPublished, isVerified)
        VALUES (#{tour.name}, #{tour.description}, #{tour.isPublished}, #{tour.isVerified});
         SET @tourId = (SELECT LAST_INSERT_ID());
