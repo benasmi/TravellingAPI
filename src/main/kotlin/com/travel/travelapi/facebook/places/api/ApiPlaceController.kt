@@ -161,9 +161,9 @@ class ApiPlaceController(
             return place
         }catch (ex: InvalidRequestException){
             throw InvalidParamsException("Place could not be retrieved. Please check if the place ID you provided is valid")
-        }catch(ex: Exception){
+        }/*catch(ex: Exception){
             throw FailedApiRequestException("Could not retrieve place. Please try again later")
-        }
+        }*/
     }
 
 

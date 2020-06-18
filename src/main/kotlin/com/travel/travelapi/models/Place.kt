@@ -18,6 +18,8 @@ abstract class Place (
         var address: String? = null,
         var country: String? = null,
         var city: String? = null,
+        var county: String? = null,
+        val municipality: String? = null,
         var phoneNumber: String? = null,
         var website: String? = null,
         var overallStarRating: Double? = null,

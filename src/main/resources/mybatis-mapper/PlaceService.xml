@@ -16,7 +16,6 @@
     </select>
 
 
-
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
         <if test="keyword!= ''">
             SELECT * FROM PLACE WHERE MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
@@ -33,22 +32,37 @@
                 AND isPublic=0
             </if>
         </foreach>
+        <if test="filterCategories.size() != 0">
+            AND placeId IN (SELECT cp.fk_placeId FROM CATEGORY c INNER JOIN CATEGORY_PLACE cp ON c.categoryId =
+            cp.fk_categoryId
+            WHERE c.name IN
+            <foreach item='item' index='index' collection='filterCategories' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>)
+        </if>
+        <if test="filterDateAdded.size() == 2">
+                AND timeAdded BETWEEN #{filterDateAdded[0]} AND #{filterDateAdded[1]}
+        </if>
+        <if test="filterDateModified.size() == 2">
+            AND dateModified BETWEEN #{filterDateModified[0]} AND #{filterDateModified[1]}
+        </if>
     ORDER BY dateModified DESC
-    </select>
 
+
+    </select>
     <select id="selectById" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT * FROM PLACE WHERE placeId=#{id}
     </select>
 
     <update id="updatePlace" >
-        UPDATE PLACE SET averageTimeSpent=#{p.averageTimeSpent}, price=#{p.price}, name=#{p.name}, description=#{p.description}, city=#{p.city}, country=#{p.country}, latitude=#{p.latitude},
+        UPDATE PLACE SET county=#{p.county}, municipality=#{p.municipality}, averageTimeSpent=#{p.averageTimeSpent}, price=#{p.price}, name=#{p.name}, description=#{p.description}, city=#{p.city}, country=#{p.country}, latitude=#{p.latitude},
         longitude=#{p.longitude}, address=#{p.address}, phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublic=#{p.isPublic}, isVerified=#{p.isVerified}
         WHERE placeId=#{p.placeId}
     </update>
 
     <insert id="insertPlace" useGeneratedKeys="true" keyProperty="placeId" keyColumn="placeId">
-        INSERT INTO PLACE (price, name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic)
-        VALUES (#{p.price},#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic})
+        INSERT INTO PLACE (price, name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic, county, municipality)
+        VALUES (#{p.price},#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic}, #{p.county},#{p.municipality})
     </insert>
 
     <delete id="deletePlace">

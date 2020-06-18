@@ -26,7 +26,9 @@ class PlaceApi(var placeId: String? = null,
                phoneNumber: String? = null,
                website: String? = null,
                overallStarRating: Double? = null,
-               val type: String? = "1"): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating){
+               county: String? = null,
+               municipality: String? = null,
+               val type: String? = "1"): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, county, municipality, phoneNumber, website, overallStarRating){
 
     companion object{
         fun CreateFromSearchResponseObject(response: PlacesSearchResult): PlaceApi{
@@ -87,10 +89,10 @@ class PlaceApi(var placeId: String? = null,
             }
             placeApi.categories = categories
 
-            if(response.openingHours.periods != null){
+            if(response.openingHours !== null && response.openingHours.periods != null){
                 val schedule = ArrayList<WorkingSchedule>()
                 for(i in 0..6 ){
-//                    schedule.add(WorkingSchedule(null, i, null, null, true))
+                    schedule.add(WorkingSchedule(null, i, null, null, true))
                 }
                 response.openingHours.periods?.forEach  lit@{ period ->
                     var dayOfWeek: Int? = null
@@ -105,7 +107,7 @@ class PlaceApi(var placeId: String? = null,
                     }
                     if(dayOfWeek == null)
                         return@lit
-//                    schedule[dayOfWeek] = WorkingSchedule(null, dayOfWeek, period.open?.time?.toString(), period.close?.time?.toString(), false)
+                    schedule[dayOfWeek] = WorkingSchedule(null, dayOfWeek, period.open?.time?.toString(), period.close?.time?.toString(), false)
                 }
 
                 placeApi.schedule = schedule

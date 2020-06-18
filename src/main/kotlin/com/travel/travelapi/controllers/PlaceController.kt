@@ -70,11 +70,18 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                   @RequestParam(required = true, defaultValue = "", name = "keyword") keyword: String,
                   @RequestParam(required = false, defaultValue = "1", name = "p") p: Int,
                   @RequestParam(required = false, defaultValue = "10", name = "s") s: Int,
-                  @RequestParam("o", defaultValue = "", name = "o") o: String ): PageInfo<PlaceLocal> {
+                  @RequestParam(defaultValue = "", name = "o") o: String,
+                  @RequestParam(defaultValue = "", name = "c") c: String,
+                  @RequestParam(defaultValue = "", name = "di") di: String,
+                  @RequestParam(defaultValue = "", name = "dm") dm: String): PageInfo<PlaceLocal> {
+
 
         PageHelper.startPage<PlaceLocal>(p, s)
-        val filterOptions = o.split(",")
-        val places = placeService.selectAllAdmin(keyword, filterOptions)
+        val places = placeService.selectAllAdmin(keyword,
+                if(o.isNotEmpty()) o.split(",") else ArrayList(),
+                if(c.isNotEmpty()) c.split(',') else ArrayList(),
+                if(di.isNotEmpty()) di.split(',') else ArrayList(),
+                if(dm.isNotEmpty()) dm.split(',') else ArrayList())
         extendPlace(full, places)
         return PageInfo(places)
     }

@@ -19,6 +19,9 @@ class PlaceLocal(val placeId: Int? = null,
                  phoneNumber: String? = null,
                  website: String? = null,
                  overallStarRating: Double? = null,
-                 price: String? = null): Place(name, description, hasSchedule, latitude, longitude, address ,country, city, phoneNumber, website, overallStarRating, price)
+                 price: String? = null,
+                 county: String? = null,
+                 municipality: String? = null): Place(name, description, hasSchedule, latitude, longitude, address
+        ,country, city, county, municipality, phoneNumber, website, overallStarRating, price)
 
 
