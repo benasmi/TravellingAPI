@@ -1,5 +1,6 @@
 package com.travel.travelapi.models
 
+
 class PlaceLocal(val placeId: Int? = null,
                  var totalReviews: Int? = null,
                  val timeAdded: String? = null,

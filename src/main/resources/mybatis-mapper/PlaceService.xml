@@ -24,6 +24,21 @@
         <if test="keyword == ''">
             SELECT * FROM PLACE WHERE 1
         </if>
+
+        <if test="filterCities.size() != 0">
+            AND city IN
+            <foreach item='item' index='index' collection='filterCities' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+
+        <if test="filterCountries.size() != 0">
+            AND country IN
+            <foreach item='item' index='index' collection='filterCountries' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+
         <foreach item='item' index='index' collection='filterOptions'>
             <if test="item == 'unverified'">
                 AND isVerified=0
@@ -46,8 +61,8 @@
         <if test="filterDateModified.size() == 2">
             AND dateModified BETWEEN #{filterDateModified[0]} AND #{filterDateModified[1]}
         </if>
-    ORDER BY dateModified DESC
 
+     ORDER BY dateModified DESC
 
     </select>
     <select id="selectById" resultType="com.travel.travelapi.models.PlaceLocal">
@@ -68,4 +83,20 @@
     <delete id="deletePlace">
         DELETE FROM PLACE WHERE placeId=#{id}
     </delete>
+
+    <select id="getAllCities" resultType="string">
+        SELECT DISTINCT city FROM PLACE WHERE 1
+    </select>
+
+    <select id="getAllCountries" resultType="string">
+        SELECT DISTINCT country FROM PLACE WHERE 1
+    </select>
+
+    <select id="getAllCounties" resultType="string">
+        SELECT DISTINCT county FROM PLACE WHERE 1
+    </select>
+
+    <select id="getAllMunicipalities" resultType="string">
+        SELECT DISTINCT municipality FROM PLACE WHERE 1
+    </select>
 </mapper>

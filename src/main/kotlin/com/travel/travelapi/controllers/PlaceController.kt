@@ -55,7 +55,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return PageInfo(places)
     }
 
-
     /**
      * @return all places that match given query for admin
      * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info
@@ -73,7 +72,9 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                   @RequestParam(defaultValue = "", name = "o") o: String,
                   @RequestParam(defaultValue = "", name = "c") c: String,
                   @RequestParam(defaultValue = "", name = "di") di: String,
-                  @RequestParam(defaultValue = "", name = "dm") dm: String): PageInfo<PlaceLocal> {
+                  @RequestParam(defaultValue = "", name = "dm") dm: String,
+                  @RequestParam(defaultValue = "", name = "countries") countries: String,
+                  @RequestParam(defaultValue = "", name = "cities") cities: String): PageInfo<PlaceLocal> {
 
 
         PageHelper.startPage<PlaceLocal>(p, s)
@@ -81,7 +82,9 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 if(o.isNotEmpty()) o.split(",") else ArrayList(),
                 if(c.isNotEmpty()) c.split(',') else ArrayList(),
                 if(di.isNotEmpty()) di.split(',') else ArrayList(),
-                if(dm.isNotEmpty()) dm.split(',') else ArrayList())
+                if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
+                if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
+                if(cities.isNotEmpty()) cities.split(',') else ArrayList())
         extendPlace(full, places)
         return PageInfo(places)
     }
@@ -145,4 +148,24 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 }
             }
     }
+
+    @GetMapping("/city/all")
+    private fun getAllCities(): ArrayList<String>{
+        return placeService.getAllCities()
+    }
+
+    @GetMapping("/country/all")
+    private fun getAllCountries(): ArrayList<String>{
+        return placeService.getAllCountries()
+    }
+
+    @GetMapping("/county/all")
+    private fun getAllCounties(): ArrayList<String>{
+        return placeService.getAllCounties()
+    }
+    @GetMapping("/municipality/all")
+    private fun getAllMunicipalities(): ArrayList<String>{
+        return placeService.getAllMunicipalities()
+    }
+
 }
