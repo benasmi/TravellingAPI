@@ -35,6 +35,15 @@ class TagController(@Autowired private val tagService: TagService) {
     /**
      * Delete tags
      */
+    @PostMapping("/update")
+    fun updateTag(@RequestBody tags: List<Tag>){
+        for(c: Tag in tags)
+            tagService.updateTag(c)
+    }
+
+    /**
+     * Delete tags
+     */
     @PostMapping("/delete")
     fun deleteTag(@RequestBody tags: List<Tag>){
         for(t: Tag in tags)

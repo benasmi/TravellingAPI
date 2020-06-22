@@ -9,5 +9,5 @@ interface CategoryService {
     fun selectAllCategories(): List<Category>
     fun insertCategory(@Param("c") c: Category): Int
     fun deleteCategory(@Param("c") c: Category)
-
+    fun updateCategory(@Param("c") c: Category)
 }
