@@ -4,6 +4,7 @@ import com.travel.travelapi.exceptions.FileStorageException
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.services.FileStorageService
 import com.travel.travelapi.services.PhotoService
+import net.coobird.thumbnailator.Thumbnails
 import org.imgscalr.Scalr.resize
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
@@ -41,29 +42,6 @@ class PhotoController(
         return inserted
     }
 
-    fun saveImageFile(image: MultipartFile): String{
-        val extension = image.originalFilename!!.substring(image.originalFilename!!.lastIndexOf(".") + 1)
-        val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
-        if(!allowedExtensions.contains(extension))
-            throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
-        val generatedName = generateUniqueFileName() + '.' + extension
-        fileStorageService.storeFile(image, generatedName)
-        return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/photo/view")
-                .toUriString() + "?photoreference=$generatedName"
-
-    }
-
-    fun generateUniqueFileName(): String? {
-        var filename = ""
-        val millis = System.currentTimeMillis()
-        var datetime: String = Date().toGMTString()
-        datetime = datetime.replace(" ", "")
-        datetime = datetime.replace(":", "")
-        val rndchars = UUID.randomUUID().toString()
-        filename = rndchars + "_" + datetime + "_" + millis
-        return filename
-    }
 
     @GetMapping("/view")
     fun serveFile(@RequestParam(name = "size", defaultValue = "500") size: String,
@@ -106,7 +84,7 @@ class PhotoController(
 
     @PostMapping("/upload")
     fun insertPhoto(@RequestBody image: MultipartFile): Photo{
-        val linkToImage = saveImageFile(image)
+        val linkToImage = fileStorageService.storeImageFile(image)
         val photo = Photo(url =  linkToImage)
         photoService.insertPhoto(photo)
         return photo

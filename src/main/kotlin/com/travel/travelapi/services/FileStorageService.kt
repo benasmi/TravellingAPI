@@ -2,18 +2,22 @@ package com.travel.travelapi.services
 
 import com.travel.travelapi.config.FileStorageProperties
 import com.travel.travelapi.exceptions.FileStorageException
+import net.coobird.thumbnailator.Thumbnails
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.awt.image.BufferedImage
 import java.io.IOException
 import java.net.MalformedURLException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
+import java.util.*
 
 
 @Service
@@ -21,6 +25,32 @@ class FileStorageService @Autowired constructor(fileStorageProperties: FileStora
 
     private val fileStorageLocation: Path = Paths.get(fileStorageProperties.uploadDir!!)
             .toAbsolutePath().normalize()
+
+    fun storeImageFile(image: MultipartFile): String{
+        val extension = image.originalFilename!!.substring(image.originalFilename!!.lastIndexOf(".") + 1)
+        val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
+        if(!allowedExtensions.contains(extension))
+            throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
+        val generatedName = generateUniqueFileName() + '.' + extension
+        val targetLocation: Path = fileStorageLocation.resolve(generatedName)
+        Thumbnails.of(image.inputStream).scale(1.0).useExifOrientation(true).toFile(targetLocation.toString())
+
+        return ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/photo/view")
+                .toUriString() + "?photoreference=$generatedName"
+
+    }
+
+    fun generateUniqueFileName(): String? {
+        var filename = ""
+        val millis = System.currentTimeMillis()
+        var datetime: String = Date().toGMTString()
+        datetime = datetime.replace(" ", "")
+        datetime = datetime.replace(":", "")
+        val rndchars = UUID.randomUUID().toString()
+        filename = rndchars + "_" + datetime + "_" + millis
+        return filename
+    }
 
     fun storeFile(file: MultipartFile, name: String): String {
         // Normalize file name
