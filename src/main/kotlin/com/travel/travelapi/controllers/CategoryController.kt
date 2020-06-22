@@ -32,6 +32,7 @@ class CategoryController(@Autowired private val categoryService: CategoryService
         }
         return inserted
     }
+
     /**
      * Delete categories
      */
@@ -39,6 +40,14 @@ class CategoryController(@Autowired private val categoryService: CategoryService
     fun deleteCategory(@RequestBody categories: List<Category>){
         for(c: Category in categories)
             categoryService.deleteCategory(c)
+    }
+    /**
+     * Delete categories
+     */
+    @PostMapping("/update")
+    fun updateCategory(@RequestBody categories: List<Category>){
+        for(c: Category in categories)
+            categoryService.updateCategory(c)
     }
 
 }
