@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.io.IOException
 import java.lang.Integer.max
 import kotlin.math.acos
@@ -35,7 +38,7 @@ class ApiPlaceController(
 ) {
 
     @GetMapping("/search")
-    fun search(@RequestParam keyword: String?, @RequestParam center: FloatArray?): List<PlaceApi>{
+    fun search(@RequestParam keyword: String?, @RequestParam center: FloatArray?): Flux<PlaceApi>?{
         if(keyword == null && center == null)
             throw InvalidParamsException("You must provide at least one of the following params: keyword, center")
         if(center != null && center.count() != 2)
@@ -44,13 +47,9 @@ class ApiPlaceController(
         val places = PlacesApi.textSearchQuery(geoApiContext.getGeoApiContext(), keyword).await()
         val placesDeserialized = ArrayList<PlaceApi>()
         places.results.forEach {
-            val place = PlaceApi.CreateFromSearchResponseObject(it)
-//            if (it.types.any{item -> item.equals("tourist_attraction") || item.equals("park")})
-                place.description = getPlaceDescriptionWiki(place)
-            placesDeserialized.add(place)
+            placesDeserialized.add(PlaceApi.CreateFromSearchResponseObject(it))
         }
-
-        return placesDeserialized
+        return appendAllDescriptions(placesDeserialized)
     }
 
     @GetMapping("/photo")
@@ -66,8 +65,16 @@ class ApiPlaceController(
         catch (ex: IOException){throw InvalidParamsException("The photo reference provided is invalid")}
     }
 
-    private fun getPlaceDescriptionWiki(place: PlaceApi): String{
-        val response = webClientService.webClientBuilder()
+    fun appendAllDescriptions(places: List<PlaceApi>): Flux<PlaceApi>? {
+        return Flux.fromIterable(places)
+                .parallel()
+                .runOn(Schedulers.elastic())
+                .flatMap(this::appendDescriptionToPlace)
+                .ordered { u1: PlaceApi, u2: PlaceApi -> places.indexOf(u1).compareTo(places.indexOf(u2)) }
+    }
+
+    private fun appendDescriptionToPlace(place: PlaceApi): Mono<PlaceApi> {
+        return webClientService.webClientBuilder()
                 .build()
                 .get()
                 .uri{t ->  t.scheme("https")
@@ -92,14 +99,18 @@ class ApiPlaceController(
                         .build()}
                 .retrieve()
                 .bodyToMono(String::class.java)
-                .block()
+                .map { item ->
+                    extractDescription(item, place)
+                }
+    }
 
+    private fun extractDescription(response: String, place: PlaceApi): PlaceApi{
         val gson = Gson().fromJson(response, JsonObject::class.java)
         val pages = gson?.get("query")?.asJsonObject?.get("pages")?.asJsonObject
         var description: String? = null
 
         if(pages == null)
-            return ""
+            return place
 
         val bestResult = pages.keySet()?.filter { item ->
             val placeWiki1 = pages.get(item).asJsonObject
@@ -128,8 +139,8 @@ class ApiPlaceController(
             comparison1.compareTo(comparison2)
         })
         description = pages.get(bestResult)?.asJsonObject?.get("extract")?.asString
-
-        return Jsoup.parse(description ?: "").text()
+        place.description = Jsoup.parse(description ?: "").text()
+        return place
     }
 
     private fun distance(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
@@ -156,17 +167,11 @@ class ApiPlaceController(
     fun search(@RequestParam id: String): PlaceApi?{
         try{
             val fetchedPlace = PlacesApi.placeDetails(geoApiContext.getGeoApiContext(), id).await()
-            val place = PlaceApi.CreateFromDetailsResponseObject(fetchedPlace)
-            place.description = getPlaceDescriptionWiki(place)
-            return place
+            return appendDescriptionToPlace(PlaceApi.CreateFromDetailsResponseObject(fetchedPlace)).block()
         }catch (ex: InvalidRequestException){
             throw InvalidParamsException("Place could not be retrieved. Please check if the place ID you provided is valid")
-        }/*catch(ex: Exception){
+        }catch(ex: Exception){
             throw FailedApiRequestException("Could not retrieve place. Please try again later")
-        }*/
+        }
     }
-
-
-
-
 }
