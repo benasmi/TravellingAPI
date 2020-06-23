@@ -66,15 +66,16 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      */
     @GetMapping("/searchadmin")
     fun getPlacesAdmin(@RequestParam(required = false,name = "full") full: Boolean = false,
-                  @RequestParam(required = true, defaultValue = "", name = "keyword") keyword: String,
-                  @RequestParam(required = false, defaultValue = "1", name = "p") p: Int,
-                  @RequestParam(required = false, defaultValue = "10", name = "s") s: Int,
-                  @RequestParam(defaultValue = "", name = "o") o: String,
-                  @RequestParam(defaultValue = "", name = "c") c: String,
-                  @RequestParam(defaultValue = "", name = "di") di: String,
-                  @RequestParam(defaultValue = "", name = "dm") dm: String,
-                  @RequestParam(defaultValue = "", name = "countries") countries: String,
-                  @RequestParam(defaultValue = "", name = "cities") cities: String): PageInfo<PlaceLocal> {
+                       @RequestParam(required = true, defaultValue = "", name = "keyword") keyword: String,
+                       @RequestParam(required = false, defaultValue = "1", name = "p") p: Int,
+                       @RequestParam(required = false, defaultValue = "10", name = "s") s: Int,
+                       @RequestParam(defaultValue = "", name = "o") o: String,
+                       @RequestParam(defaultValue = "", name = "c") c: String,
+                       @RequestParam(defaultValue = "", name = "di") di: String,
+                       @RequestParam(defaultValue = "", name = "dm") dm: String,
+                       @RequestParam(defaultValue = "", name = "countries") countries: String,
+                       @RequestParam(defaultValue = "", name = "cities") cities: String,
+                       @RequestParam(defaultValue = "", name = "municipalities") municipalities: String): PageInfo<PlaceLocal> {
 
 
         PageHelper.startPage<PlaceLocal>(p, s)
@@ -84,7 +85,8 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 if(di.isNotEmpty()) di.split(',') else ArrayList(),
                 if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
                 if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
-                if(cities.isNotEmpty()) cities.split(',') else ArrayList())
+                if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
+                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList())
         extendPlace(full, places)
         return PageInfo(places)
     }

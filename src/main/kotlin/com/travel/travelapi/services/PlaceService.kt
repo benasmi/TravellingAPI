@@ -22,7 +22,8 @@ interface PlaceService {
                        @Param("filterDateAdded") filterDateAdded: List<String>,
                        @Param("filterDateModified") filterDateModified: List<String>,
                        @Param("filterCountries") filterCountries: List<String>,
-                       @Param("filterCities") filterCities: List<String>) : Page<PlaceLocal>
+                       @Param("filterCities") filterCities: List<String>,
+                       @Param("filterMunicipalities") filterMunicipalities: List<String>) : Page<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
     fun updatePlace(@Param("p") p: PlaceLocal)

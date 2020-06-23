@@ -25,6 +25,13 @@
             SELECT * FROM PLACE WHERE 1
         </if>
 
+        <if test="filterMunicipalities.size() != 0">
+            AND municipality IN
+            <foreach item='item' index='index' collection='filterMunicipalities' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+
         <if test="filterCities.size() != 0">
             AND city IN
             <foreach item='item' index='index' collection='filterCities' open='(' separator=',' close=')'>
@@ -61,7 +68,6 @@
         <if test="filterDateModified.size() == 2">
             AND dateModified BETWEEN #{filterDateModified[0]} AND #{filterDateModified[1]}
         </if>
-
      ORDER BY dateModified DESC
 
     </select>
@@ -85,18 +91,18 @@
     </delete>
 
     <select id="getAllCities" resultType="string">
-        SELECT DISTINCT city FROM PLACE WHERE 1
+        SELECT DISTINCT city FROM PLACE WHERE 1 AND (city IS NOT NULL AND city != '' )
     </select>
 
     <select id="getAllCountries" resultType="string">
-        SELECT DISTINCT country FROM PLACE WHERE 1
+        SELECT DISTINCT country FROM PLACE WHERE 1 AND (country IS NOT NULL AND country != '' )
     </select>
 
     <select id="getAllCounties" resultType="string">
-        SELECT DISTINCT county FROM PLACE WHERE 1
+        SELECT DISTINCT county FROM PLACE WHERE 1 AND (county IS NOT NULL AND county != '' )
     </select>
 
     <select id="getAllMunicipalities" resultType="string">
-        SELECT DISTINCT municipality FROM PLACE WHERE 1
+        SELECT DISTINCT municipality FROM PLACE WHERE 1 AND (municipality IS NOT NULL AND municipality != '' )
     </select>
 </mapper>

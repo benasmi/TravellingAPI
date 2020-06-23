@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 data class Tour(val tourId: Int? = null,
                 val name: String? = null,
                 val description: String? = null,
+                val lastModified: String? = null,
                 val isPublished: Int? = null,
                 val isVerified: Int? = null
                 ){
