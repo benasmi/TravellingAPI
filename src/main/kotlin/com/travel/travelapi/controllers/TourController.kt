@@ -65,12 +65,16 @@ class TourController(@Autowired private val tourService: TourService,
         val days: ArrayList<TourDay> = ArrayList()
         val grouped = places.groupBy { it.day }.values
 
+        tourDaysDetails.forEach{
+            days.add(TourDay(it.description,ArrayList()))
+        }
+
         grouped.forEachIndexed { index, list ->
             val tourDay = ArrayList<TourDayInfo>()
             list.sortedBy {(it.position) }.forEach {
                 tourDay.add(TourDayInfo(it.place!!, it.transportFrom!!))
             }
-            days.add(TourDay(tourDaysDetails[index].description, tourDay))
+            days[index].data = tourDay
         }
         tour.days = days
         return tour
