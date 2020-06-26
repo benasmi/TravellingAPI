@@ -3,6 +3,7 @@ package com.travel.travelapi.controllers
 import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
+import com.travel.travelapi.models.Parking
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.services.PlaceReviewService
@@ -25,6 +26,10 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val tagPlaceController: TagPlaceController,
                       @Autowired private val sourcePlaceController: SourcePlaceController,
                       @Autowired private val sphinxService: SphinxService){
+
+
+
+
 
 
     /**
@@ -62,6 +67,8 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * @param keyword of a place
      * @param p is page number
      * @param s is page size
+     * @param location of a place
+     * @param range of places nearby
      *
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
@@ -76,7 +83,9 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                        @RequestParam(defaultValue = "", name = "dm") dm: String,
                        @RequestParam(defaultValue = "", name = "countries") countries: String,
                        @RequestParam(defaultValue = "", name = "cities") cities: String,
-                       @RequestParam(defaultValue = "", name = "municipalities") municipalities: String): PageInfo<PlaceLocal> {
+                       @RequestParam(defaultValue = "", name = "municipalities") municipalities: String,
+                       @RequestParam(defaultValue = "", name = "l") location: String,
+                       @RequestParam(defaultValue = "50", name = "range") range: String): PageInfo<PlaceLocal> {
 
 
         PageHelper.startPage<PlaceLocal>(p, s)
@@ -87,7 +96,9 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
                 if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
                 if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
-                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList())
+                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList(),
+                if(location.isNotEmpty()) location.split(',') else ArrayList(),
+                range.toDouble())
         extendPlace(full, places)
         return PageInfo(places)
     }

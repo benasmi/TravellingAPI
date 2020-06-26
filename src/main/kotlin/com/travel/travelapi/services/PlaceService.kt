@@ -1,6 +1,7 @@
 package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
+import com.travel.travelapi.models.Parking
 
 import org.apache.ibatis.annotations.*
 
@@ -23,12 +24,19 @@ interface PlaceService {
                        @Param("filterDateModified") filterDateModified: List<String>,
                        @Param("filterCountries") filterCountries: List<String>,
                        @Param("filterCities") filterCities: List<String>,
-                       @Param("filterMunicipalities") filterMunicipalities: List<String>) : Page<PlaceLocal>
+                       @Param("filterMunicipalities") filterMunicipalities: List<String>,
+                       @Param("location") location: List<String>,
+                       @Param("range") range: Double) : Page<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
     fun updatePlace(@Param("p") p: PlaceLocal)
     fun insertPlace(@Param("p") p: PlaceLocal)
     fun deletePlace(@Param("id") id: Int)
+
+    fun searchPlacesByLocation(@Param("latitude") latitude: Double,
+                               @Param("longitude") longitude: Double,
+                               @Param("range") range: Double): List<PlaceLocal>
+
 
     fun getAllCities(): ArrayList<String>
     fun getAllCountries(): ArrayList<String>

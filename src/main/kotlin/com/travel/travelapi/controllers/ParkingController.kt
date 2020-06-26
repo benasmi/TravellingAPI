@@ -58,7 +58,6 @@ class ParkingController(@Autowired private val parkingService: ParkingService,
 
     @GetMapping("/searchAdmin")
     fun searchAdmin(@RequestParam lat: Double, @RequestParam lng: Double):List<Parking> {
-
         return parkingService.searchParking(lat, lng)
     }
 }

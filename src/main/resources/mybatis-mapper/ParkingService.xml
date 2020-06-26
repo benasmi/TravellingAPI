@@ -10,7 +10,6 @@
     </foreach>
     </select>
 
-<!--    UNTESTED-->
     <select id="getAllParkingInfo" resultType="com.travel.travelapi.models.Parking">
         SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10
     </select>

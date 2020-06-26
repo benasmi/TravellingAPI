@@ -17,14 +17,18 @@
 
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
+        <if test="location.size() != 0">
+            SELECT *, ( 6371 * acos( cos( radians(#{location[0]}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{location[1]}) ) + sin( radians(#{location[0]}) ) * sin(radians(latitude)) ) ) AS distance FROM PLACE
+        </if>
+        <if test="location.size() == 0">
+            SELECT * FROM PLACE
+        </if>
         <if test="keyword!= ''">
-            SELECT * FROM PLACE WHERE MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
+            WHERE MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
         </if>
-
-        <if test="keyword == ''">
-            SELECT * FROM PLACE WHERE 1
+        <if test="keyword== ''">
+            WHERE 1
         </if>
-
         <if test="filterMunicipalities.size() != 0">
             AND municipality IN
             <foreach item='item' index='index' collection='filterMunicipalities' open='(' separator=',' close=')'>
@@ -68,9 +72,16 @@
         <if test="filterDateModified.size() == 2">
             AND dateModified BETWEEN #{filterDateModified[0]} AND #{filterDateModified[1]}
         </if>
-     ORDER BY dateModified DESC
+
+        <if test="location.size() != 0">
+            HAVING distance &lt; #{range} ORDER BY distance, dateModified DESC
+        </if>
+        <if test="location.size() == 0">
+            ORDER BY dateModified DESC
+        </if>
 
     </select>
+
     <select id="selectById" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT * FROM PLACE WHERE placeId=#{id}
     </select>
@@ -91,18 +102,18 @@
     </delete>
 
     <select id="getAllCities" resultType="string">
-        SELECT DISTINCT city FROM PLACE WHERE 1 AND (city IS NOT NULL AND city != '' )
+        SELECT DISTINCT city FROM PLACE WHERE 1 AND (city IS NOT NULL AND city != '' ) ORDER BY city
     </select>
 
     <select id="getAllCountries" resultType="string">
-        SELECT DISTINCT country FROM PLACE WHERE 1 AND (country IS NOT NULL AND country != '' )
+        SELECT DISTINCT country FROM PLACE WHERE 1 AND (country IS NOT NULL AND country != '' ) ORDER BY country
     </select>
 
     <select id="getAllCounties" resultType="string">
-        SELECT DISTINCT county FROM PLACE WHERE 1 AND (county IS NOT NULL AND county != '' )
+        SELECT DISTINCT county FROM PLACE WHERE 1 AND (county IS NOT NULL AND county != '' ) ORDER BY county
     </select>
 
     <select id="getAllMunicipalities" resultType="string">
-        SELECT DISTINCT municipality FROM PLACE WHERE 1 AND (municipality IS NOT NULL AND municipality != '' )
+        SELECT DISTINCT municipality FROM PLACE WHERE 1 AND (municipality IS NOT NULL AND municipality != '' ) ORDER BY municipality
     </select>
 </mapper>
