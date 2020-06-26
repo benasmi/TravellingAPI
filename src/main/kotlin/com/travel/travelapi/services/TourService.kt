@@ -2,6 +2,7 @@ package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
 import com.travel.travelapi.models.PlaceLocal
+import com.travel.travelapi.models.Tag
 import com.travel.travelapi.models.Tour
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
@@ -15,4 +16,11 @@ interface TourService {
 
     fun selectAllAdmin(@Param("keyword") keyword: String,
                        @Param("filterOptions") filterOptions: List<String>) : Page<Tour>
+
+
+    fun getTagsForTour(@Param("id") id: Int): List<Tag>
+
+    fun deleteTagsForTour(@Param("id") id: Int)
+
+    fun addTagForTour(@Param("tag")tag: Int, @Param("id") tourId: Int)
 }

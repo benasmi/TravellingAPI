@@ -101,6 +101,7 @@ class TourController(@Autowired private val tourService: TourService,
         tourService.deleteTourById(id)
     }
 
+
     /**
      * Insert new tour
      * @param tour
@@ -109,6 +110,30 @@ class TourController(@Autowired private val tourService: TourService,
     fun insertTour(@RequestBody tour: Tour): Int{
         tourService.insertTour(tour)
         return tour.tourId!!
+    }
+
+    @RestController
+    @RequestMapping("/tour/tags")
+    class Tags(@Autowired private val tourService: TourService){
+
+        /**
+         * Get tags for tour
+         * @param id of a tour
+         */
+        @GetMapping("")
+        fun tags(@RequestParam(name = "id") id: Int): List<Tag>{
+            return tourService.getTagsForTour(id)
+        }
+
+        /**
+         * Set tags for a tour
+         */
+        @RequestMapping("/update")
+        fun insertParking(@RequestBody tags: List<Tag>, @RequestParam(name="p") tourId: Int){
+            tourService.deleteTagsForTour(tourId)
+            for(tag: Tag in tags)
+                tourService.addTagForTour(tag.tagId!!, tourId)
+        }
     }
 
 }
