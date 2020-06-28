@@ -17,6 +17,8 @@
         WHERE tourId=#{id}
     </update>
 
+
+
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.Tour">
         <if test="keyword!= ''">
             SELECT * FROM TOUR WHERE MATCH (name,description) AGAINST (CONCAT(#{keyword},'*') IN NATURAL LANGUAGE MODE)
@@ -77,6 +79,14 @@
     <delete id="deleteTagsForTour" >
         DELETE FROM TAG_TOUR WHERE fk_tourId=#{id}
     </delete>
+
+    <update id="changeVerificationStatus">
+        UPDATE TOUR SET isVerified=#{verified} WHERE tourId=#{tourId}
+    </update>
+
+    <update id="changePublicityStatus">
+        UPDATE TOUR SET isPublished=#{public} WHERE tourId=#{tourId}
+    </update>
 
     <insert id="addTagForTour">
         INSERT INTO TAG_TOUR(`fk_tourId`, `fk_tagId`) VALUES (#{id}, #{tag})

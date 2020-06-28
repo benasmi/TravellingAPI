@@ -112,6 +112,16 @@ class TourController(@Autowired private val tourService: TourService,
         return tour.tourId!!
     }
 
+    @GetMapping("/changeVerificationStatus")
+    fun changeVerificationStatus(@RequestParam("id") tourId: Int, @RequestParam("verified") isVerified: Boolean){
+        tourService.changeVerificationStatus(tourId, isVerified)
+    }
+
+    @GetMapping("/changePublicityStatus")
+    fun changePublicityStatus(@RequestParam("id") tourId: Int, @RequestParam("publiv") isPublic: Boolean){
+        tourService.changePublicityStatus(tourId, isPublic)
+    }
+
     @RestController
     @RequestMapping("/tour/tags")
     class Tags(@Autowired private val tourService: TourService){

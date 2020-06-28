@@ -22,5 +22,9 @@ interface TourService {
 
     fun deleteTagsForTour(@Param("id") id: Int)
 
-    fun addTagForTour(@Param("tag")tag: Int, @Param("id") tourId: Int)
+    fun addTagForTour(@Param("tag") tag: Int, @Param("id") tourId: Int)
+
+    fun changeVerificationStatus(@Param("tourId") tourId: Int, @Param("verified") verified: Boolean)
+
+    fun changePublicityStatus(@Param("tourId") tourId: Int, @Param("public") public: Boolean)
 }
