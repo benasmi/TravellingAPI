@@ -33,7 +33,7 @@ class FileStorageService @Autowired constructor(fileStorageProperties: FileStora
             throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
         val generatedName = generateUniqueFileName() + '.' + extension
         val targetLocation: Path = fileStorageLocation.resolve(generatedName)
-        Thumbnails.of(image.inputStream).scale(1.0).useExifOrientation(true).toFile(targetLocation.toString())
+        Thumbnails.of(image.inputStream).scale(1.0).toFile(targetLocation.toString())
 
         return ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/photo/view")
