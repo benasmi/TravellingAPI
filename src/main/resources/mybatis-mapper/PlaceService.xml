@@ -77,7 +77,7 @@
             HAVING distance &lt; #{range} ORDER BY distance, dateModified DESC
         </if>
         <if test="location.size() == 0">
-            ORDER BY dateModified DESC
+            ORDER BY name ASC
         </if>
 
     </select>

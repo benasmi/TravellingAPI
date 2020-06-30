@@ -4,7 +4,7 @@
 <mapper namespace="com.travel.travelapi.services.CategoryService">
 
     <select id="selectAllCategories" resultType="com.travel.travelapi.models.Category">
-        SELECT * FROM CATEGORY
+        SELECT * FROM CATEGORY ORDER BY name ASC
     </select>
 
     <insert id="insertCategory" useGeneratedKeys = "true" keyProperty = "categoryId" keyColumn = "categoryId">
