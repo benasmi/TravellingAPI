@@ -163,23 +163,29 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             }
     }
 
-    @GetMapping("/city/all")
-    private fun getAllCities(): ArrayList<String>{
-        return placeService.getAllCities()
-    }
 
     @GetMapping("/country/all")
     private fun getAllCountries(): ArrayList<String>{
         return placeService.getAllCountries()
     }
 
+    @GetMapping("/municipality/all")
+    private fun getAllMunicipalities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String): ArrayList<String>{
+        return placeService.getAllMunicipalities(if(countryRestrictions.isNotEmpty()) countryRestrictions.split(',') else ArrayList())
+    }
+
+    @GetMapping("/city/all")
+    private fun getAllCities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String,
+                             @RequestParam(name="munRestrictions", defaultValue = "") munRestrictions: String): ArrayList<String>{
+        return placeService.getAllCities(
+                if(countryRestrictions.isNotEmpty()) countryRestrictions.split(',') else ArrayList(),
+                if(munRestrictions.isNotEmpty()) munRestrictions.split(',') else ArrayList())
+    }
+
     @GetMapping("/county/all")
     private fun getAllCounties(): ArrayList<String>{
         return placeService.getAllCounties()
     }
-    @GetMapping("/municipality/all")
-    private fun getAllMunicipalities(): ArrayList<String>{
-        return placeService.getAllMunicipalities()
-    }
+
 
 }

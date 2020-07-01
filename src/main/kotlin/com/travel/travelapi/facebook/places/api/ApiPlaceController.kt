@@ -1,6 +1,8 @@
 package com.travel.travelapi.facebook.places.api
 
 import com.google.gson.Gson
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.maps.PlacesApi
 import com.google.maps.errors.InvalidRequestException
@@ -8,8 +10,8 @@ import com.travel.travelapi.config.GeoApiContextInstance
 import com.travel.travelapi.config.WebClientService
 import com.travel.travelapi.exceptions.FailedApiRequestException
 import com.travel.travelapi.exceptions.InvalidParamsException
+import com.travel.travelapi.models.Location
 import com.travel.travelapi.models.PlaceApi
-import com.travel.travelapi.services.ApiPlace
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.jsoup.Jsoup
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,9 +21,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.client.RestTemplate
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
+import reactor.event.selector.Selectors.uri
 import java.io.IOException
 import java.lang.Integer.max
 import kotlin.math.acos
@@ -33,7 +37,6 @@ import kotlin.math.sin
 @RequestMapping("/placeApi")
 class ApiPlaceController(
         @Autowired val webClientService: WebClientService,
-        @Autowired val apiPlace: ApiPlace,
         @Autowired val geoApiContext: GeoApiContextInstance
 ) {
 
@@ -72,6 +75,72 @@ class ApiPlaceController(
                 .flatMap(this::appendDescriptionToPlace)
                 .ordered { u1: PlaceApi, u2: PlaceApi -> places.indexOf(u1).compareTo(places.indexOf(u2)) }
     }
+
+//    @GetMapping("/byaddress")
+//    fun geocodeFromAddress(@RequestParam(name="address") address: String): Location{
+//        val restTemplate = RestTemplate()
+//        val result: String = restTemplate.getForObject<String>("https://maps.googleapis.com/maps/api/geocode/json?address=Kaunas&key=XXX&language=en", String::class.java)!!
+//        val gson = Gson().fromJson(result, JsonObject::class.java)!!
+//        val coordinates = gson?.get("results")?.asJsonArray?.get(0)!!.asJsonObject.get("geometry").asJsonObject.get("location").asJsonObject
+//        return geocodeFromLatLng(coordinates.get("lat").asString+","+coordinates.get("lng").asString)
+//    }
+//
+//    @GetMapping("bylatlng")
+//    fun geocodeFromLatLng(@RequestParam(name="latLng") latLng: String): Location{
+//        val restTemplate = RestTemplate()
+//        val res: String = restTemplate.getForObject<String>("https://maps.googleapis.com/maps/api/geocode/json?latlng=$latLng&key=XXX&language=en", String::class.java)!!
+//        val gson = Gson().fromJson(res, JsonObject::class.java)!!
+//        val coordinates = latLng.split(',')
+//        val results = gson?.get("results")?.asJsonArray?.get(0)?.asJsonObject!!
+//        val addressComponents = results.get("address_components").asJsonArray
+//        val address = results.get("formatted_address").asString
+//        val country = getCountry(addressComponents)
+//        val city = getCity(addressComponents)
+//        val municipality = getMunicipality(addressComponents)
+//        val county = getCounty(addressComponents)
+//        return Location(city,address,country,coordinates[0].toFloat(),coordinates[1].toFloat(),county,municipality)
+//
+//    }
+//
+//    fun getCity(json: JsonArray): String{
+//        json.forEach {
+//            if(it.asJsonObject.get("types").asJsonArray.get(0).asString.isNotEmpty() &&
+//                    it.asJsonObject.get("types").asJsonArray.get(0).asString == "locality"){
+//                return it.asJsonObject.get("long_name").asString
+//            }
+//        }
+//        return ""
+//    }
+//
+//    fun getMunicipality(json: JsonArray): String{
+//        json.forEach {
+//            if(it.asJsonObject.get("types").asJsonArray.get(0).asString.isNotEmpty() &&
+//                    it.asJsonObject.get("types").asJsonArray.get(0).asString == "administrative_area_level_2"){
+//                return it.asJsonObject.get("long_name").asString
+//            }
+//        }
+//        return ""
+//    }
+//
+//    fun getCounty(json: JsonArray): String{
+//        json.forEach {
+//            if(it.asJsonObject.get("types").asJsonArray.get(0).asString.isNotEmpty() &&
+//                    it.asJsonObject.get("types").asJsonArray.get(0).asString == "administrative_area_level_1"){
+//                return it.asJsonObject.get("long_name").asString
+//            }
+//        }
+//        return ""
+//    }
+//
+//    fun getCountry(json: JsonArray): String{
+//        json.forEach {
+//            if(it.asJsonObject.get("types").asJsonArray.get(0).asString.isNotEmpty() &&
+//                    it.asJsonObject.get("types").asJsonArray.get(0).asString == "country"){
+//                    return it.asJsonObject.get("long_name").asString
+//            }
+//        }
+//    return ""
+//    }
 
     private fun appendDescriptionToPlace(place: PlaceApi): Mono<PlaceApi> {
         return webClientService.webClientBuilder()

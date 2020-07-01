@@ -102,7 +102,20 @@
     </delete>
 
     <select id="getAllCities" resultType="string">
-        SELECT DISTINCT city FROM PLACE WHERE 1 AND (city IS NOT NULL AND city != '' ) ORDER BY city
+        SELECT DISTINCT city FROM PLACE WHERE 1 AND (city IS NOT NULL AND city != '' )
+        <if test="munRestrictions.size() != 0">
+            AND municipality IN
+            <foreach item='item' index='index' collection='munRestrictions' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+        <if test="countryRestrictions.size() != 0">
+            AND country IN
+            <foreach item='item' index='index' collection='countryRestrictions' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY city
     </select>
 
     <select id="getAllCountries" resultType="string">
@@ -114,6 +127,13 @@
     </select>
 
     <select id="getAllMunicipalities" resultType="string">
-        SELECT DISTINCT municipality FROM PLACE WHERE 1 AND (municipality IS NOT NULL AND municipality != '' ) ORDER BY municipality
+        SELECT DISTINCT municipality FROM PLACE WHERE 1 AND (municipality IS NOT NULL AND municipality != '' )
+        <if test="restrictions.size() != 0">
+            AND country IN
+            <foreach item='item' index='index' collection='restrictions' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>
+        </if>
+        ORDER BY municipality
     </select>
 </mapper>

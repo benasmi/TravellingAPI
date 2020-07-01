@@ -38,8 +38,10 @@ interface PlaceService {
                                @Param("range") range: Double): List<PlaceLocal>
 
 
-    fun getAllCities(): ArrayList<String>
+    fun getAllCities(@Param("countryRestrictions") countryRestrictions: List<String>,
+                     @Param("munRestrictions") munRestrictions: List<String>): ArrayList<String>
+
     fun getAllCountries(): ArrayList<String>
     fun getAllCounties(): ArrayList<String>
-    fun getAllMunicipalities(): ArrayList<String>
+    fun getAllMunicipalities(@Param("restrictions") restrictions: List<String>): ArrayList<String>
 }
