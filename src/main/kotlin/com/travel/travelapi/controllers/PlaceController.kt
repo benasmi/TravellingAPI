@@ -29,8 +29,12 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
 
 
-
-
+//    @GetMapping("/searchadmin/loc")
+//    fun searchAdminByLatLng(@RequestParam lat: Double,
+//                            @RequestParam lng: Double,
+//                            @RequestParam(defaultValue = "1") range: Double):List<PlaceLocal> {
+//        return placeService.searchPlacesByLocation(lat,lng,range)
+//    }
 
     /**
      * @return all places that match given query

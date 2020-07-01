@@ -33,6 +33,7 @@ interface PlaceService {
     fun insertPlace(@Param("p") p: PlaceLocal)
     fun deletePlace(@Param("id") id: Int)
 
+
     fun searchPlacesByLocation(@Param("latitude") latitude: Double,
                                @Param("longitude") longitude: Double,
                                @Param("range") range: Double): List<PlaceLocal>
