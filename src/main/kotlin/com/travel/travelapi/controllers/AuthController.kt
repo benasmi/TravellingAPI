@@ -4,6 +4,7 @@ import com.travel.travelapi.auth.AuthUserDetailsService
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtRequest
+import com.travel.travelapi.models.User
 import com.travel.travelapi.services.AuthService
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,6 +26,15 @@ class AuthController(@Autowired private val authService: AuthService) {
     fun getUserByUserName(username: String): TravelUserDetails{
             return authService.getUserByUsername(username)
     }
+
+    fun findByEmail(email: String) : User?{
+        return authService.getUserByEmail(email)
+    }
+
+    fun emailExists(email: String): Boolean{
+        return authService.emailExists(email).isNotEmpty()
+    }
+
 
 //    @PostMapping("/login")
 //    fun generateJwtToken(@RequestBody jwtRequest: JwtRequest): String{

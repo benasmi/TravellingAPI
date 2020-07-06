@@ -1,16 +1,38 @@
 package com.travel.travelapi.auth
 
-import com.fasterxml.jackson.annotation.JsonIgnore
+import com.travel.travelapi.models.User
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.oauth2.core.user.OAuth2User
+import java.util.*
+import kotlin.collections.ArrayList
 
-data class TravelUserDetails(private val username: String?=null,
+
+data class TravelUserDetails(private val id: Long? = null,
+                             private val username: String?=null,
                              private val password: String?=null,
-                             @JsonIgnore private val grantedAuthorities: Set<GrantedAuthority?>?= emptySet(),
-                             @JsonIgnore private val isAccountNonExpired: Boolean?=true,
-                             @JsonIgnore private val isAccountNonLocked: Boolean?=true,
-                             @JsonIgnore private val isCredentialsNonExpired: Boolean?=true,
-                             @JsonIgnore private val isEnabled: Boolean?=true) : UserDetails {
+                             private val grantedAuthorities: List<GrantedAuthority?>?= ArrayList()) : UserDetails, OAuth2User {
+
+    private var attributes: Map<String, Any> = emptyMap()
+
+    companion object{
+        fun create(user: User): TravelUserDetails {
+            val authorities: List<GrantedAuthority> = Collections.singletonList(SimpleGrantedAuthority("ROLE_USER"))
+            return TravelUserDetails(
+                    user.id,
+                    user.email,
+                    user.password,
+                    authorities
+            )
+        }
+
+        fun create(user: User, attributes: Map<String, Any>): TravelUserDetails {
+            val userPrincipal: TravelUserDetails = create(user)
+            userPrincipal.attributes = attributes
+            return userPrincipal
+        }
+    }
 
     override fun getAuthorities(): Collection<GrantedAuthority?> {
         return grantedAuthorities!!
@@ -25,19 +47,27 @@ data class TravelUserDetails(private val username: String?=null,
     }
 
     override fun isAccountNonExpired(): Boolean {
-        return isAccountNonExpired!!
+        return true
     }
 
     override fun isAccountNonLocked(): Boolean {
-        return isAccountNonLocked!!
+        return true
     }
 
     override fun isCredentialsNonExpired(): Boolean {
-        return isCredentialsNonExpired!!
+        return true
     }
 
     override fun isEnabled(): Boolean {
-        return isEnabled!!
+        return true
+    }
+
+    override fun getName(): String {
+       return id.toString()
+    }
+
+    override fun getAttributes(): Map<String, Any> {
+       return attributes
     }
 
 }
