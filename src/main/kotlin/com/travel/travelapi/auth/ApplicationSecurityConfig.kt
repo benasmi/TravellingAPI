@@ -1,13 +1,12 @@
 package com.travel.travelapi.auth
 
-import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtTokenVerifier
+import com.travel.travelapi.jwt.JwtUsernameAndPasswordAuthenticationFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -35,13 +34,11 @@ class ApplicationSecurityConfig(@Autowired private val authUserDetailsService: A
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
+                .addFilter(getJWTAuthenticationFilter())
+                .addFilterAfter(JwtTokenVerifier(secretKey, jwtConfig),JwtUsernameAndPasswordAuthenticationFilter::class.java)
                 .authorizeRequests()
-                .antMatchers("/auth/**")
-                .permitAll()
                 .anyRequest()
                 .authenticated()
-
-        http.addFilterBefore(JwtTokenVerifier(secretKey,jwtConfig), UsernamePasswordAuthenticationFilter::class.java)
     }
 
     /**
@@ -64,12 +61,13 @@ class ApplicationSecurityConfig(@Autowired private val authUserDetailsService: A
     }
 
     /**
-     * Authentication manager bean to use it anywhere ex. controllers.
+     * Authentication filter
      */
     @Bean
-    @Throws(java.lang.Exception::class)
-    override fun authenticationManagerBean(): AuthenticationManager {
-        return super.authenticationManagerBean()
+    fun getJWTAuthenticationFilter(): JwtUsernameAndPasswordAuthenticationFilter {
+        val filter = JwtUsernameAndPasswordAuthenticationFilter(jwtConfig,secretKey)
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setFilterProcessesUrl("/auth/login")
+        return filter
     }
-
 }

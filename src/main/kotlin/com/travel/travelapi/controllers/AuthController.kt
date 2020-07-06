@@ -20,40 +20,36 @@ import java.time.LocalDate
 import javax.crypto.SecretKey
 
 @RestController
-@RequestMapping("/auth")
-class AuthController(@Autowired private val authService: AuthService,
-                     @Autowired private val authenticationManager: AuthenticationManager,
-                     private val jwtConfig: JwtConfig,
-                     private val secretKey: SecretKey) {
+class AuthController(@Autowired private val authService: AuthService) {
 
     fun getUserByUserName(username: String): TravelUserDetails{
             return authService.getUserByUsername(username)
     }
 
-    @PostMapping("/login")
-    fun generateJwtToken(@RequestBody jwtRequest: JwtRequest): String{
-
-        val auth = authenticate(jwtRequest.username, jwtRequest.password)
-
-        val token = Jwts.builder()
-                .setSubject(auth.name)
-                .claim("authorities", auth.authorities)
-                .setIssuedAt(java.util.Date())
-                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
-                .signWith(secretKey)
-                .compact()
-
-        return token
-    }
-
-    fun authenticate(username: String, password: String): Authentication {
-        try {
-           return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
-        } catch (e: DisabledException) {
-            throw Exception("USER_DISABLED", e)
-        } catch (e: BadCredentialsException) {
-            throw Exception("INVALID_CREDENTIALS", e)
-        }
-    }
+//    @PostMapping("/login")
+//    fun generateJwtToken(@RequestBody jwtRequest: JwtRequest): String{
+//
+//        val auth = authenticate(jwtRequest.username, jwtRequest.password)
+//
+//        val token = Jwts.builder()
+//                .setSubject(auth.name)
+//                .claim("authorities", auth.authorities)
+//                .setIssuedAt(java.util.Date())
+//                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+//                .signWith(secretKey)
+//                .compact()
+//
+//        return token
+//    }
+//
+//    fun authenticate(username: String, password: String): Authentication {
+//        try {
+//           return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
+//        } catch (e: DisabledException) {
+//            throw Exception("USER_DISABLED", e)
+//        } catch (e: BadCredentialsException) {
+//            throw Exception("INVALID_CREDENTIALS", e)
+//        }
+//    }
 
 }

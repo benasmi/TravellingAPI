@@ -9,7 +9,5 @@ class JwtConfig {
     var secretKey: String? = null
     var tokenPrefix: String? = null
     var tokenExpirationAfterDays: Int? = null
-
-    val authorizationHeader: String
-        get() = "Authorization"
+    val authorizationHeader = "Authorization"
 }
