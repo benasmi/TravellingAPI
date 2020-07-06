@@ -12,7 +12,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 
 @MapperScan("com.travel.travelapi.services")
-@ComponentScan(basePackages = ["com.travel.travelapi.controllers","com.travel.travelapi.sphinx","com.travel.travelapi.facebook.places.api","com.travel.travelapi.services", "com.travel.travelapi.models", "com.travel.travelapi.config", "com.travel.travelapi.exceptions"])
+@ComponentScan(basePackages = ["com.travel.travelapi.controllers","com.travel.travelapi.jwt","com.travel.travelapi.auth","com.travel.travelapi.sphinx","com.travel.travelapi.facebook.places.api","com.travel.travelapi.services", "com.travel.travelapi.models", "com.travel.travelapi.config", "com.travel.travelapi.exceptions"])
 @EnableConfigurationProperties(
 	FileStorageProperties::class
 )

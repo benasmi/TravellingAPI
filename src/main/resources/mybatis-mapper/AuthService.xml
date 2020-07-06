@@ -1,0 +1,10 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.AuthService">
+
+    <select id="getUserByUsername" resultType="com.travel.travelapi.auth.TravelUserDetails">
+        SELECT * FROM `USER` WHERE username=#{username}
+    </select>
+
+</mapper>
