@@ -1,4 +1,4 @@
-package com.travel.travelapi.config;
+package com.travel.travelapi.auth;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

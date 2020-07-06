@@ -47,7 +47,8 @@ class JwtUsernameAndPasswordAuthenticationFilter(private val jwtConfig: JwtConfi
                 .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
-        
+
+        response.status = 200
         response.addHeader(jwtConfig.authorizationHeader, jwtConfig.tokenPrefix + token)
     }
 }

@@ -2,6 +2,7 @@ package com.travel.travelapi.jwt
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.stereotype.Component
+import com.google.common.net.HttpHeaders;
 
 @Component
 @ConfigurationProperties(prefix = "application.jwt")
@@ -10,4 +11,5 @@ class JwtConfig {
     var tokenPrefix: String? = null
     var tokenExpirationAfterDays: Int? = null
     val authorizationHeader = "Authorization"
+
 }
