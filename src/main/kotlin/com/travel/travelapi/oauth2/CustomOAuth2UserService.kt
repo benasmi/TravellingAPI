@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler
 import org.springframework.stereotype.Service
+import java.util.*
 import javax.naming.AuthenticationException
 
 
@@ -36,14 +37,7 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
             throw AuthenticationException("Email not found from OAuth2 provider")
         }
 
-        val user: User? =  User(null,
-                oAuth2UserInfo.name,
-                oAuth2UserInfo.email,
-                oAuth2UserInfo.imageUrl,
-                true,
-                null,
-                AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)
-                ,oAuth2UserInfo.id)
+        val user = authController.getUserByIdentifier(oAuth2UserInfo.id!!)
 
         val formedUser = if (user != null) {
             if (user.provider!! != AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)) {
@@ -61,20 +55,27 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
 
     private fun registerNewUser(oAuth2UserRequest: OAuth2UserRequest, oAuth2UserInfo: OAuth2UserInfo): User {
 
-        val user = User(null,
+        val user = User(
+                null,
                 oAuth2UserInfo.name,
                 oAuth2UserInfo.email,
+                oAuth2UserInfo.id,
                 oAuth2UserInfo.imageUrl,
                 true,
                 null,
-                AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)
-                ,oAuth2UserInfo.id)
+                AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId),
+                UUID.randomUUID().toString(),
+                null,
+                1 //TODO: whatever
+        )
+        authController.createUser(user)
         return user
     }
 
     private fun updateExistingUser(existingUser: User, oAuth2UserInfo: OAuth2UserInfo): User {
         existingUser.name = oAuth2UserInfo.name
         existingUser.imageUrl = oAuth2UserInfo.imageUrl
+                //todo: update
         return existingUser
     }
 }

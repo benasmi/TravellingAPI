@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping
 class AuthUserDetailsService(@Autowired @Lazy private val authController: AuthController) : UserDetailsService{
-    override fun loadUserByUsername(username: String): UserDetails {
-        return authController.getUserByUserName(username) ?: throw UsernameNotFoundException("Username not found")
+
+    override fun loadUserByUsername(identifier: String): UserDetails {
+        val user =  authController.getUserByIdentifier(identifier) ?: throw UsernameNotFoundException("User by identifier not found")
+        return TravelUserDetails.create(user)
     }
 }

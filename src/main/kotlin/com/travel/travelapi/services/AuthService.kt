@@ -16,5 +16,5 @@ interface AuthService {
     fun getUserRoles(@Param("user") user: User): ArrayList<Role>
     fun getUserPermissions(@Param("roles") roles: ArrayList<Role>): ArrayList<Permission>
 
-    fun mapUserRoles(@Param("user") user: User): ArrayList<>
+    fun mapUserRoles(@Param("user") user: User)
 }
