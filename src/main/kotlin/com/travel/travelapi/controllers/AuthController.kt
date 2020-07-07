@@ -4,6 +4,9 @@ import com.travel.travelapi.auth.AuthUserDetailsService
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtRequest
+import com.travel.travelapi.models.Permission
+import com.travel.travelapi.models.Role
+import com.travel.travelapi.models.Roles
 import com.travel.travelapi.models.User
 import com.travel.travelapi.services.AuthService
 import io.jsonwebtoken.Jwts
@@ -18,23 +21,80 @@ import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.sql.Date
 import java.time.LocalDate
+import java.util.*
 import javax.crypto.SecretKey
+import javax.naming.AuthenticationException
 
-@RestController
+@RestController("/auth")
 class AuthController(@Autowired private val authService: AuthService) {
 
-    fun getUserByUserName(username: String): TravelUserDetails{
-            return authService.getUserByUsername(username)
+    /**
+     * Gets user row by identifier
+     * @param identifier
+     * @return TravelUserDetails
+     */
+    fun getUserByIdentifier(@RequestParam identifier: String): TravelUserDetails{
+            val user = authService.getUserByIdentifier(identifier)
+
+            val roles = getUserRoles(user)
+            val permissions = getUserPermissions(roles)
+            val grantedAuthorities = ArrayList<String>()
+
+            roles.forEach{
+                grantedAuthorities.add(it.role!!)
+            }
+            permissions.forEach{
+                grantedAuthorities.add(it.permission!!)
+            }
+
+
+            return TravelUserDetails(user.id,
+                    user.identifier,
+                    user.password,TravelUserDetails.createGrantedAuthorities(grantedAuthorities))
     }
 
-    fun findByEmail(email: String) : User?{
-        return authService.getUserByEmail(email)
+    fun identifierExists(identifier: String): Boolean{
+        return authService.identifierExists(identifier).isNotEmpty()
     }
 
-    fun emailExists(email: String): Boolean{
-        return authService.emailExists(email).isNotEmpty()
+
+    /**
+     * Creates new user
+     * @param user
+     */
+    @Throws(AuthenticationException::class)
+    @PostMapping("/registration")
+    fun createUser(@RequestBody user: User){
+        if(identifierExists(user.email!!)) throw AuthenticationException("Email already exists")
+
+        user.refreshToken = UUID.randomUUID().toString()
+        user.roles.add(Roles.ROLE_USER.i)
+        authService.createUser(user)
+
+        mapUserRoles(user)
     }
 
+    /**
+     * Get mapped user roles
+     * @param user
+     * @return user roles
+     */
+    fun getUserRoles(user: User): ArrayList<Role>{
+        return authService.getUserRoles(user)
+    }
+
+    /**
+     * Get mapped user permissions
+     * @param user
+     * @return user permissions
+     */
+    fun getUserPermissions(roles: ArrayList<Role>): ArrayList<Permission>{
+        return authService.getUserPermissions(roles)
+    }
+
+    fun mapUserRoles(user: User){
+        authService.
+    }
 
 //    @PostMapping("/login")
 //    fun generateJwtToken(@RequestBody jwtRequest: JwtRequest): String{

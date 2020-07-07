@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 data class TravelUserDetails(private val id: Long? = null,
                              private val username: String?=null,
                              private val password: String?=null,
-                             private val grantedAuthorities: List<GrantedAuthority?>?= ArrayList()) : UserDetails, OAuth2User {
+                             private val grantedAuthorities: List<GrantedAuthority>?= ArrayList()) : UserDetails, OAuth2User {
 
     private var attributes: Map<String, Any> = emptyMap()
 
@@ -31,6 +31,14 @@ data class TravelUserDetails(private val id: Long? = null,
             val userPrincipal: TravelUserDetails = create(user)
             userPrincipal.attributes = attributes
             return userPrincipal
+        }
+
+        fun createGrantedAuthorities(roles: List<String>): List<GrantedAuthority>{
+            val authorities = ArrayList<GrantedAuthority>()
+            for (role in roles) {
+                authorities.add(SimpleGrantedAuthority(role))
+            }
+            return authorities
         }
     }
 

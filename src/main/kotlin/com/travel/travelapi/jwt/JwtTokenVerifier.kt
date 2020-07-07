@@ -49,7 +49,7 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
             SecurityContextHolder.getContext().authentication = authentication
         } catch (e: JwtException) {
             throw IllegalStateException(String.format("Token %s cannot be trusted", token))
-        } 
+        }
         filterChain.doFilter(request, response)
     }
 
