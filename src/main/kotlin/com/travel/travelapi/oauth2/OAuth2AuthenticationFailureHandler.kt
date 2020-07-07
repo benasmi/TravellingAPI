@@ -1,4 +1,4 @@
-package com.travel.travelapi.oauth2.users
+package com.travel.travelapi.oauth2
 
 import com.travel.travelapi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository
 import com.travel.travelapi.utils.CookieUtils

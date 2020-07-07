@@ -1,4 +1,4 @@
-package com.travel.travelapi.oauth2.users
+package com.travel.travelapi.oauth2
 
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository
@@ -50,7 +50,9 @@ class OAuth2AuthenticationSuccessHandler(
                 throw AuthorizationServiceException("Sorry! We've got an Unauthorized Redirect URI and can't proceed with the authentication")
             }
         }
+
         val targetUrl: String = redirectUri!!.orElse(defaultTargetUrl)
+
         val token = Jwts.builder()
                 .setSubject(authentication.name)
                 .claim("authorities", authentication.authorities)

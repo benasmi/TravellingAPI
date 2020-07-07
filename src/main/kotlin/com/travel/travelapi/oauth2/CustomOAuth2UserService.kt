@@ -36,7 +36,15 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
             throw AuthenticationException("Email not found from OAuth2 provider")
         }
 
-        val user: User? = authController.findByEmail(oAuth2UserInfo.email!!)
+        val user: User? =  User(null,
+                oAuth2UserInfo.name,
+                oAuth2UserInfo.email,
+                oAuth2UserInfo.imageUrl,
+                true,
+                null,
+                AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)
+                ,oAuth2UserInfo.id)
+
         val formedUser = if (user != null) {
             if (user.provider!! != AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)) {
                 throw AuthenticationException("Looks like you're signed up with " +
@@ -53,18 +61,20 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
 
     private fun registerNewUser(oAuth2UserRequest: OAuth2UserRequest, oAuth2UserInfo: OAuth2UserInfo): User {
 
-//        val user = User()
-//        user.setProvider(AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId))
-//        user.setProviderId(oAuth2UserInfo.getId())
-//        user.setName(oAuth2UserInfo.getName())
-//        user.setEmail(oAuth2UserInfo.getEmail())
-//        user.setImageUrl(oAuth2UserInfo.getImageUrl())
-        return User()
+        val user = User(null,
+                oAuth2UserInfo.name,
+                oAuth2UserInfo.email,
+                oAuth2UserInfo.imageUrl,
+                true,
+                null,
+                AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)
+                ,oAuth2UserInfo.id)
+        return user
     }
 
     private fun updateExistingUser(existingUser: User, oAuth2UserInfo: OAuth2UserInfo): User {
-//        existingUser.setName(oAuth2UserInfo.getName())
-//        existingUser.setImageUrl(oAuth2UserInfo.getImageUrl())
-        return User()
+        existingUser.name = oAuth2UserInfo.name
+        existingUser.imageUrl = oAuth2UserInfo.imageUrl
+        return existingUser
     }
 }

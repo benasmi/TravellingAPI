@@ -13,17 +13,17 @@ class HttpCookieOAuth2AuthorizationRequestRepository : AuthorizationRequestRepos
     val REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri"
     private val cookieExpireSeconds = 180
 
-    override fun loadAuthorizationRequest(request: HttpServletRequest?): OAuth2AuthorizationRequest {
+    override fun loadAuthorizationRequest(request: HttpServletRequest): OAuth2AuthorizationRequest {
         return CookieUtils.getCookie(request, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
                 .map { cookie: Cookie? -> CookieUtils.deserialize(cookie, OAuth2AuthorizationRequest::class.java) }
                 .orElse(null)
     }
 
-    override fun removeAuthorizationRequest(request: HttpServletRequest?): OAuth2AuthorizationRequest {
+    override fun removeAuthorizationRequest(request: HttpServletRequest): OAuth2AuthorizationRequest {
         return this.loadAuthorizationRequest(request)
     }
 
-    override fun saveAuthorizationRequest(authorizationRequest: OAuth2AuthorizationRequest?, request: HttpServletRequest?, response: HttpServletResponse?) {
+    override fun saveAuthorizationRequest(authorizationRequest: OAuth2AuthorizationRequest, request: HttpServletRequest, response: HttpServletResponse) {
         if (authorizationRequest == null) {
             CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
             CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME)
@@ -37,7 +37,7 @@ class HttpCookieOAuth2AuthorizationRequestRepository : AuthorizationRequestRepos
         }
     }
 
-    fun removeAuthorizationRequestCookies(request: HttpServletRequest?, response: HttpServletResponse?) {
+    fun removeAuthorizationRequestCookies(request: HttpServletRequest, response: HttpServletResponse) {
         CookieUtils.deleteCookie(request, response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME)
         CookieUtils.deleteCookie(request, response, REDIRECT_URI_PARAM_COOKIE_NAME)
     }
