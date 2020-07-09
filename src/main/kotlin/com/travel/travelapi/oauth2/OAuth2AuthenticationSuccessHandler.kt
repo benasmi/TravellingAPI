@@ -31,19 +31,25 @@ class OAuth2AuthenticationSuccessHandler(
     @Throws(IOException::class, ServletException::class)
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         val targetUrl = determineTargetUrl(request, response, authentication)
+//        val targetUrl = "http://localhost:8080/api/v1/oauth2/callback/google"
         if (response.isCommitted) {
             logger.debug("Response has already been committed. Unable to redirect to $targetUrl")
             return
         }
+
         clearAuthenticationAttributes(request)
+
+
+//        response.addHeader(jwtConfig.authorizationHeader, jwtConfig.tokenPrefix + token)
+
         redirectStrategy.sendRedirect(request, response, targetUrl)
     }
 
     val REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri"
 
     override fun determineTargetUrl(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication): String? {
-        val redirectUri: Optional<String>? = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
-                .map<String>(Cookie::getValue)
+        val redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
+                .map(Cookie::getValue)
 
         if (redirectUri != null) {
             if (redirectUri.isPresent && !isAuthorizedRedirectUri(redirectUri.get())) {
@@ -64,7 +70,7 @@ class OAuth2AuthenticationSuccessHandler(
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)
                 .build().toUriString()
-    }
+    } //http://localhost:8080/api/v1/oauth2/authorize/google?redirect_uri=https://www.google.com/
 
     private fun isAuthorizedRedirectUri(uri: String): Boolean {
         return true

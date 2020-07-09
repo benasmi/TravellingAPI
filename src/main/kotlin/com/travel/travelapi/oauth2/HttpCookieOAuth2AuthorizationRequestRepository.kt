@@ -31,8 +31,8 @@ class HttpCookieOAuth2AuthorizationRequestRepository : AuthorizationRequestRepos
         }
 
         CookieUtils.addCookie(response, OAUTH2_AUTHORIZATION_REQUEST_COOKIE_NAME, CookieUtils.serialize(authorizationRequest), cookieExpireSeconds)
-        val redirectUriAfterLogin = request!!.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME)
-        if (redirectUriAfterLogin.isNotEmpty()) {
+        val redirectUriAfterLogin = request.getParameter(REDIRECT_URI_PARAM_COOKIE_NAME)
+        if (redirectUriAfterLogin != null && redirectUriAfterLogin.isNotEmpty()) {
             CookieUtils.addCookie(response, REDIRECT_URI_PARAM_COOKIE_NAME, redirectUriAfterLogin, cookieExpireSeconds)
         }
     }

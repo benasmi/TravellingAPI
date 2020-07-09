@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AuthService {
     fun getUserByIdentifier(@Param("identifier") identifier: String): User
-    fun identifierExists(@Param("email") email: String): String
+    fun identifierExists(@Param("identifier") identifier: String): Boolean
     fun createUser(@Param("user") user: User)
 
     fun getUserRoles(@Param("user") user: User): ArrayList<Role>

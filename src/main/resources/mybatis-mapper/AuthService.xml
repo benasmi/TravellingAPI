@@ -7,4 +7,22 @@
         SELECT * FROM `USER` WHERE username=#{username}
     </select>
 
+    <select id="getUserByIdentifier" resultType="com.travel.travelapi.models.User">
+        SELECT * FROM USERS WHERE identifier=#{identifier}
+    </select>
+
+    <select id="identifierExists" resultType="Boolean">
+        SELECT EXISTS(SELECT * FROM USERS WHERE identifier=#{identifier})
+    </select>
+
+    <insert id="createUser">
+        INSERT INTO `USERS`(`identifier`, `name`, `surname`, `birthday`, `gender`, `email`, `fk_photoId`, `fk_locale`, `password`, `provider`, `phoneNumber`, `refreshToken`)
+        VALUES (#{user.identifier},#{user.name},NULL,NULL,NULL,#{user.email},NULL,NULL,NULL,#{user.provider},NULL,#{user.refreshToken});
+        SET @userInsertedId = (SELECT LAST_INSERT_ID());
+        <foreach collection="user.roles" item="roleId">
+            INSERT INTO `USER_ROLE`(`fk_userId`, `fk_roleId`) VALUES (@userInsertedId,#{roleId});
+        </foreach>
+    </insert>
+
+
 </mapper>

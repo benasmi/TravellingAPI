@@ -29,9 +29,7 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
 
         val token = authorizationHeader.replace(jwtConfig.tokenPrefix!!, "")
         try {
-            val claimsJws = Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
+            val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
             val body = claimsJws.body
             val username = body.subject
             val authorities = body["authorities"] as List<Map<String, String>>?

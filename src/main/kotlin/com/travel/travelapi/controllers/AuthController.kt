@@ -22,18 +22,18 @@ class AuthController(@Autowired private val authService: AuthService) {
     fun getUserByIdentifier(@RequestParam identifier: String): User?{
             val user = authService.getUserByIdentifier(identifier)
 
-            val roles = getUserRoles(user)
-            val permissions = getUserPermissions(roles)
-            val grantedAuthorities = ArrayList<String>()
-
-            roles.forEach{
-                grantedAuthorities.add(it.role!!)
-            }
-            permissions.forEach{
-                grantedAuthorities.add(it.permission!!)
-            }
-
-            user.authorities = TravelUserDetails.createGrantedAuthorities(grantedAuthorities)
+//            val roles = getUserRoles(user)
+//            val permissions = getUserPermissions(roles)
+//            val grantedAuthorities = ArrayList<String>()
+//
+//            roles.forEach{
+//                grantedAuthorities.add(it.role!!)
+//            }
+//            permissions.forEach{
+//                grantedAuthorities.add(it.permission!!)
+//            }
+//
+//            user.authorities = TravelUserDetails.createGrantedAuthorities(grantedAuthorities)
             return user
 //            return TravelUserDetails(user.id,
 //                    user.identifier,
@@ -41,7 +41,7 @@ class AuthController(@Autowired private val authService: AuthService) {
     }
 
     fun identifierExists(identifier: String): Boolean{
-        return authService.identifierExists(identifier).isNotEmpty()
+        return authService.identifierExists(identifier)
     }
 
 
@@ -57,8 +57,6 @@ class AuthController(@Autowired private val authService: AuthService) {
         user.refreshToken = UUID.randomUUID().toString()
         user.roles.add(Roles.ROLE_USER.id)
         authService.createUser(user)
-
-        mapUserRoles(user)
     }
 
     /**
@@ -77,10 +75,6 @@ class AuthController(@Autowired private val authService: AuthService) {
      */
     fun getUserPermissions(roles: ArrayList<Role>): ArrayList<Permission>{
         return authService.getUserPermissions(roles)
-    }
-
-    fun mapUserRoles(user: User){
-        authService.mapUserRoles(user)
     }
 
 //    @PostMapping("/login")

@@ -2,6 +2,7 @@ package com.travel.travelapi.oauth2
 
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.controllers.AuthController
+import com.travel.travelapi.models.Roles
 import com.travel.travelapi.models.User
 import com.travel.travelapi.oauth2.users.OAuth2UserInfo
 import com.travel.travelapi.oauth2.users.OAuth2UserInfoFactory
