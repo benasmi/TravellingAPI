@@ -25,11 +25,13 @@ class JwtUsernameAndPasswordAuthenticationFilter(private val jwtConfig: JwtConfi
         return try {
             val authenticationRequest: JwtRequest = ObjectMapper()
                     .readValue(request.inputStream, JwtRequest::class.java)
+
             val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                    authenticationRequest.username,
+                    authenticationRequest.identifier,
                     authenticationRequest.password
             )
             authenticationManager.authenticate(authentication)
+
         } catch (e: IOException) {
             throw RuntimeException(e)
         }
@@ -47,6 +49,8 @@ class JwtUsernameAndPasswordAuthenticationFilter(private val jwtConfig: JwtConfi
                 .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
+
+
 
         response.status = 200
         response.addHeader(jwtConfig.authorizationHeader, jwtConfig.tokenPrefix + token)

@@ -67,9 +67,9 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
                 AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId),
                 UUID.randomUUID().toString(),
                 null,
-                1 //TODO: whatever
+                Date().toString()
         )
-        authController.createUser(user)
+//        authController.createUser(user)
         return user
     }
 

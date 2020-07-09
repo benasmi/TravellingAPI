@@ -10,6 +10,8 @@ import kotlin.collections.ArrayList
 
 
 data class TravelUserDetails(private val id: Long? = null,
+                             private val identifier: String? = null,
+                             val refreshToken: String? = null,
                              private val username: String?=null,
                              private val password: String?=null,
                              private val grantedAuthorities: List<GrantedAuthority>?= ArrayList()) : UserDetails, OAuth2User {
@@ -18,12 +20,13 @@ data class TravelUserDetails(private val id: Long? = null,
 
     companion object{
         fun create(user: User): TravelUserDetails {
-            val authorities: List<GrantedAuthority> = Collections.singletonList(SimpleGrantedAuthority("ROLE_USER"))
             return TravelUserDetails(
                     user.id,
+                    user.identifier,
+                    user.refreshToken,
                     user.email,
                     user.password,
-                    authorities
+                    user.authorities
             )
         }
 
@@ -71,11 +74,12 @@ data class TravelUserDetails(private val id: Long? = null,
     }
 
     override fun getName(): String {
-       return id.toString()
+       return identifier!!
     }
 
     override fun getAttributes(): Map<String, Any> {
        return attributes
     }
+
 
 }

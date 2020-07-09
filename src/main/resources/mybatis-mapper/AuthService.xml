@@ -3,26 +3,40 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.travel.travelapi.services.AuthService">
 
-    <select id="getUserByUsername" resultType="com.travel.travelapi.auth.TravelUserDetails">
-        SELECT * FROM `USER` WHERE username=#{username}
-    </select>
-
     <select id="getUserByIdentifier" resultType="com.travel.travelapi.models.User">
-        SELECT * FROM USERS WHERE identifier=#{identifier}
+        SELECT * FROM USERS WHERE identifier=#{identifier} AND provider="local"
     </select>
 
     <select id="identifierExists" resultType="Boolean">
         SELECT EXISTS(SELECT * FROM USERS WHERE identifier=#{identifier})
     </select>
 
+    <select id="emailExists" resultType="Boolean">
+        SELECT EXISTS(SELECT * FROM USERS WHERE email=#{email})
+    </select>
+
     <insert id="createUser">
-        INSERT INTO `USERS`(`identifier`, `name`, `surname`, `birthday`, `gender`, `email`, `fk_photoId`, `fk_locale`, `password`, `provider`, `phoneNumber`, `refreshToken`)
-        VALUES (#{user.identifier},#{user.name},NULL,NULL,NULL,#{user.email},NULL,NULL,NULL,#{user.provider},NULL,#{user.refreshToken});
+        INSERT INTO `USERS`(`identifier`, `name`, `surname`, `birthday`, `gender`, `email`, `fk_photoId`, `fk_locale`, `password`, `provider`, `refreshToken`)
+        VALUES (#{user.identifier},#{user.name},NULL,(STR_TO_DATE(#{user.birthday},'%d/%m/%Y')),NULL,#{user.email},NULL,NULL,#{user.password},#{user.provider},#{user.refreshToken});
         SET @userInsertedId = (SELECT LAST_INSERT_ID());
         <foreach collection="user.roles" item="roleId">
             INSERT INTO `USER_ROLE`(`fk_userId`, `fk_roleId`) VALUES (@userInsertedId,#{roleId});
         </foreach>
     </insert>
 
+    <select id="getUserRoles" resultType="com.travel.travelapi.models.Role">
+        SELECT r.roleId, r.role, r.description FROM ROLE r
+        INNER JOIN USER_ROLE ur ON ur.fk_roleId = r.roleId
+        WHERE ur.fk_userId = #{user.id}
+    </select>
+
+    <select id="getUserPermissions" resultType="com.travel.travelapi.models.Permission">
+        SELECT p.permissionId, p.permission, p.description FROM PERMISSIONS p
+        INNER JOIN ROLE_PERMISSIONS rp on rp.fk_permissionId = p.permissionId
+        WHERE rp.fk_roleId IN
+        <foreach item='item' index='index' collection='roles' open='(' separator=',' close=')'>
+            #{item.roleId}
+        </foreach>
+    </select>
 
 </mapper>
