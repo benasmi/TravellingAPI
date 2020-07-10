@@ -38,7 +38,7 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
             throw AuthenticationException("Email not found from OAuth2 provider")
         }
 
-        val user = authController.getUserByIdentifier(oAuth2UserInfo.id!!)
+        val user = authController.getUserByIdentifier(oAuth2UserInfo.id!!, AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId).name)
 
         val formedUser = if (user != null) {
             if (user.provider!! != AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId)) {
@@ -67,16 +67,16 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
                 AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId),
                 UUID.randomUUID().toString(),
                 null,
-                Date().toString()
+                "20/08/1999"
         )
-//        authController.createUser(user)
+        authController.createUserOauth2(user)
         return user
     }
 
     private fun updateExistingUser(existingUser: User, oAuth2UserInfo: OAuth2UserInfo): User {
         existingUser.name = oAuth2UserInfo.name
         existingUser.imageUrl = oAuth2UserInfo.imageUrl
-                //todo: update
+        authController.updateUserOauth2(existingUser)
         return existingUser
     }
 }

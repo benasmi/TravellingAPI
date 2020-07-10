@@ -1,5 +1,8 @@
 package com.travel.travelapi.oauth2
 
+import com.google.api.client.util.DateTime
+import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository
 import com.travel.travelapi.utils.CookieUtils
@@ -23,25 +26,17 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @Component
-class OAuth2AuthenticationSuccessHandler(
-        private val secretKey: SecretKey,
-        private val jwtConfig: JwtConfig)
-    : SimpleUrlAuthenticationSuccessHandler() {
+class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : SimpleUrlAuthenticationSuccessHandler() {
 
     @Throws(IOException::class, ServletException::class)
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         val targetUrl = determineTargetUrl(request, response, authentication)
-//        val targetUrl = "http://localhost:8080/api/v1/oauth2/callback/google"
         if (response.isCommitted) {
             logger.debug("Response has already been committed. Unable to redirect to $targetUrl")
             return
         }
 
         clearAuthenticationAttributes(request)
-
-
-//        response.addHeader(jwtConfig.authorizationHeader, jwtConfig.tokenPrefix + token)
-
         redirectStrategy.sendRedirect(request, response, targetUrl)
     }
 
@@ -58,19 +53,22 @@ class OAuth2AuthenticationSuccessHandler(
         }
 
         val targetUrl: String = redirectUri!!.orElse(defaultTargetUrl)
+        val user = authentication.principal as TravelUserDetails
 
+        //JWT expires in 30 seconds
         val token = Jwts.builder()
-                .setSubject(authentication.name)
+                .setSubject(user.identifier)
                 .claim("authorities", authentication.authorities)
+                .claim("provider", user.provider)
                 .setIssuedAt(java.util.Date())
-                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+                .setExpiration(Date(System.currentTimeMillis() + 30000L))
                 .signWith(secretKey)
                 .compact()
 
         return UriComponentsBuilder.fromUriString(targetUrl)
                 .queryParam("token", token)
                 .build().toUriString()
-    } //http://localhost:8080/api/v1/oauth2/authorize/google?redirect_uri=https://www.google.com/
+    }
 
     private fun isAuthorizedRedirectUri(uri: String): Boolean {
         return true

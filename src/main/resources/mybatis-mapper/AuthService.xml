@@ -4,7 +4,10 @@
 <mapper namespace="com.travel.travelapi.services.AuthService">
 
     <select id="getUserByIdentifier" resultType="com.travel.travelapi.models.User">
-        SELECT * FROM USERS WHERE identifier=#{identifier} AND provider="local"
+        SELECT * FROM USERS WHERE identifier=#{identifier}
+         <if test="provider != null">
+             AND provider=#{provider}
+         </if>
     </select>
 
     <select id="identifierExists" resultType="Boolean">
@@ -29,6 +32,10 @@
         INNER JOIN USER_ROLE ur ON ur.fk_roleId = r.roleId
         WHERE ur.fk_userId = #{user.id}
     </select>
+
+    <update id="updateUser">
+        UPDATE `USERS` SET `name`=#{user.name} WHERE identifier=#{user.identifier}
+    </update>
 
     <select id="getUserPermissions" resultType="com.travel.travelapi.models.Permission">
         SELECT p.permissionId, p.permission, p.description FROM PERMISSIONS p

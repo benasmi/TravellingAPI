@@ -144,6 +144,7 @@ class AuthController(@Autowired private val authService: AuthService,
     }
 
 
+
     @PostMapping("/refresh")
     @Throws(InvalidUserDataException::class)
     fun refreshAccessToken(@RequestBody jwtRefresh: JwtRefresh): String{
@@ -169,8 +170,8 @@ class AuthController(@Autowired private val authService: AuthService,
      * @param identifier
      * @return TravelUserDetails
      */
-    fun getUserByIdentifier(@RequestParam identifier: String): User?{
-        val user = authService.getUserByIdentifier(identifier)
+    fun getUserByIdentifier(identifier: String, provider: String? = null): User?{
+        val user = authService.getUserByIdentifier(identifier, provider)?: return null
 
         val roles = getUserRoles(user)
         val permissions = getUserPermissions(roles)
@@ -213,21 +214,36 @@ class AuthController(@Autowired private val authService: AuthService,
      * @param user
      */
     @Throws(AuthenticationException::class)
-    fun createUserOauth2(@RequestBody user: User){
-        if(identifierExists(user.email!!)) throw AuthenticationException("Email already exists")
-
-        user.refreshToken = UUID.randomUUID().toString()
-        user.password = passwordEncoder.encode(user.password)
-
+    fun createUserOauth2(user: User){
         user.roles.add(Roles.ROLE_USER.id)
         authService.createUser(user)
     }
 
+    /**
+     * Updates existing OAuth2 user
+     */
+    fun updateUserOauth2(user: User){
+        authService.updateUser(user)
+    }
 
+    /**
+     * Exchanges short lived JWT OAuth2 token for long lived JWT token and refresh token
+     * @param token short lived JWT token
+     */
+    @GetMapping("/exchange")
+    fun exchangeTokens(@RequestParam(name="token") token: String): JwtResponse{
+        try {
+            val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
+            val body = claimsJws.body
+            val identifier = body.subject
+            val provider = body["provider"] as String
 
+            val user = getUserByIdentifier(identifier, provider)
+            val validToken = refreshAccessToken(JwtRefresh(identifier,user?.refreshToken))
 
-
-
-
-
+            return JwtResponse(validToken, user?.refreshToken)
+        } catch (e: JwtException) {
+            throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
+        }
+    }
 }

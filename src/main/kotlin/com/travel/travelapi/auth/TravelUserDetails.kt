@@ -1,6 +1,7 @@
 package com.travel.travelapi.auth
 
 import com.travel.travelapi.models.User
+import com.travel.travelapi.oauth2.AuthProvider
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
@@ -10,7 +11,8 @@ import kotlin.collections.ArrayList
 
 
 data class TravelUserDetails(private val id: Long? = null,
-                             private val identifier: String? = null,
+                             val identifier: String? = null,
+                             val provider: String? = null,
                              val refreshToken: String? = null,
                              private val username: String?=null,
                              private val password: String?=null,
@@ -23,6 +25,7 @@ data class TravelUserDetails(private val id: Long? = null,
             return TravelUserDetails(
                     user.id,
                     user.identifier,
+                    user.provider?.name,
                     user.refreshToken,
                     user.email,
                     user.password,
