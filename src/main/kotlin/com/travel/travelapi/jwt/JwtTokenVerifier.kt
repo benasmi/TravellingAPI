@@ -45,7 +45,6 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
 
             val authorities = authController.getPermissionsByIdentifier(username)
 
-
             val authentication: Authentication = UsernamePasswordAuthenticationToken(
                     username,
                     null,
