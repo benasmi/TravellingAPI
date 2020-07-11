@@ -28,6 +28,7 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
         }
 
         val token = authorizationHeader.replace(jwtConfig.tokenPrefix!!, "")
+
         try {
             val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
             val body = claimsJws.body
