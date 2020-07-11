@@ -6,4 +6,8 @@
     <insert id="insertPhoto" useGeneratedKeys = "true" keyProperty = "photoId" keyColumn = "photoId">
         INSERT INTO PHOTO (url, date) VALUES (#{p.url}, now())
     </insert>
+
+    <update id="updatePhoto">
+        UPDATE PHOTO SET url=#{url} WHERE photoId=#{id}
+    </update>
 </mapper>

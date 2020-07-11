@@ -48,7 +48,7 @@ data class TravelUserDetails(private val id: Long? = null,
         }
     }
 
-    override fun getAuthorities(): Collection<GrantedAuthority?> {
+    override fun getAuthorities(): Collection<GrantedAuthority> {
         return grantedAuthorities!!
     }
 

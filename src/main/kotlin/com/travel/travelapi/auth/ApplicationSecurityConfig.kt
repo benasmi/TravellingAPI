@@ -1,5 +1,6 @@
 package com.travel.travelapi.auth
 
+import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtTokenVerifier
 import com.travel.travelapi.jwt.JwtUsernameAndPasswordAuthenticationFilter
@@ -30,12 +31,13 @@ import javax.crypto.SecretKey
 @EnableGlobalMethodSecurity(prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
-class ApplicationSecurityConfig(@Autowired private val authUserDetailsService: AuthUserDetailsService,
+class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsService: AuthUserDetailsService,
+                                @Autowired @Lazy private val authController: AuthController,
                                 private val secretKey: SecretKey,
                                 private val jwtConfig: JwtConfig,
-                                @Autowired private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
+                                @Autowired @Lazy private val oAuth2AuthenticationSuccessHandler: OAuth2AuthenticationSuccessHandler,
                                 @Autowired @Lazy private val oAuth2AuthenticationFailureHandler: OAuth2AuthenticationFailureHandler,
-                                @Autowired private val customOAuth2UserService: CustomOAuth2UserService) : WebSecurityConfigurerAdapter() {
+                                @Autowired @Lazy private val customOAuth2UserService: CustomOAuth2UserService) : WebSecurityConfigurerAdapter() {
 
 
     @Bean
@@ -53,13 +55,12 @@ class ApplicationSecurityConfig(@Autowired private val authUserDetailsService: A
                 .authenticationEntryPoint(RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/*").permitAll()
-                .antMatchers("/categories/all").hasAuthority("category:read")
-                .antMatchers("/categories/insert").hasAuthority("category:write")
+                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
-                .addFilterAfter(JwtTokenVerifier(secretKey, jwtConfig), UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterAfter(JwtTokenVerifier(secretKey, jwtConfig, authController), UsernamePasswordAuthenticationFilter::class.java)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()

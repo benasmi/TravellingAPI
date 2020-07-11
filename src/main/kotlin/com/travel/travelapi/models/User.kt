@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 data class User(
         var id: Long? = null,
         var name: String? = null,
+        val surname: String? = null,
         var email: String? = null,
         var identifier: String? = null,
         var imageUrl: String? = null,
@@ -16,8 +17,17 @@ data class User(
         var provider: AuthProvider? = null,
         var refreshToken: String? = null,
         var fk_locale: Int? = 1,
+        var fk_photoId: Int? = null,
         var birthday: String? = null){
 
     var roles = ArrayList<Int>()
     var authorities :List<GrantedAuthority> = ArrayList()
 }
+
+data class UserProfile(val name: String? = null,
+                       val surname: String? = null,
+                       val email: String? = null,
+                       val provider: String? = null,
+                       val birthday: String? = null,
+                       val gender: String? = null,
+                       val imageUrl: String? = null)

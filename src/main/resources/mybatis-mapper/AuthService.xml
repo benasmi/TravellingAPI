@@ -10,6 +10,12 @@
          </if>
     </select>
 
+    <select id="getUserProfile" resultType="com.travel.travelapi.models.UserProfile">
+        SELECT u.`name`, u.`surname`, u.`birthday`, u.`gender`, u.`email`, u.`phoneNumber`, u.`provider`, p.url as imageUrl FROM USERS u
+        INNER JOIN PHOTO p ON u.fk_photoId = p.photoId
+        WHERE identifier=#{identifier} AND provider=#{provider}
+    </select>
+
     <select id="identifierExists" resultType="Boolean">
         SELECT EXISTS(SELECT * FROM USERS WHERE identifier=#{identifier})
     </select>
@@ -33,8 +39,15 @@
         WHERE ur.fk_userId = #{user.id}
     </select>
 
+    <select id="getUserRolesByIdentifier" resultType="com.travel.travelapi.models.Role">
+        SELECT r.roleId, r.role, r.description FROM ROLE r
+        INNER JOIN USER_ROLE ur ON ur.fk_roleId = r.roleId
+        INNER JOIN USERS u on u.id = ur.fk_userId
+        WHERE u.identifier = #{identifier}
+    </select>
+
     <update id="updateUser">
-        UPDATE `USERS` SET `name`=#{user.name} WHERE identifier=#{user.identifier}
+        UPDATE `USERS` SET `name`=#{user.name}, fk_photoId=#{user.fk_photoId} WHERE identifier=#{user.identifier}
     </update>
 
     <select id="getUserPermissions" resultType="com.travel.travelapi.models.Permission">

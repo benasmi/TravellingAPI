@@ -4,6 +4,7 @@ import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.models.Permission
 import com.travel.travelapi.models.Role
 import com.travel.travelapi.models.User
+import com.travel.travelapi.models.UserProfile
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
 
@@ -15,9 +16,12 @@ interface AuthService {
     fun createUser(@Param("user") user: User)
 
     fun getUserRoles(@Param("user") user: User): ArrayList<Role>
+    fun getUserRolesByIdentifier(@Param("identifier") identifier: String): ArrayList<Role>
     fun getUserPermissions(@Param("roles") roles: ArrayList<Role>): ArrayList<Permission>
 
+    fun getUserProfile(@Param("identifier") identifier: String, @Param("provider") provider: String): UserProfile?
     fun updateUser(@Param("user") user: User)
+
     fun mapUserRoles(@Param("user") user: User)
 
 }

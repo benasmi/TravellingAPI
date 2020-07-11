@@ -59,6 +59,7 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
         val user = User(
                 null,
                 oAuth2UserInfo.name,
+                null,
                 oAuth2UserInfo.email,
                 oAuth2UserInfo.id,
                 oAuth2UserInfo.imageUrl,
@@ -66,6 +67,7 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
                 null,
                 AuthProvider.valueOf(oAuth2UserRequest.clientRegistration.registrationId),
                 UUID.randomUUID().toString(),
+                null,
                 null,
                 "20/08/1999"
         )

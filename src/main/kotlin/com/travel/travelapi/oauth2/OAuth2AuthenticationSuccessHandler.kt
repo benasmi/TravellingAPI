@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse
 
 @Component
 class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : SimpleUrlAuthenticationSuccessHandler() {
+    val REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri"
 
     @Throws(IOException::class, ServletException::class)
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
@@ -39,8 +40,6 @@ class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : Sim
         clearAuthenticationAttributes(request)
         redirectStrategy.sendRedirect(request, response, targetUrl)
     }
-
-    val REDIRECT_URI_PARAM_COOKIE_NAME = "redirect_uri"
 
     override fun determineTargetUrl(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication): String? {
         val redirectUri = CookieUtils.getCookie(request, REDIRECT_URI_PARAM_COOKIE_NAME)
@@ -71,7 +70,7 @@ class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : Sim
     }
 
     private fun isAuthorizedRedirectUri(uri: String): Boolean {
-        return true
+        return uri == "https://www.google.com/"
     }
 
 

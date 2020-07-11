@@ -12,4 +12,8 @@ class JwtConfig {
     var tokenExpirationAfterDays: Int? = null
     val authorizationHeader = "Authorization"
 
+    enum class JwtTypes{
+        ACCESS_TOKEN,
+        EXCHANGE_TOKEN
+    }
 }

@@ -6,16 +6,12 @@ import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtRefresh
 import com.travel.travelapi.jwt.JwtRequest
 import com.travel.travelapi.jwt.JwtResponse
-import com.travel.travelapi.models.Permission
-import com.travel.travelapi.models.Role
-import com.travel.travelapi.models.Roles
-import com.travel.travelapi.models.User
+import com.travel.travelapi.models.*
 import com.travel.travelapi.oauth2.AuthProvider
 import com.travel.travelapi.services.AuthService
-import io.jsonwebtoken.ExpiredJwtException
+import com.travel.travelapi.services.PhotoService
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.MalformedJwtException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.authentication.AuthenticationManager
@@ -23,8 +19,7 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
@@ -33,7 +28,6 @@ import java.text.SimpleDateFormat
 import java.sql.Date
 import java.time.LocalDate
 import java.util.*
-import java.util.stream.Collectors
 import javax.crypto.SecretKey
 import javax.mail.internet.AddressException
 import javax.mail.internet.InternetAddress
@@ -44,6 +38,7 @@ import javax.validation.Valid
 @RestController
 @RequestMapping("/auth")
 class AuthController(@Autowired private val authService: AuthService,
+                     @Autowired private val photoService: PhotoService,
                      @Lazy private val passwordEncoder: PasswordEncoder,
                      @Lazy private val authenticationManager: AuthenticationManager,
                      @Lazy private val secretKey: SecretKey,
@@ -68,10 +63,14 @@ class AuthController(@Autowired private val authService: AuthService,
         formedUser.email = user.email
         formedUser.birthday = user.birthday
         formedUser.provider = AuthProvider.local
-
         formedUser.roles.add(Roles.ROLE_USER.id)
-        authService.createUser(formedUser)
 
+        if(!user.imageUrl.isNullOrEmpty()){
+            val photo = Photo(null, user.imageUrl, null)
+            photoService.insertPhoto(photo)
+            formedUser.fk_photoId = photo.photoId
+        }
+        authService.createUser(formedUser)
     }
 
     fun identifierExists(identifier: String): Boolean{
@@ -122,42 +121,43 @@ class AuthController(@Autowired private val authService: AuthService,
         val auth = authenticate(jwtRequest.identifier!!, jwtRequest.password!!)
         val userDetails = auth.principal as TravelUserDetails
 
+
         val token = Jwts.builder()
                 .setSubject(auth.name)
-                .claim("authorities", auth.authorities)
-                .setIssuedAt(java.util.Date())
+                .claim("provider", "local")
+                .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
+                .setIssuedAt(Date())
                 .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
-
-        return JwtResponse(token,userDetails.refreshToken)
+        return JwtResponse(token,userDetails.refreshToken, userDetails.authorities)
     }
 
     fun authenticate(username: String, password: String): Authentication {
         try {
             return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
         } catch (e: DisabledException) {
-            throw Exception("USER_DISABLED", e)
+            throw InvalidUserDataException("USER_DISABLED")
         } catch (e: BadCredentialsException) {
-            throw Exception("INVALID_CREDENTIALS", e)
+            throw InvalidUserDataException("INVALID_CREDENTIALS")
         }
     }
 
 
-
     @PostMapping("/refresh")
     @Throws(InvalidUserDataException::class)
-    fun refreshAccessToken(@RequestBody jwtRefresh: JwtRefresh): String{
+    fun refreshAccessToken(@RequestBody jwtRefresh: JwtRefresh): JwtResponse{
         val user = getUserByIdentifier(jwtRefresh.identifier!!)?: throw InvalidUserDataException("Invalid refresh token!")
         if(user.refreshToken == jwtRefresh.refreshToken){
             val token = Jwts.builder()
                     .setSubject(jwtRefresh.identifier)
-                    .claim("authorities", user.authorities)
-                    .setIssuedAt(java.util.Date())
+                    .claim("provider", jwtRefresh.provider)
+                    .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
+                    .setIssuedAt(Date())
                     .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                     .signWith(secretKey)
                     .compact()
-            return token
+            return JwtResponse(token,null,user.authorities)
         }else{
             throw InvalidUserDataException("Invalid refresh token!")
         }
@@ -208,7 +208,6 @@ class AuthController(@Autowired private val authService: AuthService,
     }
 
 
-
     /**
      * Creates new user OAuth2
      * @param user
@@ -223,6 +222,13 @@ class AuthController(@Autowired private val authService: AuthService,
      * Updates existing OAuth2 user
      */
     fun updateUserOauth2(user: User){
+        if(user.fk_photoId != null){
+            photoService.updatePhoto(user.fk_photoId!!,user.imageUrl!!)
+        }else{
+            val photo = Photo(null, user.imageUrl,null)
+            photoService.insertPhoto(photo)
+            user.fk_photoId = photo.photoId
+        }
         authService.updateUser(user)
     }
 
@@ -237,13 +243,49 @@ class AuthController(@Autowired private val authService: AuthService,
             val body = claimsJws.body
             val identifier = body.subject
             val provider = body["provider"] as String
+            val type = body["type"] as String
+
+            if(type != JwtConfig.JwtTypes.EXCHANGE_TOKEN.name){
+                throw InvalidUserDataException(String.format("Token %s is not type of EXCHANGE_TOKEN", token))
+            }
 
             val user = getUserByIdentifier(identifier, provider)
-            val validToken = refreshAccessToken(JwtRefresh(identifier,user?.refreshToken))
 
-            return JwtResponse(validToken, user?.refreshToken)
+            return refreshAccessToken(JwtRefresh(identifier,user?.refreshToken))
         } catch (e: JwtException) {
             throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
         }
+    }
+
+    @PostMapping("/user/profile")
+    fun getUserProfile(@RequestBody token: String): UserProfile{
+        try {
+            val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
+            val body = claimsJws.body
+            val identifier = body.subject
+            val provider = body["provider"] as String
+            val type = body["type"] as String
+
+            if(type != JwtConfig.JwtTypes.ACCESS_TOKEN.name){
+                throw InvalidUserDataException(String.format("Token %s is not type of EXCHANGE_TOKEN", token))
+            }
+            return authService.getUserProfile(identifier, provider) ?: throw InvalidUserDataException("User does not exist")
+        } catch (e: JwtException) {
+            throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
+        }
+    }
+
+    fun getPermissionsByIdentifier(identifier: String): List<GrantedAuthority>{
+        val roles = authService.getUserRolesByIdentifier(identifier)
+        val permissions = getUserPermissions(roles)
+        val grantedAuthorities = ArrayList<String>()
+
+        roles.forEach{
+            grantedAuthorities.add(it.role!!)
+        }
+        permissions.forEach{
+            grantedAuthorities.add(it.permission!!)
+        }
+        return TravelUserDetails.createGrantedAuthorities(grantedAuthorities)
     }
 }
