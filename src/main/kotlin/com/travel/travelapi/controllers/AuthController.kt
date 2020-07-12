@@ -263,27 +263,6 @@ class AuthController(@Autowired private val authService: AuthService,
         }
     }
 
-    @PostMapping("/user/profile")
-    fun getUserProfile(@RequestBody token: String): UserProfile{
-        try {
-            val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
-            val body = claimsJws.body
-            val identifier = body.subject
-            val provider = body["provider"] as String
-            val type = body["type"] as String
-
-            if(type != JwtConfig.JwtTypes.ACCESS_TOKEN.name){
-                throw InvalidUserDataException(String.format("Token %s is not type of EXCHANGE_TOKEN", token))
-            }
-            val user = authService.getUserProfile(identifier, provider) ?: throw InvalidUserDataException("User does not exist")
-            user.roles = authService.getUserRolesByIdentifier(identifier)
-            user.permissions = getUserPermissions(user.roles)
-            return user
-        } catch (e: JwtException) {
-            throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
-        }
-    }
-
     fun getPermissionsByIdentifier(identifier: String): List<GrantedAuthority>{
         val roles = authService.getUserRolesByIdentifier(identifier)
         val permissions = getUserPermissions(roles)
