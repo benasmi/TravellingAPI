@@ -26,9 +26,11 @@ data class User(
 
 data class UserProfile(val name: String? = null,
                        val identifier: String? = null,
+                       val id: Long? = null,
                        val surname: String? = null,
                        val email: String? = null,
                        val provider: String? = null,
+                       val phoneNumber: String? = null,
                        val birthday: String? = null,
                        val gender: String? = null,
                        val imageUrl: String? = null,

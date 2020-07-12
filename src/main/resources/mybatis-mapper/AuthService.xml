@@ -14,7 +14,7 @@
         SELECT * FROM USERS WHERE refreshToken=#{token}
     </select>
 
-    <select id="getAllRoles">
+    <select id="getAllRoles" resultMap="com.travel.travelapi.models.Role">
         SELECT * FROM ROLE
     </select>
 

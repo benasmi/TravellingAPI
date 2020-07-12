@@ -17,7 +17,7 @@ interface AuthService {
     fun emailExists(@Param("email") email: String): Boolean
     fun createUser(@Param("user") user: User)
 
-    fun getAllRoles(): List<Role>
+    fun getAllRoles(): ArrayList<Role>
     fun searchAdmin(keyword: String, roles: List<String>): List<UserProfile>
 
     fun getUserRoles(@Param("user") user: User): ArrayList<Role>
