@@ -9,7 +9,7 @@ data class Tour(val tourId: Int? = null,
                 val lastModified: String? = null,
                 val isPublished: Boolean? = null,
                 val isVerified: Boolean? = null,
-                val userId: Int? = null
+                var userId: Int? = null
                 ){
     var days: ArrayList<TourDay>? = null
 }
