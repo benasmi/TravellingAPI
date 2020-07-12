@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface AuthService {
     fun getUserByIdentifier(@Param("identifier") identifier: String, @Param("provider") provider: String?): User?
+    fun getUserByRefreshToken(@Param("token") token: String): User?
+
     fun identifierExists(@Param("identifier") identifier: String): Boolean
     fun emailExists(@Param("email") email: String): Boolean
     fun createUser(@Param("user") user: User)

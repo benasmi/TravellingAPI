@@ -50,7 +50,6 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
             val user = authController.getUserByIdentifier(username, provider) ?: throw InvalidUserDataException("User invalid")
             val principal = TravelUserDetails.create(user)
 
-
             val authentication: Authentication = UsernamePasswordAuthenticationToken(
                     principal,
                     null,

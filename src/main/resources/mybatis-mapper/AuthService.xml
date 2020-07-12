@@ -10,8 +10,12 @@
          </if>
     </select>
 
+    <select id="getUserByRefreshToken" resultType="com.travel.travelapi.models.User">
+        SELECT * FROM USERS WHERE refreshToken=#{token}
+    </select>
+
     <select id="getUserProfile" resultType="com.travel.travelapi.models.UserProfile">
-        SELECT u.`name`, u.`surname`, u.`birthday`, u.`gender`, u.`email`, u.`phoneNumber`, u.`provider`, p.url as imageUrl FROM USERS u
+        SELECT u.`name`, u.`surname`, u.`birthday`, u.`gender`, u.`email`, u.`phoneNumber`, u.`provider`, p.url, u.`identifier` as imageUrl FROM USERS u
         INNER JOIN PHOTO p ON u.fk_photoId = p.photoId
         WHERE identifier=#{identifier} AND provider=#{provider}
     </select>

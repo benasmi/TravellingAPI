@@ -16,6 +16,7 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -55,8 +56,8 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                 .authenticationEntryPoint(RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-                .antMatchers("/auth/**").permitAll()
-                .antMatchers("/oauth2/**").permitAll()
+//                .antMatchers("/auth/**").permitAll()
+//                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -77,6 +78,11 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                         .and()
                     .successHandler(oAuth2AuthenticationSuccessHandler)
                     .failureHandler(oAuth2AuthenticationFailureHandler);
+    }
+
+    override fun configure(web: WebSecurity) {
+        web.ignoring().antMatchers("/auth/**")
+        web.ignoring().antMatchers("/oauth2/**")
     }
 
     /**

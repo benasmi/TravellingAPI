@@ -152,10 +152,11 @@ class AuthController(@Autowired private val authService: AuthService,
     @PostMapping("/refresh")
     @Throws(InvalidUserDataException::class)
     fun refreshAccessToken(@RequestBody jwtRefresh: JwtRefresh): JwtResponse{
-        val user = getUserByIdentifier(jwtRefresh.identifier!!)?: throw InvalidUserDataException("Invalid refresh token!")
+        val user = authService.getUserByRefreshToken(jwtRefresh.refreshToken!!)?: throw InvalidUserDataException("Invalid refresh token!")
         if(user.refreshToken == jwtRefresh.refreshToken){
+
             val token = Jwts.builder()
-                    .setSubject(jwtRefresh.identifier)
+                    .setSubject(user.identifier)
                     .claim("provider", jwtRefresh.provider)
                     .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                     .setIssuedAt(Date())
@@ -274,7 +275,10 @@ class AuthController(@Autowired private val authService: AuthService,
             if(type != JwtConfig.JwtTypes.ACCESS_TOKEN.name){
                 throw InvalidUserDataException(String.format("Token %s is not type of EXCHANGE_TOKEN", token))
             }
-            return authService.getUserProfile(identifier, provider) ?: throw InvalidUserDataException("User does not exist")
+            val user = authService.getUserProfile(identifier, provider) ?: throw InvalidUserDataException("User does not exist")
+            user.roles = authService.getUserRolesByIdentifier(identifier)
+            user.permissions = getUserPermissions(user.roles)
+            return user
         } catch (e: JwtException) {
             throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
         }
