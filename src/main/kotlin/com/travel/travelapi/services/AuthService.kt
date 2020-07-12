@@ -17,6 +17,9 @@ interface AuthService {
     fun emailExists(@Param("email") email: String): Boolean
     fun createUser(@Param("user") user: User)
 
+    fun getAllRoles(): List<Role>
+    fun searchAdmin(keyword: String, roles: List<String>): List<UserProfile>
+
     fun getUserRoles(@Param("user") user: User): ArrayList<Role>
     fun getUserRolesByIdentifier(@Param("identifier") identifier: String): ArrayList<Role>
     fun getUserPermissions(@Param("roles") roles: ArrayList<Role>): ArrayList<Permission>
@@ -24,6 +27,6 @@ interface AuthService {
     fun getUserProfile(@Param("identifier") identifier: String, @Param("provider") provider: String): UserProfile?
     fun updateUser(@Param("user") user: User)
 
-    fun mapUserRoles(@Param("user") user: User)
+    fun mapUserRoles(@Param("userId") userId: Int, @Param("roles") roles: List<Int>)
 
 }
