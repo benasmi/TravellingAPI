@@ -33,12 +33,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
 
 
-//    @GetMapping("/searchadmin/loc")
-//    fun searchAdminByLatLng(@RequestParam lat: Double,
-//                            @RequestParam lng: Double,
-//                            @RequestParam(defaultValue = "1") range: Double):List<PlaceLocal> {
-//        return placeService.searchPlacesByLocation(lat,lng,range)
-//    }
 
     /**
      * @return all places that match given query
@@ -215,19 +209,19 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
     @GetMapping("/country/all")
     @PreAuthorize("hasAuthority('place:read')")
-    private fun getAllCountries(): ArrayList<String>{
+    fun getAllCountries(): ArrayList<String>{
         return placeService.getAllCountries()
     }
 
     @GetMapping("/municipality/all")
     @PreAuthorize("hasAuthority('place:read')")
-    private fun getAllMunicipalities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String): ArrayList<String>{
+    fun getAllMunicipalities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String): ArrayList<String>{
         return placeService.getAllMunicipalities(if(countryRestrictions.isNotEmpty()) countryRestrictions.split(',') else ArrayList())
     }
 
     @GetMapping("/city/all")
     @PreAuthorize("hasAuthority('place:read')")
-    private fun getAllCities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String,
+    fun getAllCities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String,
                              @RequestParam(name="munRestrictions", defaultValue = "") munRestrictions: String): ArrayList<String>{
         return placeService.getAllCities(
                 if(countryRestrictions.isNotEmpty()) countryRestrictions.split(',') else ArrayList(),
@@ -236,7 +230,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
     @GetMapping("/county/all")
     @PreAuthorize("hasAuthority('place:read')")
-    private fun getAllCounties(): ArrayList<String>{
+    fun getAllCounties(): ArrayList<String>{
         return placeService.getAllCounties()
     }
 

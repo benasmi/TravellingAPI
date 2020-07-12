@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/categoryplace")
 @RestController
 class CategoryPlaceController(@Autowired private val categoryPlaceService: CategoryPlaceService,
-@Autowired private val placeService: PlaceService,
-                              @Autowired private val authController: AuthController){
+                              @Autowired private val placeService: PlaceService){
 
 
     /**

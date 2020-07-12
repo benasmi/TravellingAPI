@@ -131,6 +131,7 @@ class AuthController(@Autowired private val authService: AuthService,
                 .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
+
         return JwtResponse(token,userDetails.refreshToken, userDetails.authorities)
     }
 
@@ -151,13 +152,12 @@ class AuthController(@Autowired private val authService: AuthService,
 
     @PostMapping("/refresh")
     @Throws(InvalidUserDataException::class)
-    fun refreshAccessToken(@RequestBody jwtRefresh: JwtRefresh): JwtResponse{
-        val user = authService.getUserByRefreshToken(jwtRefresh.refreshToken!!)?: throw InvalidUserDataException("Invalid refresh token!")
-        if(user.refreshToken == jwtRefresh.refreshToken){
-
+    fun refreshAccessToken(@RequestBody refreshToken: String): JwtResponse{
+        val user = authService.getUserByRefreshToken(refreshToken)?: throw InvalidUserDataException("User does not exist!")
+        if(user.refreshToken == refreshToken){
             val token = Jwts.builder()
                     .setSubject(user.identifier)
-                    .claim("provider", jwtRefresh.provider)
+                    .claim("provider", user.provider)
                     .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                     .setIssuedAt(Date())
                     .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
@@ -257,7 +257,7 @@ class AuthController(@Autowired private val authService: AuthService,
 
             val user = getUserByIdentifier(identifier, provider)
 
-            return refreshAccessToken(JwtRefresh(identifier,user?.refreshToken))
+            return refreshAccessToken(user?.refreshToken!!)
         } catch (e: JwtException) {
             throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
         }

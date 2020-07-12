@@ -3,7 +3,6 @@ package com.travel.travelapi.auth
 import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtTokenVerifier
-import com.travel.travelapi.jwt.JwtUsernameAndPasswordAuthenticationFilter
 import com.travel.travelapi.oauth2.CustomOAuth2UserService
 import com.travel.travelapi.oauth2.HttpCookieOAuth2AuthorizationRequestRepository
 import com.travel.travelapi.oauth2.OAuth2AuthenticationFailureHandler
@@ -56,8 +55,6 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                 .authenticationEntryPoint(RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/auth/**").permitAll()
-//                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/parkingplace")
 @RestController
 class ParkingPlaceController(@Autowired private val parkingPlaceService: ParkingPlaceService,
-@Autowired private val placeService: PlaceService) {
+                             @Autowired private val placeService: PlaceService) {
 
     /**
      * @param placeId of a place
