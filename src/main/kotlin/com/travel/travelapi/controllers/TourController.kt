@@ -2,10 +2,14 @@ package com.travel.travelapi.controllers
 
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
+import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.exceptions.UnauthorizedException
 import com.travel.travelapi.facebook.places.api.ApiPlaceController
 import com.travel.travelapi.models.*
 import com.travel.travelapi.services.TourService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -17,6 +21,28 @@ class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val placeController: PlaceController,
                      @Autowired private val apiPlaceController: ApiPlaceController) {
 
+    /**
+     * Checks if user has permission to modify the tour with a given ID.
+     * Throws an exception if user is not permitted
+     */
+    @Throws(UnauthorizedException::class)
+    fun checkModifyAccess(user: TravelUserDetails, tourId: Int){
+        //Getting the relevant tour from database
+        val tour = tourService.getTourById(tourId)
+
+        //Checking if user has permission to modify tour info unconditionally
+        if(user.hasAuthority("tour:modify_unrestricted")){
+            return
+            //Else we check if user has authority to modify their tour and the given tour is created by them
+        }else if(tour.userId != null
+                && tour.userId.toLong() == user.id
+                && !tour.isVerified!!
+                && !tour.isPublished!!
+                && user.hasAuthority("tour:modify"))   {
+            return
+        }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
+    }
+
 
     /**
      * @param keyword of a place
@@ -25,6 +51,7 @@ class TourController(@Autowired private val tourService: TourService,
      * @return paged tour data for admin
      */
     @GetMapping("/searchadmin")
+    @PreAuthorize("hasAuthority('tour:read_unrestricted')")
     fun getPlacesAdmin(@RequestParam(required = true, defaultValue = "", name = "keyword") keyword: String,
                        @RequestParam(required = false, defaultValue = "1", name = "p") p: Int,
                        @RequestParam(required = false, defaultValue = "10", name = "s") s: Int,
@@ -41,6 +68,7 @@ class TourController(@Autowired private val tourService: TourService,
      * @return full tour information with days and places
      */
     @GetMapping("")
+    @PreAuthorize("hasAuthority('tour:read')")
     fun getTourById(@RequestParam(name = "id", required = true) id: Int): Tour {
         val tour: Tour = tourService.getTourById(id)
 
@@ -87,6 +115,13 @@ class TourController(@Autowired private val tourService: TourService,
      */
     @PostMapping("/update")
     fun updateTourById(@RequestBody tour: Tour, @RequestParam("id") id: Int){
+
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Checking if user has access to modify this tour. If not, this line will throw an exception
+        checkModifyAccess(principal, id)
+
         tourService.updateTour(tour, id)
         tourDayController.deleteTourDaysById(id)
         tourDayController.insertTourDaysById(id, tour)
@@ -98,6 +133,13 @@ class TourController(@Autowired private val tourService: TourService,
      */
     @GetMapping("/delete")
     fun deleteTourById(@RequestParam(name = "id") id: Int){
+
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Checking if user has access to modify this tour. If not, this line will throw an exception
+        checkModifyAccess(principal, id)
+
         tourService.deleteTourById(id)
     }
 
@@ -107,18 +149,27 @@ class TourController(@Autowired private val tourService: TourService,
      * @param tour
      */
     @PostMapping("/insert")
+    @PreAuthorize("hasAuthority('tour:modify')")
     fun insertTour(@RequestBody tour: Tour): Int{
         tourService.insertTour(tour)
         return tour.tourId!!
     }
 
     @GetMapping("/changeVerificationStatus")
+    @PreAuthorize("hasAuthority('tour:verify')")
     fun changeVerificationStatus(@RequestParam("id") tourId: Int, @RequestParam("verified") isVerified: Boolean){
         tourService.changeVerificationStatus(tourId, isVerified)
     }
 
     @GetMapping("/changePublicityStatus")
-    fun changePublicityStatus(@RequestParam("id") tourId: Int, @RequestParam("publiv") isPublic: Boolean){
+    fun changePublicityStatus(@RequestParam("id") tourId: Int, @RequestParam("public") isPublic: Boolean){
+
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Checking if user has access to modify this tour. If not, this line will throw an exception
+        checkModifyAccess(principal, tourId)
+
         tourService.changePublicityStatus(tourId, isPublic)
     }
 
@@ -127,10 +178,33 @@ class TourController(@Autowired private val tourService: TourService,
     class Tags(@Autowired private val tourService: TourService){
 
         /**
+         * Checks if user has permission to modify the tour's tags with a given ID.
+         * Throws an exception if user is not permitted
+         */
+        @Throws(UnauthorizedException::class)
+        fun checkModifyAccess(user: TravelUserDetails, tourId: Int){
+            //Getting the relevant tour from database
+            val tour = tourService.getTourById(tourId)
+
+            //Checking if user has permission to modify tour info unconditionally
+            if(user.hasAuthority("tourtag:modify_unrestricted")){
+                return
+                //Else we check if user has authority to modify their tour and the given tour is created by them
+            }else if(tour.userId != null
+                    && tour.userId.toLong() == user.id
+                    && !tour.isVerified!!
+                    && !tour.isPublished!!
+                    && user.hasAuthority("tourtag:modify"))   {
+                return
+            }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
+        }
+
+        /**
          * Get tags for tour
          * @param id of a tour
          */
         @GetMapping("")
+        @PreAuthorize("hasAuthority('tour:read')")
         fun tags(@RequestParam(name = "id") id: Int): List<Tag>{
             return tourService.getTagsForTour(id)
         }
@@ -140,6 +214,13 @@ class TourController(@Autowired private val tourService: TourService,
          */
         @RequestMapping("/update")
         fun insertParking(@RequestBody tags: List<Tag>, @RequestParam(name="p") tourId: Int){
+
+            //Getting the authenticated user
+            val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+            //Checking if user has access to modify this tour. If not, this line will throw an exception
+            checkModifyAccess(principal, tourId)
+
             tourService.deleteTagsForTour(tourId)
             for(tag: Tag in tags)
                 tourService.addTagForTour(tag.tagId!!, tourId)

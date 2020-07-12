@@ -23,4 +23,6 @@ interface ParkingService {
 
     fun searchParking(@Param("latitude") latitude: Double, @Param("longitude") longitude: Double): List<Parking>
 
+    fun getParkingById(@Param("id") id: Int): Parking
+
 }

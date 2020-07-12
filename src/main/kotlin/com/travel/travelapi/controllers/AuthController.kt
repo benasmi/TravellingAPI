@@ -20,6 +20,7 @@ import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
@@ -133,9 +134,13 @@ class AuthController(@Autowired private val authService: AuthService,
         return JwtResponse(token,userDetails.refreshToken, userDetails.authorities)
     }
 
-    fun authenticate(username: String, password: String): Authentication {
+    fun authenticate(identifier: String, password: String): Authentication {
         try {
-            return authenticationManager.authenticate(UsernamePasswordAuthenticationToken(username, password))
+            val auth = authenticationManager.authenticate(UsernamePasswordAuthenticationToken(identifier, password))
+
+            getUserByIdentifier(identifier, AuthProvider.local.name)
+            SecurityContextHolder.getContext().authentication = auth
+            return auth
         } catch (e: DisabledException) {
             throw InvalidUserDataException("USER_DISABLED")
         } catch (e: BadCredentialsException) {

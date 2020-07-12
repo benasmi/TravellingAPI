@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -32,18 +33,19 @@ class PhotoController(
     /**
      * Insert photo
      */
-    @PostMapping("/insert")
-    fun insertPhoto(@RequestBody photos : List<Photo>): List<Int>{
-        val inserted = ArrayList<Int>()
-        for(p: Photo in photos){
-            photoService.insertPhoto(p)
-            inserted.add(p.photoId!!)
-        }
-        return inserted
-    }
+//    @PostMapping("/insert")
+//    fun insertPhoto(@RequestBody photos : List<Photo>): List<Int>{
+//        val inserted = ArrayList<Int>()
+//        for(p: Photo in photos){
+//            photoService.insertPhoto(p)
+//            inserted.add(p.photoId!!)
+//        }
+//        return inserted
+//    }
 
 
     @GetMapping("/view")
+    @PreAuthorize("hasAuthority('photo:view')")
     fun serveFile(@RequestParam(name = "size", defaultValue = "500") size: String,
                   @RequestParam(name ="photoreference") fileName: String?, request: HttpServletRequest): ResponseEntity<ByteArray?>? {
         // Load file as Resource
@@ -83,6 +85,7 @@ class PhotoController(
 
 
     @PostMapping("/upload")
+    @PreAuthorize("hasAuthority('photo:upload')")
     fun insertPhoto(@RequestBody image: MultipartFile): Photo{
         val linkToImage = fileStorageService.storeImageFile(image)
         val photo = Photo(url =  linkToImage)

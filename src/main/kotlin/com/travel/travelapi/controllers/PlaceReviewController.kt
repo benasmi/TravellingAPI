@@ -6,6 +6,7 @@ import com.github.pagehelper.PageInfo
 import com.travel.travelapi.models.*
 import com.travel.travelapi.services.PlaceReviewService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController
 class PlaceReviewController(@Autowired private val placeReviewService: PlaceReviewService) {
 
     @GetMapping("/all")
+    @PreAuthorize("hasAuthority('review:read')")
     fun getPagedReviews(@RequestParam("p") id: Int,
                         @RequestParam(required = false, defaultValue = "1", name = "page") p: Int,
                         @RequestParam(required = false, defaultValue = "5", name = "size") s: Int,

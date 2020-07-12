@@ -6,17 +6,18 @@ import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.oauth2.core.user.OAuth2User
+import org.springframework.web.reactive.result.SimpleHandlerAdapter
 import java.util.*
 import kotlin.collections.ArrayList
 
 
-data class TravelUserDetails(private val id: Long? = null,
-                             val identifier: String? = null,
-                             val provider: String? = null,
-                             val refreshToken: String? = null,
-                             private val username: String?=null,
-                             private val password: String?=null,
-                             private val grantedAuthorities: List<GrantedAuthority>?= ArrayList()) : UserDetails, OAuth2User {
+data class TravelUserDetails(public var id: Long? ,
+                             var identifier: String? ,
+                             var provider: String? ,
+                             var refreshToken: String? ,
+                             private var username: String?,
+                             private var password: String?,
+                             public var grantedAuthorities: List<GrantedAuthority>?= ArrayList()) : UserDetails, OAuth2User {
 
     private var attributes: Map<String, Any> = emptyMap()
 
@@ -46,6 +47,23 @@ data class TravelUserDetails(private val id: Long? = null,
             }
             return authorities
         }
+    }
+
+    /**
+     * Returns a boolean, that indicates whether the user has a given authority.
+     * It checks for roles if authority name begins with ROLE_
+     */
+    fun hasAuthority(authority: SimpleGrantedAuthority): Boolean{
+        return authorities.contains(authority)
+    }
+
+    /**
+     * Returns a boolean, that indicates whether the user has a given authority.
+     * It checks for roles if authority name begins with ROLE_
+     * This override method creates a SimpleGrantedAuthority from the given auhority string
+     */
+    fun hasAuthority(authority: String): Boolean{
+        return hasAuthority(SimpleGrantedAuthority(authority))
     }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {

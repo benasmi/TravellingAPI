@@ -13,6 +13,9 @@
     <select id="getAllParkingInfo" resultType="com.travel.travelapi.models.Parking">
         SELECT * FROM PARKING WHERE levenshtein(#{p.address}, address) BETWEEN 0 AND 10
     </select>
+    <select id="getParkingById" resultType="com.travel.travelapi.models.Parking">
+        SELECT * FROM PARKING WHERE parkingId=#{id}
+    </select>
 
     <insert id="insertParking" useGeneratedKeys = "true" keyColumn = "parkingId" keyProperty = "parkingId">
         INSERT INTO PARKING (latitude, longitude, address, city, country) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.city}, #{p.country})

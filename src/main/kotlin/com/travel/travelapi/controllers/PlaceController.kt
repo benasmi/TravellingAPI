@@ -3,6 +3,8 @@ package com.travel.travelapi.controllers
 import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
+import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.exceptions.UnauthorizedException
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.models.PlaceLocal
@@ -11,6 +13,8 @@ import com.travel.travelapi.services.PlaceService
 import com.travel.travelapi.services.SourcePlaceService
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import kotlin.math.absoluteValue
 
@@ -46,6 +50,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('place:read')")
     fun getPlaces(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(required = true, defaultValue = "") keyword: String,
                   @RequestParam(required = false, defaultValue = "1") p: Int,
@@ -77,6 +82,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
     @GetMapping("/searchadmin")
+    @PreAuthorize("hasAuthority('place:read_unrestricted')")
     fun getPlacesAdmin(@RequestParam(required = false,name = "full") full: Boolean = false,
                        @RequestParam(required = true, defaultValue = "", name = "keyword") keyword: String,
                        @RequestParam(required = false, defaultValue = "1", name = "p") p: Int,
@@ -110,7 +116,37 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
     @PostMapping("/update")
     fun updatePlace(@RequestBody p: PlaceLocal){
+
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Checking if user has access to modify this place's basic info. If not, this line will throw an exception
+        checkModifyAccess(principal, p.placeId!!)
+
+        //Updating the place
         placeService.updatePlace(p)
+    }
+
+    /**
+     * Checks if user has permission to modify the place with a given ID.
+     * Throws an exception if user is not permitted
+     */
+    @Throws(UnauthorizedException::class)
+    fun checkModifyAccess(user: TravelUserDetails, placeId: Int){
+        //Getting the relevant place from database
+        val place = placeService.selectById(placeId)
+
+        //Checking if user has permission to modify place info unconditionally
+        if(user.hasAuthority("place:modify_unrestricted")){
+            return
+            //Else we check if user has authority to modify their place's basic info and the given place is created by them
+        }else if(place.userId != null
+                && place.userId!!.toLong() == user.id
+                && !place.isVerified!!
+                && !place.isPublic!!
+                && user.hasAuthority("place:modify"))   {
+            return
+        }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
     }
 
     /**
@@ -123,6 +159,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
      * If @param p and @param s are not present, default values are p=1 and s=10
      */
     @GetMapping("/getplace")
+    @PreAuthorize("hasAuthority('place:read')")
     fun getPlaceById(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(name="p") id: Int): PlaceLocal {
 
@@ -143,10 +180,18 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
     @GetMapping("/delete")
     fun deletePlace(@RequestParam("p") id: Int){
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Checking if user has access to remove this place. If not, this line will throw an exception
+        checkModifyAccess(principal, id)
+
+        //Deleting the place
         placeService.deletePlace(id)
     }
 
     @PostMapping("/insert")
+    @PreAuthorize("hasAuthority('place:insert')")
     fun insertPlace(@RequestBody p: PlaceLocal): Int{
         placeService.insertPlace(p)
         return p.placeId!!;
@@ -169,16 +214,19 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
 
     @GetMapping("/country/all")
+    @PreAuthorize("hasAuthority('place:read')")
     private fun getAllCountries(): ArrayList<String>{
         return placeService.getAllCountries()
     }
 
     @GetMapping("/municipality/all")
+    @PreAuthorize("hasAuthority('place:read')")
     private fun getAllMunicipalities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String): ArrayList<String>{
         return placeService.getAllMunicipalities(if(countryRestrictions.isNotEmpty()) countryRestrictions.split(',') else ArrayList())
     }
 
     @GetMapping("/city/all")
+    @PreAuthorize("hasAuthority('place:read')")
     private fun getAllCities(@RequestParam(name="countryRestrictions", defaultValue = "") countryRestrictions: String,
                              @RequestParam(name="munRestrictions", defaultValue = "") munRestrictions: String): ArrayList<String>{
         return placeService.getAllCities(
@@ -187,6 +235,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
     }
 
     @GetMapping("/county/all")
+    @PreAuthorize("hasAuthority('place:read')")
     private fun getAllCounties(): ArrayList<String>{
         return placeService.getAllCounties()
     }

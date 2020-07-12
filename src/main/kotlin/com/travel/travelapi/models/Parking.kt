@@ -6,5 +6,6 @@ data class Parking(val latitude: Float? = null,
                    val address: String? = null,
                    val city: String? = null,
                    val country: String? = null,
-                   val parkingId: Int? = null)
+                   val parkingId: Int? = null,
+                    val userId: Int? = null)
 

@@ -1,10 +1,13 @@
 package com.travel.travelapi.jwt
 
+import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.exceptions.InvalidUserDataException
+import com.travel.travelapi.models.User
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -38,19 +41,22 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
             val body = claimsJws.body
             val username = body.subject
             val type = body["type"] as String
+            val provider = body["provider"] as String
 
             if(type != JwtConfig.JwtTypes.ACCESS_TOKEN.name){
                 throw InvalidUserDataException(String.format("Token %s is not type of ACCESS_TOKEN", token))
             }
 
-            val authorities = authController.getPermissionsByIdentifier(username)
+            val user = authController.getUserByIdentifier(username, provider) ?: throw InvalidUserDataException("User invalid")
+            val principal = TravelUserDetails.create(user)
 
 
             val authentication: Authentication = UsernamePasswordAuthenticationToken(
-                    username,
+                    principal,
                     null,
-                    authorities
+                    principal.authorities
             )
+
             SecurityContextHolder.getContext().authentication = authentication
         } catch (e: JwtException) {
             throw IllegalStateException(String.format("Token %s cannot be trusted", token))
