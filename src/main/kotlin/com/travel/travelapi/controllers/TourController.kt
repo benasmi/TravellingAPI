@@ -35,7 +35,7 @@ class TourController(@Autowired private val tourService: TourService,
             return
             //Else we check if user has authority to modify their tour and the given tour is created by them
         }else if(tour.userId != null
-                && tour.userId.toLong() == user.id
+                && tour.userId!!.toLong() == user.id
                 && !tour.isVerified!!
                 && !tour.isPublished!!
                 && user.hasAuthority("tour:modify"))   {
@@ -151,6 +151,9 @@ class TourController(@Autowired private val tourService: TourService,
     @PostMapping("/insert")
     @PreAuthorize("hasAuthority('tour:modify')")
     fun insertTour(@RequestBody tour: Tour): Int{
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+        tour.userId = principal.id!!.toInt()
         tourService.insertTour(tour)
         return tour.tourId!!
     }
@@ -191,7 +194,7 @@ class TourController(@Autowired private val tourService: TourService,
                 return
                 //Else we check if user has authority to modify their tour and the given tour is created by them
             }else if(tour.userId != null
-                    && tour.userId.toLong() == user.id
+                    && tour.userId!!.toLong() == user.id
                     && !tour.isVerified!!
                     && !tour.isPublished!!
                     && user.hasAuthority("tourtag:modify"))   {

@@ -187,6 +187,9 @@ class PlaceController(@Autowired private val placeService: PlaceService,
     @PostMapping("/insert")
     @PreAuthorize("hasAuthority('place:insert')")
     fun insertPlace(@RequestBody p: PlaceLocal): Int{
+        //Getting the authenticated user
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+        p.userId = principal.id!!.toInt()
         placeService.insertPlace(p)
         return p.placeId!!;
     }

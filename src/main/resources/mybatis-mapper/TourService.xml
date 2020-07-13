@@ -40,8 +40,8 @@
     </select>
 
     <insert id="insertTour" useGeneratedKeys="true" keyColumn="tourId" keyProperty="tourId">
-      INSERT INTO TOUR (name, description, isPublished, isVerified)
-       VALUES (#{tour.name}, #{tour.description}, #{tour.isPublished}, #{tour.isVerified});
+      INSERT INTO TOUR (name, description, isPublished, isVerified, userId)
+       VALUES (#{tour.name}, #{tour.description}, #{tour.isPublished}, #{tour.isVerified}, #{tour.userId});
         SET @tourId = (SELECT LAST_INSERT_ID());
       <foreach item="day" collection="tour.days" index="i">
              INSERT INTO TOUR_DAY (day, fk_tourId, description) VALUES (#{i}, @tourId, #{day.description});

@@ -92,8 +92,8 @@
     </update>
 
     <insert id="insertPlace" useGeneratedKeys="true" keyProperty="placeId" keyColumn="placeId">
-        INSERT INTO PLACE (price, name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic, county, municipality)
-        VALUES (#{p.price},#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic}, #{p.county},#{p.municipality})
+        INSERT INTO PLACE (price, name, description, averageTimeSpent, latitude, longitude, address, country, city, phoneNumber, website, hasSchedule, isVerified, isPublic, county, municipality, userId)
+        VALUES (#{p.price},#{p.name},#{p.description}, #{p.averageTimeSpent}, #{p.latitude}, #{p.longitude}, #{p.address}, #{p.country}, #{p.city}, #{p.phoneNumber}, #{p.website}, #{p.hasSchedule}, #{p.isVerified}, #{p.isPublic}, #{p.county},#{p.municipality}, #{p.userId})
     </insert>
 
     <delete id="deletePlace">
