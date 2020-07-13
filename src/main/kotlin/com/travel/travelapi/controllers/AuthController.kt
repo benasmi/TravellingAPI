@@ -1,6 +1,7 @@
 package com.travel.travelapi.controllers
 
 import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.exceptions.FailedApiRequestException
 import com.travel.travelapi.exceptions.InvalidUserDataException
 import com.travel.travelapi.jwt.JwtConfig
 import com.travel.travelapi.jwt.JwtRefresh
@@ -49,12 +50,12 @@ class AuthController(@Autowired private val authService: AuthService,
      * Creates new user
      * @param user
      */
-    @Throws(AuthenticationException::class,InvalidUserDataException::class)
     @PostMapping("/registration")
-    fun createUser(@Valid @RequestBody user: User, bindingResult: BindingResult){
+    fun createUser(@Valid @RequestBody user: User, bindingResult: BindingResult): Long{
         if(bindingResult.hasErrors()){
             throw InvalidUserDataException("Password is to weak")
         }
+
         validUserData(user)
 
         val formedUser = User()
@@ -72,6 +73,8 @@ class AuthController(@Autowired private val authService: AuthService,
             formedUser.fk_photoId = photo.photoId
         }
         authService.createUser(formedUser)
+
+        return formedUser.id!!
     }
 
     fun identifierExists(identifier: String): Boolean{
@@ -102,6 +105,9 @@ class AuthController(@Autowired private val authService: AuthService,
 
     @Throws(InvalidUserDataException::class)
     fun isValidBirthday(birthday: String) {
+        if(birthday.isNullOrEmpty()){
+            return
+        }
         try {
             val date = SimpleDateFormat("dd/MM/yyyy").parse(birthday)
             if(date.after(Date())){

@@ -55,6 +55,8 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                 .authenticationEntryPoint(RestAuthenticationEntryPoint())
                 .and()
                 .authorizeRequests()
+                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/oauth2/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

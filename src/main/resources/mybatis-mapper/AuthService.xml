@@ -14,7 +14,8 @@
         SELECT * FROM USERS WHERE refreshToken=#{token}
     </select>
 
-    <select id="getAllRoles" resultMap="com.travel.travelapi.models.Role">
+
+    <select id="getAllRoles" resultType="com.travel.travelapi.models.Role">
         SELECT * FROM ROLE
     </select>
 
@@ -52,9 +53,16 @@
         SELECT EXISTS(SELECT * FROM USERS WHERE email=#{email})
     </select>
 
-    <insert id="createUser">
+    <insert id="createUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
         INSERT INTO `USERS`(`identifier`, `name`, `surname`, `birthday`, `gender`, `email`, `fk_photoId`, `fk_locale`, `password`, `provider`, `refreshToken`)
-        VALUES (#{user.identifier},#{user.name},NULL,(STR_TO_DATE(#{user.birthday},'%d/%m/%Y')),NULL,#{user.email},NULL,NULL,#{user.password},#{user.provider},#{user.refreshToken});
+        VALUES (#{user.identifier},#{user.name},#{user.surname},
+        <if test="user.birthday != null">
+            (STR_TO_DATE(#{user.birthday},'%d/%m/%Y'))
+        </if>
+        <if test="user.birthday == null">
+            NULL
+        </if>
+        ,NULL,#{user.email},NULL,NULL,#{user.password},#{user.provider},#{user.refreshToken});
         SET @userInsertedId = (SELECT LAST_INSERT_ID());
         <foreach collection="user.roles" item="roleId">
             INSERT INTO `USER_ROLE`(`fk_userId`, `fk_roleId`) VALUES (@userInsertedId,#{roleId});
