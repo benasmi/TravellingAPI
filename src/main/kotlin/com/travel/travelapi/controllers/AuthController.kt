@@ -134,7 +134,8 @@ class AuthController(@Autowired private val authService: AuthService,
                 .claim("provider", "local")
                 .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                 .setIssuedAt(Date())
-                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+                .setExpiration(Date(System.currentTimeMillis() + 5000L))
+//                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
 
@@ -149,9 +150,9 @@ class AuthController(@Autowired private val authService: AuthService,
             SecurityContextHolder.getContext().authentication = auth
             return auth
         } catch (e: DisabledException) {
-            throw InvalidUserDataException("USER_DISABLED")
+            throw InvalidUserDataException("User is currently disabled")
         } catch (e: BadCredentialsException) {
-            throw InvalidUserDataException("INVALID_CREDENTIALS")
+            throw InvalidUserDataException("Wrong username or password")
         }
     }
 
@@ -166,7 +167,8 @@ class AuthController(@Autowired private val authService: AuthService,
                     .claim("provider", user.provider)
                     .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                     .setIssuedAt(Date())
-                    .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+                    .setExpiration(Date(System.currentTimeMillis() + 5000L))
+//                    .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                     .signWith(secretKey)
                     .compact()
             return JwtResponse(token,null,user.authorities)

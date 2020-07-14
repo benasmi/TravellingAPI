@@ -79,10 +79,6 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                     .failureHandler(oAuth2AuthenticationFailureHandler);
     }
 
-    override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/auth/**")
-        web.ignoring().antMatchers("/oauth2/**")
-    }
 
     /**
      * Inject password encoding technique into PasswordEncoder

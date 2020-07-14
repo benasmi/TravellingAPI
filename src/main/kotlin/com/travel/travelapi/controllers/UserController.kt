@@ -59,6 +59,9 @@ class UserController(
     @PostMapping("/setRoles")
     @PreAuthorize("hasAuthority('role:manage')")
     fun setUserRoles(@RequestBody data: RoleUser){
+        if(data.userId==46){
+            throw InvalidUserDataException("Insufficient authority")
+        }
         authService.mapUserRoles(data.userId, data.roles)
     }
 

@@ -11,7 +11,7 @@
     </select>
 
     <select id="getUserByRefreshToken" resultType="com.travel.travelapi.models.User">
-        SELECT * FROM USERS WHERE refreshToken=#{token}/
+        SELECT * FROM USERS WHERE refreshToken=#{token}
     </select>
 
 

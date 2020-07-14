@@ -4,6 +4,7 @@ import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.exceptions.InvalidUserDataException
 import com.travel.travelapi.exceptions.UnauthorizedException
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.models.Photo
@@ -30,8 +31,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val tagPlaceController: TagPlaceController,
                       @Autowired private val sourcePlaceController: SourcePlaceController,
                       @Autowired private val sphinxService: SphinxService){
-
-
 
 
     /**
