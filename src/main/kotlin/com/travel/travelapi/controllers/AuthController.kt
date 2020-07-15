@@ -59,6 +59,8 @@ class AuthController(@Autowired private val authService: AuthService,
         validUserData(user)
 
         val formedUser = User()
+        formedUser.name = user.name
+        formedUser.surname = user.surname
         formedUser.refreshToken = UUID.randomUUID().toString()
         formedUser.password = passwordEncoder.encode(user.password)
         formedUser.identifier = user.email
@@ -134,8 +136,7 @@ class AuthController(@Autowired private val authService: AuthService,
                 .claim("provider", "local")
                 .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                 .setIssuedAt(Date())
-                .setExpiration(Date(System.currentTimeMillis() + 5000L))
-//                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+                .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                 .signWith(secretKey)
                 .compact()
 
@@ -167,8 +168,7 @@ class AuthController(@Autowired private val authService: AuthService,
                     .claim("provider", user.provider)
                     .claim("type", JwtConfig.JwtTypes.ACCESS_TOKEN.name)
                     .setIssuedAt(Date())
-                    .setExpiration(Date(System.currentTimeMillis() + 5000L))
-//                    .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
+                    .setExpiration(Date.valueOf(LocalDate.now().plusDays(jwtConfig.tokenExpirationAfterDays!!.toLong())))
                     .signWith(secretKey)
                     .compact()
             return JwtResponse(token,null,user.authorities)

@@ -62,5 +62,4 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
         }
         filterChain.doFilter(request, response)
     }
-
 }

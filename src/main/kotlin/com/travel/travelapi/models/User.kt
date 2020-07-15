@@ -8,7 +8,7 @@ import org.springframework.security.core.GrantedAuthority
 data class User(
         var id: Long? = null,
         var name: String? = null,
-        val surname: String? = null,
+        var surname: String? = null,
         var email: String? = null,
         var identifier: String? = null,
         var imageUrl: String? = null,
