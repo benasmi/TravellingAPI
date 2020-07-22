@@ -19,6 +19,10 @@
         SELECT * FROM ROLE
     </select>
 
+    <update id="updateInitialData">
+        UPDATE `USERS` SET `name`=#{data.name}, `surname`=#{data.surname}, `birthday`=STR_TO_DATE(#{data.birthday},'%d/%m/%Y'), `gender`=#{data.gender.id} WHERE `id`=#{userId}
+    </update>
+
     <select id="searchAdmin" resultType="com.travel.travelapi.models.UserProfile">
         SELECT * FROM USERS
         <if test="keyword!= ''">

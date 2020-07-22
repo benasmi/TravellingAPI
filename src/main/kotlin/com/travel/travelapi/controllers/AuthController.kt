@@ -67,7 +67,7 @@ class AuthController(@Autowired private val authService: AuthService,
         formedUser.email = user.email
         formedUser.birthday = user.birthday
         formedUser.provider = AuthProvider.local
-        formedUser.roles.add(Roles.ROLE_USER.id)
+        formedUser.roles.add(Roles.ROLE_LIMBO.id)
 
         if(!user.imageUrl.isNullOrEmpty()){
             val photo = Photo(null, user.imageUrl, null)

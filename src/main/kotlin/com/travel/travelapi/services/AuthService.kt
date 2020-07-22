@@ -1,6 +1,7 @@
 package com.travel.travelapi.services
 
 import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.controllers.UserController
 import com.travel.travelapi.models.Permission
 import com.travel.travelapi.models.Role
 import com.travel.travelapi.models.User
@@ -26,6 +27,8 @@ interface AuthService {
 
     fun getUserProfile(@Param("identifier") identifier: String, @Param("provider") provider: String): UserProfile?
     fun updateUser(@Param("user") user: User)
+
+    fun updateInitialData(@Param("data") data: UserController.InitialData, @Param("userId") userId: Int)
 
     fun mapUserRoles(@Param("userId") userId: Int, @Param("roles") roles: List<Int>)
 

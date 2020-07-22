@@ -22,6 +22,15 @@ data class User(
 
     var roles = ArrayList<Int>()
     var authorities :List<GrantedAuthority> = ArrayList()
+
+    companion object{
+        enum class Gender(val id: Int){
+            MALE(1),
+            FEMALE(2),
+            OTHER(3)
+        }
+    }
+
 }
 
 data class UserProfile(val name: String? = null,

@@ -4,19 +4,20 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.InvalidUserDataException
-import com.travel.travelapi.models.PlaceLocal
-import com.travel.travelapi.models.Role
-import com.travel.travelapi.models.UserProfile
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.AuthService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import java.util.*
+import kotlin.collections.ArrayList
 
 @RestController
 @RequestMapping("/user")
 class UserController(
-        @Autowired private val authService: AuthService
+        @Autowired private val authService: AuthService,
+        @Autowired private val authController: AuthController
 ){
 
     /**
@@ -53,6 +54,20 @@ class UserController(
     data class RoleUser(var roles: List<Int>,
                         var userId: Int)
 
+    data class InitialData(var name: String,
+                            var surname: String,
+                            var birthday: String,
+                            var gender: User.Companion.Gender)
+
+    @PreAuthorize("hasAuthority('user:update_initial_data')")
+    @PostMapping("/updateInitialData")
+    fun updateInitialData(@RequestBody data: InitialData){
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+        authController.isValidBirthday(data.birthday)
+        authService.updateInitialData(data, principal.id!!.toInt())
+        authService.mapUserRoles(principal.id!!.toInt(), arrayListOf(Roles.ROLE_USER.id))
+    }
+
     /**
      * Sets roles for user.
      */
@@ -64,6 +79,8 @@ class UserController(
         }
         authService.mapUserRoles(data.userId, data.roles)
     }
+
+
 
     /**
      * User search functionality with advanced filtering options

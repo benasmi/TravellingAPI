@@ -7,5 +7,6 @@ data class Role(val roleId: Int? = null,
 
 enum class Roles(val id: Int) {
     ROLE_ADMIN(1),
-    ROLE_USER(2)
+    ROLE_USER(2),
+    ROLE_LIMBO(3)
 }
