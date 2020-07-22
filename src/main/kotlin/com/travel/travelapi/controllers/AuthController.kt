@@ -265,7 +265,9 @@ class AuthController(@Autowired private val authService: AuthService,
 
             val user = getUserByIdentifier(identifier, provider)
 
-            return refreshAccessToken(user?.refreshToken!!)
+            val refresh = refreshAccessToken(user?.refreshToken!!)
+            refresh.refresh_token = user.refreshToken
+            return refresh
         } catch (e: JwtException) {
             throw InvalidUserDataException(String.format("Token %s cannot be trusted", token))
         }

@@ -57,8 +57,8 @@ class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : Sim
         //JWT expires in 30 seconds
         val token = Jwts.builder()
                 .setSubject(user.identifier)
-                .claim("authorities", authentication.authorities)
                 .claim("provider", user.provider)
+                .claim("type", JwtConfig.JwtTypes.EXCHANGE_TOKEN.name)
                 .setIssuedAt(java.util.Date())
                 .setExpiration(Date(System.currentTimeMillis() + 30000L))
                 .signWith(secretKey)
@@ -70,7 +70,7 @@ class OAuth2AuthenticationSuccessHandler(private val secretKey: SecretKey) : Sim
     }
 
     private fun isAuthorizedRedirectUri(uri: String): Boolean {
-        return uri == "https://www.google.com/"
+        return true
     }
 
 
