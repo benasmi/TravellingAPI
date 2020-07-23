@@ -228,7 +228,7 @@ class AuthController(@Autowired private val authService: AuthService,
      */
     @Throws(AuthenticationException::class)
     fun createUserOauth2(user: User){
-        user.roles.add(Roles.ROLE_USER.id)
+        user.roles.add(Roles.ROLE_LIMBO.id)
         authService.createUser(user)
     }
 
