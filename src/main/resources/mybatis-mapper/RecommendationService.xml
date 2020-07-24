@@ -1,0 +1,65 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.RecommendationService">
+
+    <insert id="createRecommendation" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+        INSERT INTO `RECOMMENDATION`(`name`, `subtitle`, `description`, `type`, `fk_userId`)
+        VALUES (#{recommendation.name}, #{recommendation.subtitle}, #{recommendation.description},
+                #{recommendation.type.id}, #{recommendation.user})
+    </insert>
+
+    <select id="searchRecommendations" resultType="com.travel.travelapi.models.Recommendation">
+        SELECT * FROM RECOMMENDATION
+        <if test='keyword != ""'>
+            WHERE MATCH (name) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
+        </if>
+    </select>
+
+    <insert id="addPlace">
+        INSERT INTO `PLACE_RECOMMENDATION`(`fk_placeId`, `fk_recommendationId`) VALUES (#{data.id}, #{data.recommendationId})
+    </insert>
+
+    <insert id="addTour">
+        INSERT INTO `TOUR_RECOMMENDATION`(`fk_tourId`, `fk_recommendationId`) VALUES (#{data.id}, #{data.recommendationId})
+    </insert>
+
+    <delete id="removePlace">
+        DELETE FROM `PLACE_RECOMMENDATION` WHERE `fk_placeId`=#{data.id} AND `fk_recommendationId`=#{data.recommendationId}
+    </delete>
+
+    <delete id="removeTour">
+        DELETE FROM `TOUR_RECOMMENDATION` WHERE `fk_tourId`=#{data.id} AND `fk_recommendationId`=#{data.recommendationId}
+    </delete>
+
+    <select id="selectPlacesForRecommendation" resultType="Int">
+        SELECT p.placeId FROM PLACE p
+                                  INNER JOIN PLACE_RECOMMENDATION pr on pr.fk_placeId = p.placeId
+        WHERE pr.fk_recommendationId = #{recommendationId}
+    </select>
+
+    <select id="selectToursForRecommendation" resultType="com.travel.travelapi.models.Tour">
+        SELECT NULL
+    </select>
+
+    <update id="updateRecommendation">
+        <if test="recommendation.type == 1"> <!-- Recommendation if of place type -->
+            DELETE FROM `PLACE_RECOMMENDATION` WHERE `fk_recommendationId` = #{recommendation.id};
+            <foreach collection="recommendation.places" item="place">
+                INSERT INTO `PLACE_RECOMMENDATION`(`fk_placeId`, `fk_recommendationId`)
+                VALUES (#{place.placeId}, #{recommendation.id});
+            </foreach>
+        </if>
+        <if test="recommendation.type == 2"> <!-- Recommendation if of tour type -->
+            DELETE FROM `TOUR_RECOMMENDATION` WHERE `fk_recommendationId` = #{id};
+            <foreach collection="recommendation.tours" item="tour">
+                INSERT INTO `TOUR_RECOMMENDATION`(`fk_tourId`, `fk_recommendationId`)
+                VALUES (#{tour.tourId}, #{recommendation.id});
+            </foreach>
+        </if>
+        UPDATE `RECOMMENDATION` SET `name`=#{recommendation.name},`subtitle`=#{recommendation.subtitle},`description`=#{recommendation.description}
+        WHERE `id`=#{recommendation.id};
+
+    </update>
+
+</mapper>

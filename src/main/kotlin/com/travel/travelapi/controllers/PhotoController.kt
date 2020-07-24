@@ -45,7 +45,7 @@ class PhotoController(
 
 
     @GetMapping("/view")
-    @PreAuthorize("hasAuthority('photo:view')")
+//    @PreAuthorize("hasAuthority('photo:view')")
     fun serveFile(@RequestParam(name = "size", defaultValue = "500") size: String,
                   @RequestParam(name ="photoreference") fileName: String?, request: HttpServletRequest): ResponseEntity<ByteArray?>? {
         // Load file as Resource
