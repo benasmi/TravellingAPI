@@ -12,6 +12,7 @@ data class Tour(val tourId: Int? = null,
                 var userId: Int? = null
                 ){
     var days: ArrayList<TourDay>? = null
+    var photos: ArrayList<Photo>? = null
 }
 
 data class TourDayDetails(val description: String? = null)

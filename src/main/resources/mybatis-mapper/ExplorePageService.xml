@@ -1,0 +1,18 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.ExplorePageService">
+
+    <update id="update">
+        DELETE FROM EXPLORE_PAGE WHERE 1;
+        <foreach collection="recommendations" item="recommendationId">
+            INSERT INTO `EXPLORE_PAGE`(`fk_recommendationId`) VALUES (#{recommendationId});
+        </foreach>
+    </update>
+
+    <select id="selectAll" resultType="com.travel.travelapi.models.Recommendation">
+        SELECT * FROM `RECOMMENDATION` recommendation
+                          INNER JOIN `EXPLORE_PAGE` explorePage ON recommendation.id = explorePage.fk_recommendationId
+    </select>
+
+</mapper>

@@ -1,6 +1,7 @@
 package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
+import com.travel.travelapi.models.Photo
 import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.models.Tag
 import com.travel.travelapi.models.Tour
@@ -16,6 +17,8 @@ interface TourService {
 
     fun selectAllAdmin(@Param("keyword") keyword: String,
                        @Param("filterOptions") filterOptions: List<String>) : Page<Tour>
+
+    fun photosForTour(@Param("id") tourId: Int) : List<Photo>
 
 
     fun getTagsForTour(@Param("id") id: Int): List<Tag>

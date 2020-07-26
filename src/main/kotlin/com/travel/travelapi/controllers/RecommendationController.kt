@@ -4,23 +4,26 @@ import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
+import com.travel.travelapi.exceptions.InvalidParamsException
 import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.models.Recommendation
 import com.travel.travelapi.models.RecommendationType
+import com.travel.travelapi.models.Tour
 import com.travel.travelapi.services.AuthService
 import com.travel.travelapi.services.RecommendationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import java.sql.SQLException
 
 @RestController
 @RequestMapping("/recommendation")
 class RecommendationController(
         @Autowired private val recommendationService: RecommendationService,
-        @Autowired private val placeController: PlaceController
+        @Autowired private val placeController: PlaceController,
+        @Autowired private val tourController: TourController
 ) {
 
-    // TODO: add requires permission
     @PostMapping("/create")
     fun createRecommendation(@RequestBody recommendation: Recommendation): Int {
         //Getting the authenticated user
@@ -52,36 +55,72 @@ class RecommendationController(
                     places.add(placeController.getPlaceById(false, placeId))
                 recommendation.places = places
             } else if (recommendation.type == RecommendationType.TOUR.id) {
-                //recommendation.tours = recommendationService.selectToursForRecommendation(recommendation.id!!)
-                // TODO
+                val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
+                val tours = arrayListOf<Tour>()
+                for (tour in tourIds)
+                    tours.add(tourController.tourOverviewById(tour.tourId!!))
+                recommendation.tours = tours
             }
         }
         return PageInfo(recommendationsFound)
     }
 
-    data class ObjectRecommendation(val id: Int, val recommendationId: Int, val type: Int)
+    data class ObjectRecommendation(val id: Int, val recommendationId: Int)
+
+    fun getRecommendationById(id: Int): Recommendation{
+        val recommendation: Recommendation
+        try{
+            recommendation = recommendationService.selectRecommendationById(id)
+        }catch(e: SQLException) {
+            throw InvalidParamsException("Recommendation id is not valid")
+        }
+        return recommendation
+    }
 
     @PostMapping("/addObject")
     fun addPlace(@RequestBody data: ObjectRecommendation){
-        if(data.type == RecommendationType.PLACE.id){
+        val recommendation = getRecommendationById(data.recommendationId)
+        if(recommendation.type == RecommendationType.PLACE.id){
+            if(recommendationService.placeExists(data.recommendationId, data.id))
+                throw InvalidParamsException("The place you wanted to add is already in the recommendation.")
             recommendationService.addPlace(data)
-        }else if(data.type == RecommendationType.TOUR.id){
+        }else if(recommendation.type == RecommendationType.TOUR.id){
+            if(recommendationService.tourExists(data.recommendationId, data.id))
+                throw InvalidParamsException("The tour you wanted to add is already in the recommendation.")
             recommendationService.addTour(data)
         }
     }
 
     @PostMapping("/removeObject")
     fun removePlace(@RequestBody data: ObjectRecommendation){
-        if(data.type == RecommendationType.PLACE.id){
+        val recommendation = getRecommendationById(data.recommendationId)
+        if(recommendation.type == RecommendationType.PLACE.id){
             recommendationService.removePlace(data)
-        }else if(data.type == RecommendationType.TOUR.id){
+        }else if(recommendation.type == RecommendationType.TOUR.id){
             recommendationService.removeTour(data)
         }
     }
 
     @PostMapping("/update")
     fun updateRecommendation(@RequestBody data: Recommendation){
-        recommendationService.updateRecommendation(data)
+        //Getting the recommendation by ID so we can determine it's type
+        val recommendation = getRecommendationById(data.id!!)
+        var hasDuplicates = false
+        if(recommendation.type == RecommendationType.PLACE.id){
+            //Checking if recommendation has duplicate places
+            hasDuplicates = data.places!!.distinctBy { place -> place.placeId }.count() != data.places!!.count()
+        }else if(recommendation.type == RecommendationType.TOUR.id){
+            //Checking if recommendation has duplicate tours
+            hasDuplicates = data.tours!!.distinctBy { tour -> tour.tourId }.count() != data.tours!!.count()
+        }
+        if(hasDuplicates)
+            throw InvalidParamsException("The recommendation contains duplicates!")
+        else
+            recommendationService.updateRecommendation(data)
     }
 
+    @PostMapping("/remove")
+    fun removeRecommendation(@RequestBody data: Recommendation){
+        recommendationService.removeRecommendation(data)
+    }
 }

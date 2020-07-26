@@ -14,6 +14,10 @@ interface RecommendationService {
      */
     fun createRecommendation(@Param("recommendation") recommendation: Recommendation): Int
 
+    fun selectRecommendationById(@Param("id") id: Int): Recommendation
+
+    fun removeRecommendation(@Param("recommendation") recommendation: Recommendation)
+
     fun searchRecommendations(@Param("keyword") keyword: String?): Page<Recommendation>
 
     fun addPlace(@Param("data") placeRecommendation: RecommendationController.ObjectRecommendation)
@@ -23,6 +27,10 @@ interface RecommendationService {
     fun removePlace(@Param("data") placeRecommendation: RecommendationController.ObjectRecommendation)
 
     fun removeTour(@Param("data") tourRecommendation: RecommendationController.ObjectRecommendation)
+
+    fun tourExists(@Param("recommendationId") recommendationId: Int, @Param("tourId") tourId: Int): Boolean
+
+    fun placeExists(@Param("recommendationId") recommendationId: Int, @Param("placeId") placeId: Int): Boolean
 
     /**
      * Returns a list of places, that have id's for a recommendation with a given ID

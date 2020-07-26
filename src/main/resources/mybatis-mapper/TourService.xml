@@ -8,6 +8,14 @@
         SELECT * FROM TOUR WHERE tourId=#{id}
     </select>
 
+    <select id="photosForTour" resultType="com.travel.travelapi.models.Photo">
+        SELECT * FROM TOUR_DAY td INNER JOIN
+                      PLACE_TOUR_DAY ptd ON td.tourDayId = ptd.fk_tourDayId
+                                  INNER JOIN PHOTO_PLACE pp ON pp.fk_placeId = ptd.fk_placeId
+                                  INNER JOIN PHOTO photo ON pp.fk_photoId = photo.photoId
+        WHERE fk_tourId=#{id}
+    </select>
+
     <delete id="deleteTourById">
         DELETE FROM TOUR WHERE tourId=#{id}
     </delete>

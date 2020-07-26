@@ -24,6 +24,28 @@
         INSERT INTO `TOUR_RECOMMENDATION`(`fk_tourId`, `fk_recommendationId`) VALUES (#{data.id}, #{data.recommendationId})
     </insert>
 
+    <select id="placeExists" resultType="Boolean">
+        SELECT EXISTS(
+            SELECT pr.fk_placeId as placeId FROM `RECOMMENDATION` r
+                INNER JOIN `PLACE_RECOMMENDATION` pr ON pr.fk_recommendationId = r.id
+                                                            AND pr.fk_placeId = #{placeId}
+            WHERE r.id=#{recommendationId}
+            )
+    </select>
+
+    <select id="selectRecommendationById" resultType="com.travel.travelapi.models.Recommendation">
+        SELECT * FROM `RECOMMENDATION` WHERE `id`=#{id};
+    </select>
+
+    <select id="tourExists" resultType="Boolean">
+        SELECT EXISTS(
+            SELECT tr.fk_tourId as tourId FROM `RECOMMENDATION` r
+                INNER JOIN `TOUR_RECOMMENDATION` tr ON tr.fk_recommendationId = r.id
+                                                            AND tr.fk_tourId = #{tourId}
+            WHERE r.id=#{recommendationId}
+            )
+    </select>
+
     <delete id="removePlace">
         DELETE FROM `PLACE_RECOMMENDATION` WHERE `fk_placeId`=#{data.id} AND `fk_recommendationId`=#{data.recommendationId}
     </delete>
@@ -39,7 +61,9 @@
     </select>
 
     <select id="selectToursForRecommendation" resultType="com.travel.travelapi.models.Tour">
-        SELECT NULL
+        SELECT p.tourId FROM TOUR p
+                                  INNER JOIN TOUR_RECOMMENDATION pr on pr.fk_tourId = p.tourId
+        WHERE pr.fk_recommendationId = #{recommendationId}
     </select>
 
     <update id="updateRecommendation">
@@ -59,7 +83,10 @@
         </if>
         UPDATE `RECOMMENDATION` SET `name`=#{recommendation.name},`subtitle`=#{recommendation.subtitle},`description`=#{recommendation.description}
         WHERE `id`=#{recommendation.id};
-
     </update>
+
+    <delete id="removeRecommendation">
+        DELETE FROM RECOMMENDATION WHERE `id` = #{recommendation.id}
+    </delete>
 
 </mapper>

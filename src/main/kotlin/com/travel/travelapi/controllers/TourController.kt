@@ -62,6 +62,20 @@ class TourController(@Autowired private val tourService: TourService,
         val tours = tourService.selectAllAdmin(keyword,filterOptions)
         return PageInfo(tours)
     }
+
+    fun tourOverviewById(tourId: Int): Tour{
+        //Getting tour by ID
+        val tour: Tour = tourService.getTourById(tourId)
+        //Creating a new tour object, with limited amount of information
+        val tourTrimmed = Tour(tourId = tour.tourId, name=tour.name, description=tour.description,userId=tour.userId)
+        //Selecting all photos of all tour places
+        val photos = tourService.photosForTour(tourId)
+        //Selecting first photo to be the featured photo for this tour. This should be changed to something
+        //else in the future
+        tourTrimmed.photos = if (photos.count() > 0) arrayListOf(photos[0]) else null
+        return tourTrimmed
+    }
+
     /**
      * Get tour by id
      * @param id of a tour
