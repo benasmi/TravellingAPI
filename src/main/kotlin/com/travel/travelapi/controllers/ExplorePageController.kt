@@ -32,13 +32,12 @@ class ExplorePageController(
     ): PageInfo<Recommendation>{
         PageHelper.startPage<Recommendation>(p, s)
 
-        val recommendationIds = explorePageService.selectAll()
-//        val recommendations = arrayListOf<Recommendation>()
-//
-//        for(recommendation in recommendationIds)
-//            recommendations.add(recommendationController.getRecommendationById(recommendation.id!!))
+        val recommendations = explorePageService.selectAll()
 
-        return PageInfo(recommendationIds)
+        for(recommendation in recommendations)
+            recommendationController.extendRecommendation(recommendation)
+
+        return PageInfo(recommendations)
     }
 
 }

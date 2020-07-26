@@ -48,21 +48,25 @@ class RecommendationController(
             return PageInfo(recommendationsFound)
 
         for (recommendation in recommendationsFound) {
-            if (recommendation.type == RecommendationType.PLACE.id) {
-                val placeIds = recommendationService.selectPlacesForRecommendation(recommendation.id!!)
-                val places = arrayListOf<PlaceLocal>()
-                for (placeId in placeIds)
-                    places.add(placeController.getPlaceById(false, placeId))
-                recommendation.places = places
-            } else if (recommendation.type == RecommendationType.TOUR.id) {
-                val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
-                val tours = arrayListOf<Tour>()
-                for (tour in tourIds)
-                    tours.add(tourController.tourOverviewById(tour.tourId!!))
-                recommendation.tours = tours
-            }
+            extendRecommendation(recommendation)
         }
         return PageInfo(recommendationsFound)
+    }
+
+    fun extendRecommendation(recommendation: Recommendation){
+        if (recommendation.type == RecommendationType.PLACE.id) {
+            val placeIds = recommendationService.selectPlacesForRecommendation(recommendation.id!!)
+            val places = arrayListOf<PlaceLocal>()
+            for (placeId in placeIds)
+                places.add(placeController.getPlaceById(false, placeId))
+            recommendation.places = places
+        } else if (recommendation.type == RecommendationType.TOUR.id) {
+            val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
+            val tours = arrayListOf<Tour>()
+            for (tour in tourIds)
+                tours.add(tourController.tourOverviewById(tour.tourId!!))
+            recommendation.tours = tours
+        }
     }
 
     data class ObjectRecommendation(val id: Int, val recommendationId: Int)
