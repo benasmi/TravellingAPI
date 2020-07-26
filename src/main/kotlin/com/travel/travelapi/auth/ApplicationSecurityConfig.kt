@@ -57,6 +57,7 @@ class ApplicationSecurityConfig(@Autowired @Lazy private val authUserDetailsServ
                 .authorizeRequests()
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/oauth2/**").permitAll()
+                .antMatchers("/photo/view").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
