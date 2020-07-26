@@ -12,6 +12,7 @@ import com.travel.travelapi.models.Tour
 import com.travel.travelapi.services.AuthService
 import com.travel.travelapi.services.RecommendationService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.sql.SQLException
@@ -25,6 +26,7 @@ class RecommendationController(
 ) {
 
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('recommendation:write')")
     fun createRecommendation(@RequestBody recommendation: Recommendation): Int {
         //Getting the authenticated user
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
@@ -37,6 +39,7 @@ class RecommendationController(
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('recommendation:read')")
     fun searchRecommendations(@RequestParam("keyword", defaultValue = "") keyword: String?,
                               @RequestParam("full", defaultValue = "false") full: Boolean?,
                               @RequestParam(required = false, defaultValue = "1") p: Int,
@@ -82,6 +85,7 @@ class RecommendationController(
     }
 
     @PostMapping("/addObject")
+    @PreAuthorize("hasAuthority('recommendation:write')")
     fun addPlace(@RequestBody data: ObjectRecommendation){
         val recommendation = getRecommendationById(data.recommendationId)
         if(recommendation.type == RecommendationType.PLACE.id){
@@ -96,6 +100,7 @@ class RecommendationController(
     }
 
     @PostMapping("/removeObject")
+    @PreAuthorize("hasAuthority('recommendation:write')")
     fun removePlace(@RequestBody data: ObjectRecommendation){
         val recommendation = getRecommendationById(data.recommendationId)
         if(recommendation.type == RecommendationType.PLACE.id){
@@ -106,6 +111,7 @@ class RecommendationController(
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasAuthority('recommendation:write')")
     fun updateRecommendation(@RequestBody data: Recommendation){
         //Getting the recommendation by ID so we can determine it's type
         val recommendation = getRecommendationById(data.id!!)
@@ -124,6 +130,7 @@ class RecommendationController(
     }
 
     @PostMapping("/remove")
+    @PreAuthorize("hasAuthority('recommendation:write')")
     fun removeRecommendation(@RequestBody data: Recommendation){
         recommendationService.removeRecommendation(data)
     }
