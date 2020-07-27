@@ -76,7 +76,7 @@
         </if>
         <if test="recommendation.type == 2"> <!-- Recommendation if of tour type -->
             DELETE FROM `TOUR_RECOMMENDATION` WHERE `fk_recommendationId` = #{recommendation.id};
-            <foreach collection="recommendation.tours" item="tour">
+            <foreach collection="recommendation.objects" item="tour">
                 INSERT INTO `TOUR_RECOMMENDATION`(`fk_tourId`, `fk_recommendationId`)
                 VALUES (#{tour.id}, #{recommendation.id});
             </foreach>

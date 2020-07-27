@@ -111,6 +111,10 @@ class RecommendationController(
     @PreAuthorize("hasAuthority('recommendation:write')")
     fun updateRecommendation(@RequestBody data: Recommendation){
         //Getting the recommendation by ID so we can determine it's type
+        val recommendation = getRecommendationById(data.id!!)
+
+        data.type = recommendation.type
+
         val hasDuplicates = data.objects!!.distinctBy { obj -> obj.id }.count() != data.objects!!.count()
 
         if(hasDuplicates)

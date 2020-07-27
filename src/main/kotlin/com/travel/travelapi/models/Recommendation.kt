@@ -18,9 +18,8 @@ enum class RecommendationType(val id: Int){
     PLACE(1),
     TOUR(2)
 }
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", defaultImpl = RecommendationPlaces::class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "taipas", defaultImpl = RecommendationPlaces::class)
 @JsonSubTypes(
         JsonSubTypes.Type(value = RecommendationPlaces::class, name = "1"),
         JsonSubTypes.Type(value = RecommendationTours::class, name = "2"))
