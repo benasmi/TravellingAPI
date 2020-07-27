@@ -4,9 +4,9 @@
 <mapper namespace="com.travel.travelapi.services.RecommendationService">
 
     <insert id="createRecommendation" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
-        INSERT INTO `RECOMMENDATION`(`name`, `subtitle`, `description`, `type`, `fk_userId`)
+        INSERT INTO `RECOMMENDATION`(`name`, `subtitle`, `description`, `type`, `user`)
         VALUES (#{recommendation.name}, #{recommendation.subtitle}, #{recommendation.description},
-                #{recommendation.type.id}, #{recommendation.user})
+                #{recommendation.type}, #{recommendation.user})
     </insert>
 
     <select id="searchRecommendations" resultType="com.travel.travelapi.models.Recommendation">
@@ -69,16 +69,16 @@
     <update id="updateRecommendation">
         <if test="recommendation.type == 1"> <!-- Recommendation if of place type -->
             DELETE FROM `PLACE_RECOMMENDATION` WHERE `fk_recommendationId` = #{recommendation.id};
-            <foreach collection="recommendation.places" item="place">
+            <foreach collection="recommendation.objects" item="place">
                 INSERT INTO `PLACE_RECOMMENDATION`(`fk_placeId`, `fk_recommendationId`)
-                VALUES (#{place.placeId}, #{recommendation.id});
+                VALUES (#{place.id}, #{recommendation.id});
             </foreach>
         </if>
         <if test="recommendation.type == 2"> <!-- Recommendation if of tour type -->
-            DELETE FROM `TOUR_RECOMMENDATION` WHERE `fk_recommendationId` = #{id};
+            DELETE FROM `TOUR_RECOMMENDATION` WHERE `fk_recommendationId` = #{recommendation.id};
             <foreach collection="recommendation.tours" item="tour">
                 INSERT INTO `TOUR_RECOMMENDATION`(`fk_tourId`, `fk_recommendationId`)
-                VALUES (#{tour.tourId}, #{recommendation.id});
+                VALUES (#{tour.id}, #{recommendation.id});
             </foreach>
         </if>
         UPDATE `RECOMMENDATION` SET `name`=#{recommendation.name},`subtitle`=#{recommendation.subtitle},`description`=#{recommendation.description}
@@ -86,7 +86,7 @@
     </update>
 
     <delete id="removeRecommendation">
-        DELETE FROM RECOMMENDATION WHERE `id` = #{recommendation.id}
+        DELETE FROM RECOMMENDATION WHERE `id` = #{id}
     </delete>
 
 </mapper>

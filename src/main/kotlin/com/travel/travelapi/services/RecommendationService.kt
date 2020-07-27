@@ -16,7 +16,7 @@ interface RecommendationService {
 
     fun selectRecommendationById(@Param("id") id: Int): Recommendation
 
-    fun removeRecommendation(@Param("recommendation") recommendation: Recommendation)
+    fun removeRecommendation(@Param("id") id: Int)
 
     fun searchRecommendations(@Param("keyword") keyword: String?): Page<Recommendation>
 

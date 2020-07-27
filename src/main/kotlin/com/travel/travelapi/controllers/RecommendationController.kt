@@ -5,10 +5,7 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.InvalidParamsException
-import com.travel.travelapi.models.PlaceLocal
-import com.travel.travelapi.models.Recommendation
-import com.travel.travelapi.models.RecommendationType
-import com.travel.travelapi.models.Tour
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.AuthService
 import com.travel.travelapi.services.RecommendationService
 import org.springframework.beans.factory.annotation.Autowired
@@ -59,16 +56,16 @@ class RecommendationController(
     fun extendRecommendation(recommendation: Recommendation){
         if (recommendation.type == RecommendationType.PLACE.id) {
             val placeIds = recommendationService.selectPlacesForRecommendation(recommendation.id!!)
-            val places = arrayListOf<PlaceLocal>()
+            val places = arrayListOf<RecommendationPlaces>()
             for (placeId in placeIds)
-                places.add(placeController.getPlaceById(false, placeId))
-            recommendation.places = places
+                places.add(RecommendationPlaces.createFromPlaceInstance(placeController.getPlaceById(false, placeId)))
+            recommendation.objects = places
         } else if (recommendation.type == RecommendationType.TOUR.id) {
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
-            val tours = arrayListOf<Tour>()
+            val tours = arrayListOf<RecommendationTours>()
             for (tour in tourIds)
-                tours.add(tourController.tourOverviewById(tour.tourId!!))
-            recommendation.tours = tours
+                tours.add(RecommendationTours.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
+            recommendation.objects = tours
         }
     }
 
@@ -114,15 +111,8 @@ class RecommendationController(
     @PreAuthorize("hasAuthority('recommendation:write')")
     fun updateRecommendation(@RequestBody data: Recommendation){
         //Getting the recommendation by ID so we can determine it's type
-        val recommendation = getRecommendationById(data.id!!)
-        var hasDuplicates = false
-        if(recommendation.type == RecommendationType.PLACE.id){
-            //Checking if recommendation has duplicate places
-            hasDuplicates = data.places!!.distinctBy { place -> place.placeId }.count() != data.places!!.count()
-        }else if(recommendation.type == RecommendationType.TOUR.id){
-            //Checking if recommendation has duplicate tours
-            hasDuplicates = data.tours!!.distinctBy { tour -> tour.tourId }.count() != data.tours!!.count()
-        }
+        val hasDuplicates = data.objects!!.distinctBy { obj -> obj.id }.count() != data.objects!!.count()
+
         if(hasDuplicates)
             throw InvalidParamsException("The recommendation contains duplicates!")
         else
@@ -131,7 +121,7 @@ class RecommendationController(
 
     @PostMapping("/remove")
     @PreAuthorize("hasAuthority('recommendation:write')")
-    fun removeRecommendation(@RequestBody data: Recommendation){
-        recommendationService.removeRecommendation(data)
+    fun removeRecommendation(@RequestBody id: Int){
+        recommendationService.removeRecommendation(id)
     }
 }
