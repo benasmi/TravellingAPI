@@ -10,9 +10,12 @@
     </insert>
 
     <select id="searchRecommendations" resultType="com.travel.travelapi.models.Recommendation">
-        SELECT * FROM RECOMMENDATION
+        SELECT * FROM RECOMMENDATION WHERE 1
         <if test='keyword != ""'>
-            WHERE MATCH (name) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
+            AND MATCH (name) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
+        </if>
+        <if test="type != null">
+            AND `type` = #{type}
         </if>
     </select>
 

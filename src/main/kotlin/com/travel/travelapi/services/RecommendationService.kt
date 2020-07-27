@@ -18,7 +18,7 @@ interface RecommendationService {
 
     fun removeRecommendation(@Param("id") id: Int)
 
-    fun searchRecommendations(@Param("keyword") keyword: String?): Page<Recommendation>
+    fun searchRecommendations(@Param("keyword") keyword: String?, @Param("type") type: Int?): Page<Recommendation>
 
     fun addPlace(@Param("data") placeRecommendation: RecommendationController.ObjectRecommendation)
 

@@ -12,7 +12,7 @@
 
     <select id="selectAll" resultType="com.travel.travelapi.models.Recommendation">
         SELECT * FROM `RECOMMENDATION` recommendation
-                          INNER JOIN `EXPLORE_PAGE` explorePage ON recommendation.id = explorePage.fk_recommendationId
+                          INNER JOIN `EXPLORE_PAGE` explorePage ON recommendation.id = explorePage.fk_recommendationId ORDER BY explorePage.id
     </select>
 
 </mapper>

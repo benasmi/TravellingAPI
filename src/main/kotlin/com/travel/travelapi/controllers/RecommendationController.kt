@@ -39,11 +39,12 @@ class RecommendationController(
     @PreAuthorize("hasAuthority('recommendation:read')")
     fun searchRecommendations(@RequestParam("keyword", defaultValue = "") keyword: String?,
                               @RequestParam("full", defaultValue = "false") full: Boolean?,
+                              @RequestParam("type") type: Int?,
                               @RequestParam(required = false, defaultValue = "1") p: Int,
                               @RequestParam(required = false, defaultValue = "10") s: Int): PageInfo<Recommendation> {
         PageHelper.startPage<Recommendation>(p, s)
 
-        val recommendationsFound = recommendationService.searchRecommendations(keyword)
+        val recommendationsFound = recommendationService.searchRecommendations(keyword, type)
         if (!full!!)
             return PageInfo(recommendationsFound)
 
