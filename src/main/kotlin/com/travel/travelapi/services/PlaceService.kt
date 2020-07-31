@@ -1,6 +1,7 @@
 package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
+import com.travel.travelapi.controllers.ExplorePageController
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.models.Place
 
@@ -30,6 +31,8 @@ interface PlaceService {
                        @Param("range") range: Double) : Page<PlaceLocal>
 
     fun searchClient(@Param("keyword") keyword: String): List<PlaceLocal>
+
+    fun matchPlacesByLocation(@Param("location") location: String, @Param("locationType") locationType: String): List<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
     fun updatePlace(@Param("p") p: PlaceLocal)

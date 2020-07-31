@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import java.util.*
 import kotlin.collections.ArrayList
 
 @RestController
@@ -191,11 +190,11 @@ class TourController(@Autowired private val tourService: TourService,
     }
 
     @RestController
-    @RequestMapping("/tour/tags")
+    @RequestMapping("/tour/categories")
     class Tags(@Autowired private val tourService: TourService){
 
         /**
-         * Checks if user has permission to modify the tour's tags with a given ID.
+         * Checks if user has permission to modify the tour's categories with a given ID.
          * Throws an exception if user is not permitted
          */
         @Throws(UnauthorizedException::class)
@@ -204,33 +203,33 @@ class TourController(@Autowired private val tourService: TourService,
             val tour = tourService.getTourById(tourId)
 
             //Checking if user has permission to modify tour info unconditionally
-            if(user.hasAuthority("tourtag:modify_unrestricted")){
+            if(user.hasAuthority("tourcategory:modify_unrestricted")){
                 return
                 //Else we check if user has authority to modify their tour and the given tour is created by them
             }else if(tour.userId != null
                     && tour.userId!!.toLong() == user.id
                     && !tour.isVerified!!
                     && !tour.isPublished!!
-                    && user.hasAuthority("tourtag:modify"))   {
+                    && user.hasAuthority("tourcategory:modify"))   {
                 return
             }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
         }
 
         /**
-         * Get tags for tour
+         * Get categories for tour
          * @param id of a tour
          */
         @GetMapping("")
         @PreAuthorize("hasAuthority('tour:read')")
-        fun tags(@RequestParam(name = "id") id: Int): List<Tag>{
-            return tourService.getTagsForTour(id)
+        fun categories(@RequestParam(name = "id") id: Int): List<Category>{
+            return tourService.getCategoriesForTour(id)
         }
 
         /**
-         * Set tags for a tour
+         * Set categories for a tour
          */
         @RequestMapping("/update")
-        fun insertParking(@RequestBody tags: List<Tag>, @RequestParam(name="p") tourId: Int){
+        fun updateTourCategories(@RequestBody categories: List<Category>, @RequestParam(name="p") tourId: Int){
 
             //Getting the authenticated user
             val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
@@ -238,9 +237,9 @@ class TourController(@Autowired private val tourService: TourService,
             //Checking if user has access to modify this tour. If not, this line will throw an exception
             checkModifyAccess(principal, tourId)
 
-            tourService.deleteTagsForTour(tourId)
-            for(tag: Tag in tags)
-                tourService.addTagForTour(tag.tagId!!, tourId)
+            tourService.deleteCategoriesForTour(tourId)
+            for(category: Category in categories)
+                tourService.addCategoryForTour(category.categoryId!!, tourId)
         }
     }
 

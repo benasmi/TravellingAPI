@@ -162,11 +162,11 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             place.parking = parkingPlaceController.getParkingLocationsById(id)
             place.schedule = workingScheduleService.getWorkingSchedulesById(id)
             place.totalReviews = placeReviewService.getReviewsCountsByPlace(id)
-            place.overallStarRating = placeReviewService.getReviewsAverageRating(id)
             place.photos = photoPlaceController.getPhotosById(id)
             place.tags = tagPlaceController.getTagsById(id)
             place.sources = sourcePlaceController.getSourcesById(id)
         }
+        place.overallStarRating = placeReviewService.getReviewsAverageRating(id)
         place.photos = photoPlaceController.getPhotosById(id)
         return place
     }
@@ -193,15 +193,15 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         return p.placeId!!;
     }
 
-    private fun extendPlace(full: Boolean, places: Page<PlaceLocal>) {
+    fun extendPlace(full: Boolean, places: Page<PlaceLocal>) {
             for (value: PlaceLocal in places) {
-             value.photos = photoPlaceController.getPhotosById(value.placeId!!)
+                value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId!!)
+                value.photos = photoPlaceController.getPhotosById(value.placeId!!)
                 if(full){
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
                     value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
                     value.schedule = workingScheduleService.getWorkingSchedulesById(value.placeId)
                     value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
-                    value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId)
                     value.tags = tagPlaceController.getTagsById(value.placeId)
                     value.sources = sourcePlaceController.getSourcesById(value.placeId)
                 }

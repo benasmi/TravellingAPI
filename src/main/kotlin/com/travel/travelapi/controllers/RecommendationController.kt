@@ -1,12 +1,10 @@
 package com.travel.travelapi.controllers
 
-import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.InvalidParamsException
 import com.travel.travelapi.models.*
-import com.travel.travelapi.services.AuthService
 import com.travel.travelapi.services.RecommendationService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -57,15 +55,15 @@ class RecommendationController(
     fun extendRecommendation(recommendation: Recommendation){
         if (recommendation.type == RecommendationType.PLACE.id) {
             val placeIds = recommendationService.selectPlacesForRecommendation(recommendation.id!!)
-            val places = arrayListOf<RecommendationPlaces>()
+            val places = arrayListOf<CollectionObjectPlace>()
             for (placeId in placeIds)
-                places.add(RecommendationPlaces.createFromPlaceInstance(placeController.getPlaceById(false, placeId)))
+                places.add(CollectionObjectPlace.createFromPlaceInstance(placeController.getPlaceById(false, placeId)))
             recommendation.objects = places
         } else if (recommendation.type == RecommendationType.TOUR.id) {
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
-            val tours = arrayListOf<RecommendationTours>()
+            val tours = arrayListOf<CollectionObjectTour>()
             for (tour in tourIds)
-                tours.add(RecommendationTours.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
+                tours.add(CollectionObjectTour.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
             recommendation.objects = tours
         }
     }

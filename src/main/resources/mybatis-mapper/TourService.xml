@@ -76,16 +76,16 @@
       </foreach>
     </insert>
 
-    <select id="getTagsForTour" resultType="com.travel.travelapi.models.Tag">
-        SELECT  tag.*, b.*
-        FROM    TAG tag
-                    INNER JOIN TAG_TOUR b
-                               ON tag.tagId = b.fk_tagId
+    <select id="getCategoriesForTour" resultType="com.travel.travelapi.models.Category">
+        SELECT  category.*, b.*
+        FROM    CATEGORY category
+                    INNER JOIN CATEGORY_TOUR b
+                               ON category.categoryId = b.fk_categoryId
         WHERE   b.fk_tourId = #{id}
     </select>
 
-    <delete id="deleteTagsForTour" >
-        DELETE FROM TAG_TOUR WHERE fk_tourId=#{id}
+    <delete id="deleteCategoriesForTour" >
+        DELETE FROM CATEGORY_TOUR WHERE fk_tourId=#{id}
     </delete>
 
     <update id="changeVerificationStatus">
@@ -96,8 +96,8 @@
         UPDATE TOUR SET isPublished=#{public} WHERE tourId=#{tourId}
     </update>
 
-    <insert id="addTagForTour">
-        INSERT INTO TAG_TOUR(`fk_tourId`, `fk_tagId`) VALUES (#{id}, #{tag})
+    <insert id="addCategoryForTour">
+        INSERT INTO CATEGORY_TOUR(`fk_tourId`, `fk_categoryId`) VALUES (#{id}, #{category})
     </insert>
 
 </mapper>

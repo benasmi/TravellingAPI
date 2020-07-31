@@ -1,10 +1,7 @@
 package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
-import com.travel.travelapi.models.Photo
-import com.travel.travelapi.models.PlaceLocal
-import com.travel.travelapi.models.Tag
-import com.travel.travelapi.models.Tour
+import com.travel.travelapi.models.*
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
 
@@ -21,11 +18,11 @@ interface TourService {
     fun photosForTour(@Param("id") tourId: Int) : List<Photo>
 
 
-    fun getTagsForTour(@Param("id") id: Int): List<Tag>
+    fun getCategoriesForTour(@Param("id") id: Int): ArrayList<Category>
 
-    fun deleteTagsForTour(@Param("id") id: Int)
+    fun deleteCategoriesForTour(@Param("id") id: Int)
 
-    fun addTagForTour(@Param("tag") tag: Int, @Param("id") tourId: Int)
+    fun addCategoryForTour(@Param("category") category: Int, @Param("id") tourId: Int)
 
     fun changeVerificationStatus(@Param("tourId") tourId: Int, @Param("verified") verified: Boolean)
 

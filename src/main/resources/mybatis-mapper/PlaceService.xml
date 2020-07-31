@@ -8,6 +8,10 @@
         SELECT * FROM PLACE
     </select>
 
+    <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
+        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, price FROM PLACE WHERE ${locationType}=#{location}
+    </select>
+
     <select id="search" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT * FROM PLACE WHERE placeId IN
         <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>

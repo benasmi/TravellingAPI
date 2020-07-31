@@ -2,6 +2,7 @@ package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
 import com.travel.travelapi.controllers.ExplorePageController
+import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.models.Recommendation
 import com.travel.travelapi.models.SearchResultRegion
 import com.travel.travelapi.models.Tour

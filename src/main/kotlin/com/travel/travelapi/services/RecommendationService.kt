@@ -32,6 +32,8 @@ interface RecommendationService {
 
     fun placeExists(@Param("recommendationId") recommendationId: Int, @Param("placeId") placeId: Int): Boolean
 
+    fun matchRecommendationsByLocation(@Param("locationType") locationType: String, @Param("location") location: String): List<Recommendation>
+
     /**
      * Returns a list of places, that have id's for a recommendation with a given ID
      */
