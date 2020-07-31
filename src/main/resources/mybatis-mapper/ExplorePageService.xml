@@ -15,4 +15,25 @@
                           INNER JOIN `EXPLORE_PAGE` explorePage ON recommendation.id = explorePage.fk_recommendationId ORDER BY explorePage.id
     </select>
 
+    <select id="selectToursForPlace" resultType="com.travel.travelapi.models.Tour">
+        SELECT td.fk_tourId as tourId, ptd.fk_tourDayId FROM PLACE_TOUR_DAY ptd
+                                                       INNER JOIN TOUR_DAY td ON td.tourDayId = ptd.fk_tourDayId WHERE fk_placeId = #{placeId} LIMIT 8
+    </select>
+
+    <select id="matchSearch" resultType="com.travel.travelapi.models.SearchResultRegion">
+        (SELECT DISTINCT NULL as county, NULL as country, city, NULL as municipality FROM PLACE WHERE MATCH (city) AGAINST( CONCAT(#{keyword},'*') IN BOOLEAN MODE) LIMIT 5)
+        UNION ALL
+        (SELECT DISTINCT NULL as county, NULL as country, NULL as city, municipality FROM PLACE WHERE MATCH (municipality) AGAINST( CONCAT(#{keyword},'*') IN BOOLEAN MODE) LIMIT 5)
+        UNION ALL
+        (SELECT DISTINCT county, NULL AS country, NULL as city, NULL as municipality FROM PLACE WHERE MATCH (county) AGAINST( CONCAT(#{keyword},'*') IN BOOLEAN MODE) LIMIT 5)
+        UNION ALL
+        (SELECT DISTINCT country, NULL as county, NULL as city, NULL as municipality FROM PLACE WHERE MATCH (country) AGAINST( CONCAT(#{keyword},'*') IN BOOLEAN MODE) LIMIT 5)
+        ORDER BY LEAST(
+                         levenshtein(IFNULL(city, ''), #{keyword}),
+                         levenshtein(IFNULL(municipality, ''), #{keyword}),
+                         levenshtein(IFNULL(country, ''), #{keyword}),
+                         levenshtein(IFNULL(county, ''), #{keyword})
+                     )
+    </select>
+
 </mapper>

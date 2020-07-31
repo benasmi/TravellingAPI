@@ -2,6 +2,7 @@ package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
 import com.travel.travelapi.models.Parking
+import com.travel.travelapi.models.Place
 
 import org.apache.ibatis.annotations.*
 
@@ -27,6 +28,8 @@ interface PlaceService {
                        @Param("filterMunicipalities") filterMunicipalities: List<String>,
                        @Param("location") location: List<String>,
                        @Param("range") range: Double) : Page<PlaceLocal>
+
+    fun searchClient(@Param("keyword") keyword: String): List<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
     fun updatePlace(@Param("p") p: PlaceLocal)
