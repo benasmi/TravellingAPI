@@ -63,7 +63,8 @@ class ExplorePageController(
             place.photos = if(photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
 
         }
-        return ClientSearchResult(places, tours, explorePageService.matchSearch(keyword))
+        val test = explorePageService.matchSearch(keyword)
+        return ClientSearchResult(places, tours, test)
     }
 
     fun getToursAssociatedWithPlaces(places: List<PlaceLocal>): List<Tour>{
