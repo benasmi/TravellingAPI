@@ -16,20 +16,19 @@ class ExplorePageController(
         @Autowired private val recommendationController: RecommendationController,
         @Autowired private val photoPlaceService: PhotoPlaceService,
         @Autowired private val placeService: PlaceService,
-        @Autowired private val placeController: PlaceController,
         @Autowired private val tourController: TourController,
         @Autowired private val tourService: TourService,
         @Autowired private val recommendationService: RecommendationService,
         @Autowired private val categoryPlaceService: CategoryPlaceService
-){
+) {
 
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('explore:update')")
-    fun update(@RequestBody recommendations: List<Int>){
-        if(recommendations.distinct().count() == recommendations.count()){
+    fun update(@RequestBody recommendations: List<Int>) {
+        if (recommendations.distinct().count() == recommendations.count()) {
             //No duplicate recommendations
             explorePageService.update(recommendations)
-        }else{
+        } else {
             throw InvalidParamsException("The explore page cannot have any duplicate recommendations")
         }
     }
@@ -39,12 +38,12 @@ class ExplorePageController(
     fun getExplorePage(
             @RequestParam(required = false, defaultValue = "1") p: Int,
             @RequestParam(required = false, defaultValue = "10") s: Int
-    ): PageInfo<Recommendation>{
+    ): PageInfo<Recommendation> {
         PageHelper.startPage<Recommendation>(p, s)
 
         val recommendations = explorePageService.selectAll()
 
-        for(recommendation in recommendations)
+        for (recommendation in recommendations)
             recommendationController.extendRecommendation(recommendation)
 
         return PageInfo(recommendations)
@@ -53,51 +52,48 @@ class ExplorePageController(
 
     @GetMapping("/search")
     fun search(@RequestParam keyword: String): ClientSearchResult {
-        if(keyword == "")
+        if (keyword == "")
             return ClientSearchResult(arrayListOf(), arrayListOf(), arrayListOf())
 
         val places = placeService.searchClient(keyword)
         val tours = getToursAssociatedWithPlaces(places)
-        for(place in places){
+        for (place in places) {
             val photos = photoPlaceService.selectPhotosById(place.placeId!!)
-            place.photos = if(photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
-
+            place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
         }
-        val test = explorePageService.matchSearch(keyword)
-        return ClientSearchResult(places, tours, test)
+        return ClientSearchResult(places, tours, explorePageService.matchSearch(keyword))
     }
 
-    fun getToursAssociatedWithPlaces(places: List<PlaceLocal>): List<Tour>{
+    fun getToursAssociatedWithPlaces(places: List<PlaceLocal>): List<Tour> {
         val tours = arrayListOf<Tour>()
-        for(place in places){
+        for (place in places) {
             val tourIds = explorePageService.selectToursForPlace(place.placeId!!)
-            for(tour in tourIds)
+            for (tour in tourIds)
                 tours.add(tourController.tourOverviewById(tour.tourId!!))
         }
         return tours.distinctBy { tour -> tour.tourId }
     }
 
-    data class ExploreLocation(val location: String,
-    val type: String){
-        fun valid(): Boolean{
+    data class ExploreLocation(val location: String, val type: String) {
+        fun valid(): Boolean {
             return type == "city" || type == "country" || type == "municipality" || type == "county"
         }
     }
 
     @PostMapping("/location")
-    fun getByLocation(@RequestBody exploreLocationRequest: ExploreLocation): List<ObjectCollection>{
-        if(!exploreLocationRequest.valid())
+    fun getByLocation(@RequestBody exploreLocationRequest: ExploreLocation): List<ObjectCollection> {
+        if (!exploreLocationRequest.valid())
             throw InvalidParamsException("Type specified is invalid")
-        if(exploreLocationRequest.location == "")
+        if (exploreLocationRequest.location == "")
             throw InvalidParamsException("No location specified")
 
-        var categoriesAll = arrayListOf<Category>()
+        val categoriesAll = arrayListOf<Category>()
 
         //Matching places
         var placesFound = placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
         placesFound.map { place ->
             val photos = photoPlaceService.selectPhotosById(place.placeId!!)
-            place.photos = if(photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
+            place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
             place.categories = categoryPlaceService.selectByPlaceId(place.placeId)
             categoriesAll.addAll(place.categories!!)
         }
@@ -111,18 +107,17 @@ class ExplorePageController(
 
         //Matching recommendations
         val recommendations = arrayListOf<Recommendation>()
-        for(place in placesFound)
-            recommendations.addAll(recommendationService.matchRecommendationsByLocation(exploreLocationRequest.type, exploreLocationRequest.location))
-            recommendations.forEach{recommendation ->
+        recommendations.addAll(recommendationService.matchRecommendationsByLocation(exploreLocationRequest.type, exploreLocationRequest.location))
+        recommendations.forEach { recommendation ->
             recommendationController.extendRecommendation(recommendation)
         }
 
         val collections = arrayListOf<ObjectCollection>()
 
         //Adding recommendations to the location results object
-        collections.addAll(recommendations.distinctBy { it.id })
+        collections.addAll(recommendations)
 
-        while(true){
+        while (true) {
 
             //Finding the category, which is contained by most tours/places in this search
             val mostPopularCategory = categoriesAll.groupingBy { it.categoryId }.eachCount().maxBy { it.value }
@@ -130,7 +125,7 @@ class ExplorePageController(
             mostPopularCategory ?: break
 
             //We do not want to map places/tours to categories if there are less than a certain amount of objects mapped to a category
-            if(mostPopularCategory.value < 3)
+            if (mostPopularCategory.value < 2)
                 break;
 
             //Getting the most popular categorie's name and ID
@@ -139,13 +134,15 @@ class ExplorePageController(
             val collectionsByCategories = arrayListOf<CollectionObject>()
 
             //Adding places, that contain the most popular tag
-            collectionsByCategories.addAll(placesFound.filter{ place ->
-                place.categories!!.any{ category -> category.categoryId == mostPopularCategory.key}}
+            collectionsByCategories.addAll(placesFound.filter { place ->
+                place.categories!!.any { category -> category.categoryId == mostPopularCategory.key }
+            }
                     .map { CollectionObjectPlace.createFromPlaceInstance(it) })
 
             //Adding tours, that contain the most popular tag
-            collectionsByCategories.addAll(tours.filter{ tour ->
-                tour.categories!!.any{ category -> category.categoryId == mostPopularCategory.key}}
+            collectionsByCategories.addAll(tours.filter { tour ->
+                tour.categories!!.any { category -> category.categoryId == mostPopularCategory.key }
+            }
                     .map { CollectionObjectTour.createFromTourInstance(it) })
 
             //Adding the current location result object to the list
@@ -160,20 +157,19 @@ class ExplorePageController(
                 categoriesAll.addAll(place.categories?.toList() ?: listOf())
             for (tour in tours)
                 categoriesAll.addAll(tour.categories?.toList() ?: listOf())
-
         }
 
         //Adding places to the "others" section, since they did not belong to any popular tag
         val otherPlaces = arrayListOf<CollectionObject>()
-        otherPlaces.addAll(placesFound.map{
+        otherPlaces.addAll(placesFound.map {
             CollectionObjectPlace.createFromPlaceInstance(it)
         })
-        collections.add(MiscellaneousCollection(objects = otherPlaces, name="Other places", subtitle=""))
+        collections.add(MiscellaneousCollection(objects = otherPlaces, name = "Other places", subtitle = ""))
 
         //Adding tours to the "others" section, since they did not belong to any popular tag
         val otherTours = arrayListOf<CollectionObject>()
         otherTours.addAll(tours.map { CollectionObjectTour.createFromTourInstance(it) })
-        collections.add(MiscellaneousCollection(objects = otherTours, name="Other tours", subtitle=""))
+        collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
 
         return collections
     }
