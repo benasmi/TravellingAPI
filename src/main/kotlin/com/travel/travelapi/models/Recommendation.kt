@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "collectionType", defaultImpl = CollectionObjectPlace::class)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "collectionType", defaultImpl = Recommendation::class)
 @JsonSubTypes(
         JsonSubTypes.Type(value = Recommendation::class, name = "recommendation"),
         JsonSubTypes.Type(value = SuggestionByCategory::class, name = "suggestion_category"),
