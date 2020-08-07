@@ -60,11 +60,17 @@ class CollectionObjectPlace(
         name: String? = null,
         description: String? = null,
         id: Int? = null,
-        photos: List<Photo>? = null
+        photos: List<Photo>? = null,
+        val averageTimeSpent: Int? = null,
+        val city: String? = null,
+        val country: String? = null,
+        val county: String? = null,
+        val municipality: String? = null,
+        val price: String? = null
 ): CollectionObject(name, description, id, photos){
     companion object{
         fun createFromPlaceInstance(place: PlaceLocal): CollectionObjectPlace{
-            return CollectionObjectPlace(place.name, place.description, place.placeId, if(place.photos != null && place.photos!!.count() > 0) arrayListOf(place.photos!![0]) else arrayListOf())
+            return CollectionObjectPlace(place.name, place.description, place.placeId, if(place.photos != null && place.photos!!.count() > 0) arrayListOf(place.photos!![0]) else arrayListOf(), place.averageTimeSpent,place.city,place.country,place.county,place.municipality,place.price)
         }
     }
 }

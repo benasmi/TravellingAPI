@@ -180,14 +180,14 @@ class ExplorePageController(
     }
 
     @GetMapping("/nearby")
-    fun findPlacesNearby(@RequestParam placeId: Int): MiscellaneousCollection {
+    fun findPlacesNearby(@RequestParam(name="p") placeId: Int): MiscellaneousCollection {
         //Selecting the place by ID to find coordinates
         val place = placeService.selectById(placeId)
         //Matching nearby places that are published and verified
         val placesNearby = placeService.selectAllAdmin(
                 filterOptions = listOf("verified", "published"),
                 location = listOf(place.latitude.toString(), place.longitude.toString()),
-                range = 6000.toDouble())
+                range = 10.toDouble())
 
         //Removing the place whose id was provided
         placesNearby.removeAll { it.placeId == place.placeId }
