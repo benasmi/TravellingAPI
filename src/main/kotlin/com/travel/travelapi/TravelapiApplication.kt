@@ -21,6 +21,5 @@ class TravelapiApplication
 
 fun main(args: Array<String>) {
 	runApplication<TravelapiApplication>(*args)
-
 }
 

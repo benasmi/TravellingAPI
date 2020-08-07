@@ -80,6 +80,14 @@ class ExplorePageController(
         }
     }
 
+    fun extendPlaces(places: List<PlaceLocal>) {
+        places.map { place ->
+            val photos = photoPlaceService.selectPhotosById(place.placeId!!)
+            place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
+            place.categories = categoryPlaceService.selectByPlaceId(place.placeId)
+        }
+    }
+
     @PostMapping("/location")
     fun getByLocation(@RequestBody exploreLocationRequest: ExploreLocation): List<ObjectCollection> {
         if (!exploreLocationRequest.valid())
@@ -91,13 +99,10 @@ class ExplorePageController(
 
         //Matching places
         var placesFound = placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
-        placesFound.map { place ->
-            val photos = photoPlaceService.selectPhotosById(place.placeId!!)
-            place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
-            place.categories = categoryPlaceService.selectByPlaceId(place.placeId)
-            categoriesAll.addAll(place.categories!!)
+        extendPlaces(placesFound)
+        placesFound.forEach {
+            categoriesAll.addAll(it.categories!!)
         }
-
         //Matching tours
         var tours = getToursAssociatedWithPlaces(placesFound)
         tours.map { tour ->
@@ -172,6 +177,24 @@ class ExplorePageController(
         collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
 
         return collections
+    }
+
+    @GetMapping("/nearby")
+    fun findPlacesNearby(@RequestParam placeId: Int): MiscellaneousCollection {
+        //Selecting the place by ID to find coordinates
+        val place = placeService.selectById(placeId)
+        //Matching nearby places that are published and verified
+        val placesNearby = placeService.selectAllAdmin(
+                filterOptions = listOf("verified", "published"),
+                location = listOf(place.latitude.toString(), place.longitude.toString()),
+                range = 6000.toDouble())
+
+        //Removing the place whose id was provided
+        placesNearby.removeAll { it.placeId == place.placeId }
+        //Mapping photos and other stuff to place object
+        extendPlaces(placesNearby)
+        //Returning nearby places in the form of ObjectCollection
+        return MiscellaneousCollection("Places nearby", null, placesNearby.map { CollectionObjectPlace.createFromPlaceInstance(it) })
     }
 
 }

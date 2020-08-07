@@ -19,16 +19,17 @@ interface PlaceService {
     fun search(@Param("ids") ids: List<String>): Page<PlaceLocal>
 
     fun selectAll(): Page<PlaceLocal>
-    fun selectAllAdmin(@Param("keyword") keyword: String,
-                       @Param("filterOptions") filterOptions: List<String>,
-                       @Param("filterCategories") filterCategories: List<String>,
-                       @Param("filterDateAdded") filterDateAdded: List<String>,
-                       @Param("filterDateModified") filterDateModified: List<String>,
-                       @Param("filterCountries") filterCountries: List<String>,
-                       @Param("filterCities") filterCities: List<String>,
-                       @Param("filterMunicipalities") filterMunicipalities: List<String>,
-                       @Param("location") location: List<String>,
-                       @Param("range") range: Double) : Page<PlaceLocal>
+
+    fun selectAllAdmin(@Param("keyword") keyword: String = "",
+                       @Param("filterOptions") filterOptions: List<String> = arrayListOf(),
+                       @Param("filterCategories") filterCategories: List<String>  = arrayListOf(),
+                       @Param("filterDateAdded") filterDateAdded: List<String>  = arrayListOf(),
+                       @Param("filterDateModified") filterDateModified: List<String>  = arrayListOf(),
+                       @Param("filterCountries") filterCountries: List<String> = arrayListOf(),
+                       @Param("filterCities") filterCities: List<String> = arrayListOf(),
+                       @Param("filterMunicipalities") filterMunicipalities: List<String> = arrayListOf(),
+                       @Param("location") location: List<String> = arrayListOf(),
+                       @Param("range") range: Double = 0.toDouble()) : Page<PlaceLocal>
 
     fun searchClient(@Param("keyword") keyword: String): List<PlaceLocal>
 

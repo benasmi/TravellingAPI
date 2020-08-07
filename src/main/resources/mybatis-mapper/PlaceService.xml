@@ -65,6 +65,12 @@
             <if test="item == 'unpublished'">
                 AND isPublic=0
             </if>
+            <if test="item == 'verified'">
+                AND isVerified=1
+            </if>
+            <if test="item == 'published'">
+                AND isPublic=1
+            </if>
         </foreach>
         <if test="filterCategories.size() != 0">
             AND placeId IN (SELECT cp.fk_placeId FROM CATEGORY c INNER JOIN CATEGORY_PLACE cp ON c.categoryId =
