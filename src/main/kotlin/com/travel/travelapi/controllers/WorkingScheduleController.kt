@@ -67,11 +67,11 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
         //Checking if user is authorized to modify this place's working schedule. This line will throw an exception if that is not the case
         checkModifyAccess(principal, placeId)
 
-        try{
+//        try{
             workingScheduleService.updateWorkingScheduleForPlace(workingSchedules, placeId)
-        }catch(ex: Exception){
-            throw InvalidParamsException("The input data was incorrect")
-        }
+//        }catch(ex: Exception){
+//            throw InvalidParamsException("The input data was incorrect")
+//        }
     }
 
 }
