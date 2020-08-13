@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository
 interface PhotoService {
 
     fun insertPhoto(@Param("p") p: Photo)
-    fun updatePhoto(@Param("id") id: Int, @Param("url") url: String)
+    fun updatePhoto(@Param("fk_photoId") id: Int,
+                    @Param("userId") userId: Long)
 
 }

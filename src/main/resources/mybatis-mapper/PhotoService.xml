@@ -8,6 +8,6 @@
     </insert>
 
     <update id="updatePhoto">
-        UPDATE PHOTO SET url=#{url} WHERE photoId=#{id}
+        UPDATE USERS SET fk_photoId=#{fk_photoId} WHERE id=#{userId}
     </update>
 </mapper>

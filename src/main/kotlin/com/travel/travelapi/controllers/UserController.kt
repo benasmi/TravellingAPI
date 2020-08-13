@@ -6,10 +6,14 @@ import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.InvalidUserDataException
 import com.travel.travelapi.models.*
 import com.travel.travelapi.services.AuthService
+import com.travel.travelapi.services.PhotoService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
+
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -17,7 +21,9 @@ import kotlin.collections.ArrayList
 @RequestMapping("/user")
 class UserController(
         @Autowired private val authService: AuthService,
-        @Autowired private val authController: AuthController
+        @Autowired private val authController: AuthController,
+        @Lazy @Autowired private val photoController: PhotoController,
+        @Lazy @Autowired private val photoService: PhotoService
 ){
 
     /**
@@ -110,5 +116,19 @@ class UserController(
 
         return PageInfo(users)
     }
+
+    /**
+     * Change profile picture
+     * @param keyword The keyword to filter users by
+     * @param roles Roles to filter users by
+     */
+    @PostMapping("/changeProfilePhoto")
+    fun changeProfilePhoto(@RequestBody image: MultipartFile){
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+        val photo = photoController.insertPhoto(image)
+        photoService.updatePhoto(photo.photoId!!, principal.id!!)
+    }
+
+
 
 }

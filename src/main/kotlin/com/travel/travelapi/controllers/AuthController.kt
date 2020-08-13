@@ -231,20 +231,20 @@ class AuthController(@Autowired private val authService: AuthService,
         user.roles.add(Roles.ROLE_LIMBO.id)
         authService.createUser(user)
     }
-
-    /**
-     * Updates existing OAuth2 user
-     */
-    fun updateUserOauth2(user: User){
-        if(user.fk_photoId != null){
-            photoService.updatePhoto(user.fk_photoId!!,user.imageUrl!!)
-        }else{
-            val photo = Photo(null, user.imageUrl,null)
-            photoService.insertPhoto(photo)
-            user.fk_photoId = photo.photoId
-        }
-        authService.updateUser(user)
-    }
+//
+//    /**
+//     * Updates existing OAuth2 user
+//     */
+//    fun updateUserOauth2(user: User){
+//        if(user.fk_photoId != null){
+//            photoService.updatePhoto(user.fk_photoId!!,user.imageUrl!!)
+//        }else{
+//            val photo = Photo(null, user.imageUrl,null)
+//            photoService.insertPhoto(photo)
+//            user.fk_photoId = photo.photoId
+//        }
+//        authService.updateUser(user)
+//    }
 
     /**
      * Exchanges short lived JWT OAuth2 token for long lived JWT token and refresh token
