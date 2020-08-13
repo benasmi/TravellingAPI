@@ -197,4 +197,23 @@ class ExplorePageController(
         return MiscellaneousCollection("Places nearby", null, placesNearby.map { CollectionObjectPlace.createFromPlaceInstance(it) })
     }
 
+    @GetMapping("/relatedTours")
+    fun findToursThatWithPlaces(@RequestParam(name="p") placeId: Int): MiscellaneousCollection {
+
+        //Selecting tours that include given placeId
+        val tourIds = tourService.findToursRelatedWithPlace(placeId)
+        val tours = ArrayList<Tour>()
+
+        //Getting tours that match tour id
+        tourIds.forEach {
+            val tour = tourController.tourOverviewById(it)
+            tours.add(tour)
+        }
+
+        //Returning nearby places in the form of ObjectCollection
+        return MiscellaneousCollection("Tours with this place", null, tours.map { CollectionObjectTour.createFromTourInstance(it) })
+    }
+
+
+
 }

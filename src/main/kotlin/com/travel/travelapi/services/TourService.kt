@@ -27,4 +27,6 @@ interface TourService {
     fun changeVerificationStatus(@Param("tourId") tourId: Int, @Param("verified") verified: Boolean)
 
     fun changePublicityStatus(@Param("tourId") tourId: Int, @Param("public") public: Boolean)
+
+    fun findToursRelatedWithPlace(@Param("placeId") placeId: Int): ArrayList<Int>
 }

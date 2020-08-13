@@ -25,6 +25,12 @@
         WHERE tourId=#{id}
     </update>
 
+    <select id="findToursRelatedWithPlace" resultType="int">
+        SELECT DISTINCT t.tourId FROM `PLACE_TOUR_DAY` ptd
+        INNER JOIN TOUR_DAY td ON ptd.fk_tourDayId=td.tourDayId
+        INNER JOIN TOUR t ON td.fk_tourId = t.tourId
+        WHERE ptd.fk_placeId=#{placeId}
+    </select>
 
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.Tour">

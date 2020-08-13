@@ -46,6 +46,7 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
                         user.provider.toString() + " account. Please use your " + user.provider.toString() +
                         " account to login.")
             }
+            //Currently does not do anything, because profile is controlled within Travelgo App
             updateExistingUser(user, oAuth2UserInfo)
         } else {
             registerNewUser(oAuth2UserRequest, oAuth2UserInfo)
@@ -76,9 +77,9 @@ class CustomOAuth2UserService(@Autowired private val authController: AuthControl
     }
 
     private fun updateExistingUser(existingUser: User, oAuth2UserInfo: OAuth2UserInfo): User {
-        existingUser.name = oAuth2UserInfo.name
-        existingUser.imageUrl = oAuth2UserInfo.imageUrl
-        authController.updateUserOauth2(existingUser)
+//        existingUser.name = oAuth2UserInfo.name
+//        existingUser.imageUrl = oAuth2UserInfo.imageUrl
+//        authController.updateUserOauth2(existingUser)
         return existingUser
     }
 }
