@@ -20,7 +20,7 @@
     </select>
 
     <select id="matchRecommendationsByLocation" resultType="com.travel.travelapi.models.Recommendation">
-        SELECT r.* FROM PLACE_RECOMMENDATION pr
+        SELECT DISTINCT r.* FROM PLACE_RECOMMENDATION pr
             INNER JOIN RECOMMENDATION r ON pr.fk_recommendationId = r.id
             INNER JOIN PLACE p ON pr.fk_placeId = p.placeId
         WHERE ${locationType}=#{location}

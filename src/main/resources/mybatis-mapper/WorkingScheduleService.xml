@@ -4,23 +4,35 @@
 <mapper namespace="com.travel.travelapi.services.WorkingScheduleService">
 
     <select id="selectWorkingSchedulesById" resultType="com.travel.travelapi.models.WorkingSchedule">
-        SELECT id, isDefault as scheduleDefault, DATE_FORMAT(from_date, '%m-%d') as `from`, DATE_FORMAT(to_date, '%c-%e') as `to`, fk_placeId as `placeId` FROM WORKING_SCHEDULES WHERE fk_placeId=#{targetPlaceId}
+        SELECT id,
+               isDefault                       as scheduleDefault,
+               DATE_FORMAT(from_date, '%m-%d') as `from`,
+               DATE_FORMAT(to_date, '%c-%e')   as `to`,
+               fk_placeId                      as `placeId`
+        FROM WORKING_SCHEDULES
+        WHERE fk_placeId = #{targetPlaceId}
     </select>
 
     <select id="selectPeriodsById" resultType="com.travel.travelapi.models.Period">
-        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime, lastAccommodation FROM PERIODS WHERE fk_scheduleId=#{id}
+        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime, lastAccommodation
+        FROM PERIODS
+        WHERE fk_scheduleId = #{id}
     </select>
 
 
     <insert id="updateWorkingScheduleForPlace">
         DELETE FROM WORKING_SCHEDULES WHERE fk_placeId=#{placeId};
-        <foreach item="ws" index="i1" collection="wsList" >
-            INSERT INTO WORKING_SCHEDULES (fk_placeId, from_date, to_date, isDefault) VALUES (#{placeId}, (STR_TO_DATE(#{ws.from},'%m-%d')),(STR_TO_DATE(#{ws.to},'%m-%d')), #{ws.scheduleDefault});
+        <foreach item="ws" index="i1" collection="wsList">
+            INSERT INTO WORKING_SCHEDULES (fk_placeId, from_date, to_date, isDefault) VALUES (#{placeId},
+            (STR_TO_DATE(#{ws.from},'%m-%d')),(STR_TO_DATE(#{ws.to},'%m-%d')), #{ws.scheduleDefault});
+            <if test="ws.periods.size() != 0">
+                INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime, lastAccommodation) VALUES
+                <foreach item="p" index="i2" collection="ws.periods" separator="," close=";">
+                    (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime},
+                    #{p.lastAccommodation})
+                </foreach>
+            </if>
 
-        INSERT INTO PERIODS (fk_scheduleId, openDay, openTime, closeDay, closeTime, lastAccommodation) VALUES
-        <foreach item="p" index="i2" collection="ws.periods"  separator="," close=";">
-                (LAST_INSERT_ID(), #{p.openDay}, #{p.openTime}, #{p.closeDay}, #{p.closeTime}, #{p.lastAccommodation})
-            </foreach>
         </foreach>
 
     </insert>
