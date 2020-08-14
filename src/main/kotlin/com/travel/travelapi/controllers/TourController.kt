@@ -18,6 +18,7 @@ import kotlin.collections.ArrayList
 class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val tourDayController: TourDayController,
                      @Autowired private val placeController: PlaceController,
+                     @Autowired private val dataCollectionController: DataCollectionController,
                      @Autowired private val apiPlaceController: ApiPlaceController) {
 
     /**
@@ -83,8 +84,10 @@ class TourController(@Autowired private val tourService: TourService,
     @GetMapping("")
     @PreAuthorize("hasAuthority('tour:read')")
     fun getTourById(@RequestParam(name = "id", required = true) id: Int): Tour {
-        val tour: Tour = tourService.getTourById(id)
 
+        dataCollectionController.searchedTour(id)
+
+        val tour: Tour = tourService.getTourById(id)
         val localPlaces = tourDayController.getPlacesForTourDay(tour.tourId!!)
         val apiPlaces = tourDayController.getApiPlacesForTourDay(tour.tourId)
         val tourDaysDetails = tourDayController.getTourDaysDetails(tour.tourId)

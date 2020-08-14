@@ -20,6 +20,7 @@ data class TravelUserDetails(public var id: Long? ,
                              public var grantedAuthorities: List<GrantedAuthority>?= ArrayList()) : UserDetails, OAuth2User {
 
     private var attributes: Map<String, Any> = emptyMap()
+    var device: String? = ""
 
     companion object{
         fun create(user: User): TravelUserDetails {
@@ -31,6 +32,7 @@ data class TravelUserDetails(public var id: Long? ,
                     user.email,
                     user.password,
                     user.authorities
+
             )
         }
 

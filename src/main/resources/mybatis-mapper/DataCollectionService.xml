@@ -1,0 +1,23 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.DataCollectionService">
+
+    <insert id="insertSearchedPlace">
+        INSERT INTO SEARCHES_PLACE (fk_placeId, fk_userId, device)
+        VALUES (#{searchedPlace.fk_placeId}, #{searchedPlace.fk_userId}, #{searchedPlace.device})
+    </insert>
+
+    <insert id="insertSearchedTour">
+        INSERT INTO SEARCHES_TOURS (fk_tourId, fk_userId, device)
+        VALUES (#{searchedTour.fk_tourId}, #{searchedTour.fk_userId}, #{searchedTour.device})
+    </insert>
+
+    <insert id="insertSearchedLocation">
+        INSERT INTO SEARCHES_LOCATION (`fk_userId`, `type`, `location`, `device`)
+        VALUES (#{searchedLocation.fk_userId},
+         #{searchedLocation.exploreLocation.type},
+          #{searchedLocation.exploreLocation.location},
+          #{searchedLocation.device})
+    </insert>
+</mapper>

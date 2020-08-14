@@ -16,4 +16,6 @@ class JwtConfig {
         ACCESS_TOKEN,
         EXCHANGE_TOKEN
     }
+
+
 }

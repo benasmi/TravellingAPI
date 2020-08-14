@@ -18,8 +18,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 )
 @SpringBootApplication
 class TravelapiApplication
-
 fun main(args: Array<String>) {
 	runApplication<TravelapiApplication>(*args)
 }
+
+
 

@@ -4,20 +4,16 @@ import com.github.pagehelper.Page
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
-import com.travel.travelapi.exceptions.InvalidUserDataException
 import com.travel.travelapi.exceptions.UnauthorizedException
-import com.travel.travelapi.models.Parking
-import com.travel.travelapi.models.Photo
 import com.travel.travelapi.models.PlaceLocal
 import com.travel.travelapi.services.PlaceReviewService
 import com.travel.travelapi.services.PlaceService
-import com.travel.travelapi.services.SourcePlaceService
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.mobile.device.Device
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
-import kotlin.math.absoluteValue
 
 
 @RestController
@@ -30,6 +26,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val photoPlaceController: PhotoPlaceController,
                       @Autowired private val tagPlaceController: TagPlaceController,
                       @Autowired private val sourcePlaceController: SourcePlaceController,
+                      @Autowired private val dataCollectionController: DataCollectionController,
                       @Autowired private val sphinxService: SphinxService){
 
 
@@ -142,6 +139,17 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
     }
 
+    @RequestMapping("/123")
+    fun home(device: Device) {
+                if (device.isMobile) {
+            System.out.println("Hello mobile user!");
+        } else if (device.isTablet()) {
+            System.out.println("Hello tablet user!");
+        } else {
+            System.out.println("Hello desktop user!");
+        }
+    }
+
     /**
      * @return place by id
      * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info
@@ -156,8 +164,14 @@ class PlaceController(@Autowired private val placeService: PlaceService,
     fun getPlaceById(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(name="p") id: Int): PlaceLocal {
 
+
+
+
         val place = placeService.selectById(id)
         if(full){
+            //Collecting data
+            dataCollectionController.searchedPlace(id)
+
             place.categories = categoryController.getCategoriesById(id)
             place.parking = parkingPlaceController.getParkingLocationsById(id)
             place.schedule = workingScheduleService.getWorkingSchedulesById(id)

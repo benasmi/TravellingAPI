@@ -3,18 +3,19 @@ package com.travel.travelapi.jwt
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.controllers.AuthController
 import com.travel.travelapi.exceptions.InvalidUserDataException
-import com.travel.travelapi.models.User
+import com.travel.travelapi.utils.DeviceType
 import io.jsonwebtoken.JwtException
 import io.jsonwebtoken.Jwts
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.authentication.AuthenticationManager
+import org.hibernate.validator.internal.util.logging.LoggerFactory
+import org.springframework.mobile.device.Device
+import org.springframework.mobile.device.DeviceUtils
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
-import java.util.stream.Collectors
+import java.lang.System.getLogger
+import java.util.logging.Logger
 import javax.crypto.SecretKey
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
@@ -34,8 +35,9 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
             return
         }
 
-        val token = authorizationHeader.replace(jwtConfig.tokenPrefix!!, "")
+        val device = DeviceType.getDevice(request)
 
+        val token = authorizationHeader.replace(jwtConfig.tokenPrefix!!, "")
         try {
             val claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
             val body = claimsJws.body
@@ -49,6 +51,7 @@ class JwtTokenVerifier(private val secretKey: SecretKey,
 
             val user = authController.getUserByIdentifier(username, provider) ?: throw InvalidUserDataException("User invalid")
             val principal = TravelUserDetails.create(user)
+            principal.device = device
 
             val authentication: Authentication = UsernamePasswordAuthenticationToken(
                     principal,

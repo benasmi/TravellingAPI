@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 class AuthUserDetailsService(@Autowired @Lazy private val authController: AuthController) : UserDetailsService{
 
     override fun loadUserByUsername(identifier: String): UserDetails {
-        val user =  authController.getUserByIdentifier(identifier, AuthProvider.local.name) ?: throw UsernameNotFoundException("User by identifier not found")
+        val user = authController.getUserByIdentifier(identifier, AuthProvider.local.name) ?: throw UsernameNotFoundException("User by identifier not found")
         return TravelUserDetails.create(user)
     }
 }

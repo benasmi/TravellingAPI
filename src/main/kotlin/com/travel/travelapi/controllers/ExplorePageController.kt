@@ -19,7 +19,8 @@ class ExplorePageController(
         @Autowired private val tourController: TourController,
         @Autowired private val tourService: TourService,
         @Autowired private val recommendationService: RecommendationService,
-        @Autowired private val categoryPlaceService: CategoryPlaceService
+        @Autowired private val categoryPlaceService: CategoryPlaceService,
+        @Autowired private val dataCollectionController: DataCollectionController
 ) {
 
     @PostMapping("/update")
@@ -94,6 +95,8 @@ class ExplorePageController(
             throw InvalidParamsException("Type specified is invalid")
         if (exploreLocationRequest.location == "")
             throw InvalidParamsException("No location specified")
+
+        dataCollectionController.searchedLocation(exploreLocationRequest)
 
         val categoriesAll = arrayListOf<Category>()
 
