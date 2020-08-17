@@ -14,7 +14,7 @@
     </select>
 
     <select id="selectPeriodsById" resultType="com.travel.travelapi.models.Period">
-        SELECT id, fk_scheduleId as `scheduleId`, openDay, openTime, closeDay, closeTime, lastAccommodation
+        SELECT id, fk_scheduleId as `scheduleId`, openDay, TIME_FORMAT(openTime, "%H:%i") as openTime, closeDay, TIME_FORMAT(closeTime, "%H:%i") as closeTime, lastAccommodation
         FROM PERIODS
         WHERE fk_scheduleId = #{id}
     </select>

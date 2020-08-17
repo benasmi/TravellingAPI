@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.io.Console
 import java.sql.SQLException
+import java.time.Duration
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -53,6 +54,25 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
             ws.periods = workingScheduleService.selectPeriodsById(ws.id!!)
         }
         return schedules
+    }
+
+    fun getRelevantSchedule(placeId: Int): WorkingSchedule?{
+        val schedules = getWorkingSchedulesById(placeId)
+
+        //If no from/to dates are specified, assuming schedule is year-round
+        if(schedules.count() == 1 && (schedules[0].from == null || schedules[0].to == null))
+            return schedules[0]
+
+        val format = DateTimeFormatter.ofPattern("uuuu-M-dd")
+        schedules.sortedBy { schedule -> Duration.between(LocalDate.parse("0000-" + schedule.to, format).atStartOfDay(), LocalDate.parse("0000-" + schedule.from, format).atStartOfDay())}
+        val currentMonthDay = LocalDate.parse("0000-" + LocalDate.now().month.value + "-" + LocalDate.now().dayOfMonth, format)
+        schedules.forEach { schedule ->
+            val to = LocalDate.parse("0000-"+schedule.to, format)
+            val from = LocalDate.parse("0000-" + schedule.from, format)
+            if(currentMonthDay.isBefore(to) && from.isBefore(currentMonthDay))
+                return schedule
+        }
+        return null
     }
 
     /**
