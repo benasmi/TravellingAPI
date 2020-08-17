@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/place")
 class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val categoryController: CategoryPlaceController,
-                      @Autowired private val workingScheduleService: WorkingScheduleController,
+                      @Autowired private val workingScheduleController: WorkingScheduleController,
                       @Autowired private val parkingPlaceController: ParkingPlaceController,
                       @Autowired private val placeReviewService: PlaceReviewService,
                       @Autowired private val photoPlaceController: PhotoPlaceController,
@@ -139,17 +139,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
         }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception
     }
 
-    @RequestMapping("/123")
-    fun home(device: Device) {
-                if (device.isMobile) {
-            System.out.println("Hello mobile user!");
-        } else if (device.isTablet()) {
-            System.out.println("Hello tablet user!");
-        } else {
-            System.out.println("Hello desktop user!");
-        }
-    }
-
     /**
      * @return place by id
      * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info
@@ -164,8 +153,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
     fun getPlaceById(@RequestParam(required = false) full: Boolean = false,
                   @RequestParam(name="p") id: Int): PlaceLocal {
 
-
-
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
 
         val place = placeService.selectById(id)
         if(full){
@@ -174,7 +162,15 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
             place.categories = categoryController.getCategoriesById(id)
             place.parking = parkingPlaceController.getParkingLocationsById(id)
-            place.schedule = workingScheduleService.getWorkingSchedulesById(id)
+            if(principal.device == "web")
+                place.schedule = workingScheduleController.getWorkingSchedulesById(id)
+            else{
+                val relevantSchedule = workingScheduleController.getRelevantSchedule(id)
+                if(relevantSchedule == null)
+                    place.schedule = listOf()
+                else
+                    place.schedule = listOf(relevantSchedule)
+            }
             place.totalReviews = placeReviewService.getReviewsCountsByPlace(id)
             place.photos = photoPlaceController.getPhotosById(id)
             place.tags = tagPlaceController.getTagsById(id)
@@ -214,7 +210,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 if(full){
                     value.categories = categoryController.getCategoriesById(value.placeId!!)
                     value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
-                    value.schedule = workingScheduleService.getWorkingSchedulesById(value.placeId)
+                    value.schedule = workingScheduleController.getWorkingSchedulesById(value.placeId)
                     value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
                     value.tags = tagPlaceController.getTagsById(value.placeId)
                     value.sources = sourcePlaceController.getSourcesById(value.placeId)
