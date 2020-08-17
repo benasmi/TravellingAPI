@@ -75,7 +75,7 @@ class ExplorePageController(
         return tours.distinctBy { tour -> tour.tourId }
     }
 
-    data class ExploreLocation(val location: String, val type: String) {
+    data class ExploreLocation(val location: String = "", val type: String = "") {
         fun valid(): Boolean {
             return type == "city" || type == "country" || type == "municipality" || type == "county"
         }
@@ -90,10 +90,11 @@ class ExplorePageController(
     }
 
     @PostMapping("/location")
-    fun getByLocation(@RequestBody exploreLocationRequest: ExploreLocation): List<ObjectCollection> {
-        if (!exploreLocationRequest.valid())
+    fun getByLocation(@RequestBody(required = false) exploreLocationRequest: ExploreLocation,
+                      @RequestParam(required = false, defaultValue = "") latLng: String): List<ObjectCollection> {
+        if (latLng.isEmpty() && !exploreLocationRequest.valid())
             throw InvalidParamsException("Type specified is invalid")
-        if (exploreLocationRequest.location == "")
+        if (latLng.isEmpty() && exploreLocationRequest.location == "")
             throw InvalidParamsException("No location specified")
 
         dataCollectionController.searchedLocation(exploreLocationRequest)
@@ -101,7 +102,11 @@ class ExplorePageController(
         val categoriesAll = arrayListOf<Category>()
 
         //Matching places
-        var placesFound = placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
+        var placesFound = if(latLng.isEmpty())
+            placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
+        else
+            placeService.selectAllAdmin(location = latLng.split(','), range= 50.0)
+
         extendPlaces(placesFound)
         placesFound.forEach {
             categoriesAll.addAll(it.categories!!)
@@ -114,8 +119,16 @@ class ExplorePageController(
         }
 
         //Matching recommendations
+
+        val recommendationsFound = recommendationService.matchRecommendationsByLocation(
+                locationType = exploreLocationRequest.type,
+                location = exploreLocationRequest.location,
+                latLng = if(latLng.isNotEmpty()) latLng.split(',') else ArrayList(),
+                range = 50.0
+        )
+
         val recommendations = arrayListOf<Recommendation>()
-        recommendations.addAll(recommendationService.matchRecommendationsByLocation(exploreLocationRequest.type, exploreLocationRequest.location))
+        recommendations.addAll(recommendationsFound)
         recommendations.forEach { recommendation ->
             recommendationController.extendRecommendation(recommendation)
         }
