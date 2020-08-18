@@ -1,7 +1,7 @@
 package com.travel.travelapi.models
 
 data class ClientSearchResult(
-        val places: List<PlaceLocal>? = null,
-        val tours: List<Tour>? = null,
+        val places: ObjectCollection? = null,
+        val tours: ObjectCollection? = null,
         val locations: List<SearchResultRegion>? = null
 )

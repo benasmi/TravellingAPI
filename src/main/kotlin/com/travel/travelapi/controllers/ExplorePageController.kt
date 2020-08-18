@@ -54,7 +54,7 @@ class ExplorePageController(
     @GetMapping("/search")
     fun search(@RequestParam keyword: String): ClientSearchResult {
         if (keyword == "")
-            return ClientSearchResult(arrayListOf(), arrayListOf(), arrayListOf())
+            return ClientSearchResult(MiscellaneousCollection(objects = arrayListOf()), MiscellaneousCollection(objects = arrayListOf()), arrayListOf())
 
         val places = placeService.searchClient(keyword)
         val tours = getToursAssociatedWithPlaces(places)
@@ -62,7 +62,11 @@ class ExplorePageController(
             val photos = photoPlaceService.selectPhotosById(place.placeId!!)
             place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
         }
-        return ClientSearchResult(places, tours, explorePageService.matchSearch(keyword))
+
+        return ClientSearchResult(
+                MiscellaneousCollection(objects=places.map { place ->  CollectionObjectPlace.createFromPlaceInstance(place)}),
+                MiscellaneousCollection(objects=tours.map { tour ->  CollectionObjectTour.createFromTourInstance(tour)}),
+                explorePageService.matchSearch(keyword))
     }
 
     fun getToursAssociatedWithPlaces(places: List<PlaceLocal>): List<Tour> {
