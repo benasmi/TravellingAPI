@@ -3,6 +3,7 @@ package com.travel.travelapi.models
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import kotlin.random.Random
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "collectionType", defaultImpl = Recommendation::class)
@@ -13,13 +14,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 abstract class ObjectCollection(
     var name: String? = null,
     var subtitle: String? = null,
-    var objects: Collection<CollectionObject>? = null
+    var objects: Collection<CollectionObject>? = null,
+    var id: Int? = null
 )
 
 class SuggestionByCategory(
         val category: Category? = null,
         objects: Collection<CollectionObject>? = null
-): ObjectCollection(name=category!!.name, subtitle="", objects=objects)
+): ObjectCollection(name=category!!.name, subtitle="", objects=objects, id=category.categoryId)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class Recommendation(
@@ -28,16 +30,16 @@ class Recommendation(
         objects: Collection<CollectionObject>? = null,
         var description: String? = null,
         var user: Int? = null,
-        var id: Int? = null,
-        var type: Int? = null
-        ): ObjectCollection(name, subtitle, objects){}
+        var type: Int? = null,
+        id: Int? = null): ObjectCollection(name, subtitle, objects, id){}
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class MiscellaneousCollection(
         name: String? = null,
         subtitle: String? = null,
-        objects: Collection<CollectionObject>? = null
-): ObjectCollection(name, subtitle, objects){}
+        objects: Collection<CollectionObject>? = null,
+        id: Int? = Random.nextInt(1000,1000000)
+): ObjectCollection(name, subtitle, objects, id){}
 
 enum class RecommendationType(val id: Int){
     PLACE(1),

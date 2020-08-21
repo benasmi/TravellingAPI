@@ -95,7 +95,9 @@ class ExplorePageController(
 
     @PostMapping("/location")
     fun getByLocation(@RequestBody(required = false) exploreLocationRequest: ExploreLocation,
-                      @RequestParam(required = false, defaultValue = "") latLng: String): List<ObjectCollection> {
+                      @RequestParam(required = false, defaultValue = "") latLng: String,
+                      @RequestParam(required = false, defaultValue = "0") p: Int,
+                      @RequestParam(required = false, defaultValue = "10") s: Int): LogicalPage<ObjectCollection> {
         if (latLng.isEmpty() && !exploreLocationRequest.valid())
             throw InvalidParamsException("Type specified is invalid")
         if (latLng.isEmpty() && exploreLocationRequest.location == "")
@@ -137,7 +139,7 @@ class ExplorePageController(
             recommendationController.extendRecommendation(recommendation)
         }
 
-        val collections = arrayListOf<ObjectCollection>()
+        val collections = LogicalPageList<ObjectCollection>()
 
         //Adding recommendations to the location results object
         collections.addAll(recommendations)
@@ -196,7 +198,8 @@ class ExplorePageController(
         otherTours.addAll(tours.map { CollectionObjectTour.createFromTourInstance(it) })
         collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
 
-        return collections
+
+        return collections.getPage(p,s)
     }
 
     @GetMapping("/nearby")

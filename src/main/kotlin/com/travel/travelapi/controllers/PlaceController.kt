@@ -88,19 +88,28 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                        @RequestParam(defaultValue = "50", name = "range") range: String): PageInfo<PlaceLocal> {
 
 
+
+        val plc = placeService.matchPlacesByLocation("Lithuania", "country")
+
         PageHelper.startPage<PlaceLocal>(p, s)
-        val places = placeService.selectAllAdmin(keyword,
-                if(o.isNotEmpty()) o.split(",") else ArrayList(),
-                if(c.isNotEmpty()) c.split(',') else ArrayList(),
-                if(di.isNotEmpty()) di.split(',') else ArrayList(),
-                if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
-                if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
-                if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
-                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList(),
-                if(location.isNotEmpty()) location.split(',') else ArrayList(),
-                range.toDouble())
-        extendPlace(full, places)
-        return PageInfo(places)
+        val plc1 = ArrayList<PlaceLocal>()
+
+
+        plc.forEach {
+            plc1.add(it)
+        }
+//        val places = placeService.selectAllAdmin(keyword,
+//                if(o.isNotEmpty()) o.split(",") else ArrayList(),
+//                if(c.isNotEmpty()) c.split(',') else ArrayList(),
+//                if(di.isNotEmpty()) di.split(',') else ArrayList(),
+//                if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
+//                if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
+//                if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
+//                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList(),
+//                if(location.isNotEmpty()) location.split(',') else ArrayList(),
+//                range.toDouble())
+//        extendPlace(full, places)
+        return PageInfo(plc1)
     }
 
 
