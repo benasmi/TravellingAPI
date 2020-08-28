@@ -53,4 +53,31 @@
                      )
     </select>
 
+    <resultMap id="collectionObjectMap" type="com.travel.travelapi.models.CollectionObject">
+        <id property="id" column="id"/>
+        <discriminator javaType="string" column="type">
+            <case value="place" resultType="com.travel.travelapi.models.CollectionObjectPlace"/>
+            <case value="tour" resultType="com.travel.travelapi.models.CollectionObjectTour"/>
+        </discriminator>
+    </resultMap>
+
+
+    <select id="selectObjectsByLocationAndCategory" resultMap="collectionObjectMap">
+        (SELECT tour.tourId as id, 'tour' as type
+         FROM TOUR tour
+         WHERE tour.tourId IN (SELECT td.fk_tourId
+                               FROM TOUR_DAY td
+                                        RIGHT JOIN PLACE_TOUR_DAY ptd ON ptd.fk_tourDayId = td.tourDayId AND
+                                                                         ptd.fk_placeId IN
+                                                                         (SELECT placeId FROM PLACE WHERE ${locationType} = #{location}))
+           AND tour.tourId IN (SELECT fk_tourId FROM CATEGORY_TOUR WHERE fk_categoryId = #{categoryId})
+           AND tour.isPublished = 1
+           AND tour.isVerified = 1)
+        UNION ALL
+        (SELECT placeId as id, 'place' as type
+         FROM PLACE
+         WHERE ${locationType} = #{location}
+           AND placeId IN (SELECT fk_placeId FROM CATEGORY_PLACE WHERE fk_categoryId = #{categoryId})
+            AND isPublic = 1 and isVerified = 1)
+    </select>
 </mapper>

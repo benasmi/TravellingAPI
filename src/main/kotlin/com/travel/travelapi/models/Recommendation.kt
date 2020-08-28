@@ -46,7 +46,7 @@ enum class RecommendationType(val id: Int){
     TOUR(2)
 }
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = CollectionObjectPlace::class)
+@JsonTypeInfo(visible = true, use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type", defaultImpl = CollectionObjectPlace::class)
 @JsonSubTypes(
         JsonSubTypes.Type(value = CollectionObjectPlace::class, name = "place"),
         JsonSubTypes.Type(value = CollectionObjectTour::class, name = "tour"))
@@ -63,18 +63,36 @@ class CollectionObjectPlace(
         description: String? = null,
         id: Int? = null,
         photos: List<Photo>? = null,
-        val averageTimeSpent: Int? = null,
-        val longitude: Float? = null,
-        val latitude: Float? = null,
-        val city: String? = null,
-        val country: String? = null,
-        val county: String? = null,
-        val municipality: String? = null,
-        val price: String? = null
+        var averageTimeSpent: Int? = null,
+        var longitude: Float? = null,
+        var latitude: Float? = null,
+        var city: String? = null,
+        var country: String? = null,
+        var county: String? = null,
+        var municipality: String? = null,
+        var price: String? = null
 ): CollectionObject(name, description, id, photos){
+
+    fun setData(place: PlaceLocal){
+        name = place.name
+        description = place.description
+        id = place.placeId
+        photos = if(place.photos != null && place.photos!!.count() > 0) arrayListOf(place.photos!![0]) else arrayListOf()
+        averageTimeSpent = place.averageTimeSpent
+        longitude = place.longitude
+        latitude = place.latitude
+        city = place.city
+        country = place.country
+        county = place.county
+        municipality = place.municipality
+        price = place.price
+    }
+
     companion object{
         fun createFromPlaceInstance(place: PlaceLocal): CollectionObjectPlace{
-            return CollectionObjectPlace(place.name, place.description, place.placeId, if(place.photos != null && place.photos!!.count() > 0) arrayListOf(place.photos!![0]) else arrayListOf(), place.averageTimeSpent,place.longitude, place.latitude, place.city,place.country,place.county,place.municipality,place.price)
+            val item = CollectionObjectPlace()
+            item.setData(place)
+            return item
         }
     }
 }
@@ -86,9 +104,19 @@ class CollectionObjectTour(
         id: Int? = null,
         photos: List<Photo>? = null
 ) : CollectionObject(name, description, id, photos){
+
+    fun setData(tour: Tour) {
+        name = tour.name
+        description = tour.description
+        id = tour.tourId
+        photos = tour.photos
+    }
+
     companion object{
         fun createFromTourInstance(tour: Tour): CollectionObjectTour{
-            return CollectionObjectTour(tour.name, tour.description, tour.tourId, tour.photos)
+            val item = CollectionObjectTour()
+            item.setData(tour)
+            return item
         }
     }
 }

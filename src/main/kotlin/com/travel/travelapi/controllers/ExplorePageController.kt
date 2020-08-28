@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
+data class TypeIdPair(val id: Int, val type: String)
+
 @RestController
 @RequestMapping("/explore")
 class ExplorePageController(
         @Autowired private val explorePageService: ExplorePageService,
         @Autowired private val recommendationController: RecommendationController,
         @Autowired private val photoPlaceService: PhotoPlaceService,
+        @Autowired private val placeController: PlaceController,
         @Autowired private val placeService: PlaceService,
         @Autowired private val tourController: TourController,
         @Autowired private val tourService: TourService,
@@ -32,6 +35,38 @@ class ExplorePageController(
         } else {
             throw InvalidParamsException("The explore page cannot have any duplicate recommendations")
         }
+    }
+
+    class PageInfoCollectionObject(data: List<CollectionObject>) : PageInfo<CollectionObject>(data)
+
+    @GetMapping("/locationCategory")
+    @PreAuthorize("hasAuthority('explore:locationByCategory')")
+    fun getLocationByCategory(
+            @RequestParam(required = false, defaultValue = "1") p: Int,
+            @RequestParam(required = false, defaultValue = "10") s: Int,
+            @RequestParam(required = true) categoryId: Int,
+            @RequestParam(required = true) location: String,
+            @RequestParam(required = true) locationType: String
+    ): PageInfoCollectionObject {
+
+        //Creating ExploreLocation object so we can verify that locationType is valid (to prevent SQL injection)
+        val exploreLocationObject = ExploreLocation(location, locationType)
+
+        if (!exploreLocationObject.valid())
+            throw InvalidParamsException("Location type is invalid")
+
+        PageHelper.startPage<CollectionObject>(p, s)
+
+        val objects = explorePageService.selectObjectsByLocationAndCategory(exploreLocationObject.location, exploreLocationObject.type, categoryId)
+
+        objects.forEach{ item ->
+            if (item is CollectionObjectPlace) {
+                item.setData(placeController.getPlaceById(id = item.id!!))
+            } else if (item is CollectionObjectTour) {
+                item.setData(tourController.tourOverviewById(item.id!!))
+            }
+        }
+        return PageInfoCollectionObject(objects)
     }
 
     @GetMapping("/")
@@ -52,6 +87,7 @@ class ExplorePageController(
 
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('explore:search')")
     fun search(@RequestParam keyword: String): ClientSearchResult {
         if (keyword == "")
             return ClientSearchResult(MiscellaneousCollection(objects = arrayListOf()), MiscellaneousCollection(objects = arrayListOf()), arrayListOf())
@@ -64,8 +100,8 @@ class ExplorePageController(
         }
 
         return ClientSearchResult(
-                MiscellaneousCollection(objects=places.map { place ->  CollectionObjectPlace.createFromPlaceInstance(place)}),
-                MiscellaneousCollection(objects=tours.map { tour ->  CollectionObjectTour.createFromTourInstance(tour)}),
+                MiscellaneousCollection(objects = places.map { place -> CollectionObjectPlace.createFromPlaceInstance(place) }),
+                MiscellaneousCollection(objects = tours.map { tour -> CollectionObjectTour.createFromTourInstance(tour) }),
                 explorePageService.matchSearch(keyword))
     }
 
@@ -85,7 +121,7 @@ class ExplorePageController(
         }
     }
 
-    fun extendPlaces(places: List<PlaceLocal>) {
+    fun extendPlaces(places: Collection<PlaceLocal>) {
         places.map { place ->
             val photos = photoPlaceService.selectPhotosById(place.placeId!!)
             place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
@@ -94,10 +130,11 @@ class ExplorePageController(
     }
 
     @PostMapping("/location")
+    @PreAuthorize("hasAuthority('explore:location')")
     fun getByLocation(@RequestBody(required = false) exploreLocationRequest: ExploreLocation,
                       @RequestParam(required = false, defaultValue = "") latLng: String,
                       @RequestParam(required = false, defaultValue = "0") p: Int,
-                      @RequestParam(required = false, defaultValue = "10") s: Int): LogicalPage<ObjectCollection> {
+                      @RequestParam(required = false, defaultValue = "10") s: Int): LogicalPage {
         if (latLng.isEmpty() && !exploreLocationRequest.valid())
             throw InvalidParamsException("Type specified is invalid")
         if (latLng.isEmpty() && exploreLocationRequest.location == "")
@@ -108,10 +145,10 @@ class ExplorePageController(
         val categoriesAll = arrayListOf<Category>()
 
         //Matching places
-        var placesFound = if(latLng.isEmpty())
+        var placesFound = if (latLng.isEmpty())
             placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
         else
-            placeService.selectAllAdmin(location = latLng.split(','), range= 50.0)
+            placeService.selectAllAdmin(location = latLng.split(','), range = 50.0)
 
         extendPlaces(placesFound)
         placesFound.forEach {
@@ -125,11 +162,10 @@ class ExplorePageController(
         }
 
         //Matching recommendations
-
         val recommendationsFound = recommendationService.matchRecommendationsByLocation(
                 locationType = exploreLocationRequest.type,
                 location = exploreLocationRequest.location,
-                latLng = if(latLng.isNotEmpty()) latLng.split(',') else ArrayList(),
+                latLng = if (latLng.isNotEmpty()) latLng.split(',') else ArrayList(),
                 range = 50.0
         )
 
@@ -155,12 +191,12 @@ class ExplorePageController(
             if (mostPopularCategory.value < 2)
                 break;
 
-            //Getting the most popular categorie's name and ID
+            //Getting the most popular category name and ID
             val categoryPopular = categoriesAll.filter { it.categoryId == mostPopularCategory.key }[0]
 
             val collectionsByCategories = arrayListOf<CollectionObject>()
 
-            //Adding places, that contain the most popular tag
+            //Adding places, that contain the most popular category
             collectionsByCategories.addAll(placesFound.filter { place ->
                 place.categories!!.any { category -> category.categoryId == mostPopularCategory.key }
             }
@@ -199,11 +235,12 @@ class ExplorePageController(
         collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
 
 
-        return collections.getPage(p,s)
+        return collections.getPage(p, s)
     }
 
     @GetMapping("/nearby")
-    fun findPlacesNearby(@RequestParam(name="p") placeId: Int): MiscellaneousCollection {
+    @PreAuthorize("hasAuthority('explore:nearby')")
+    fun findPlacesNearby(@RequestParam(name = "p") placeId: Int): MiscellaneousCollection {
         //Selecting the place by ID to find coordinates
         val place = placeService.selectById(placeId)
         //Matching nearby places that are published and verified
@@ -221,7 +258,8 @@ class ExplorePageController(
     }
 
     @GetMapping("/relatedTours")
-    fun findToursThatWithPlaces(@RequestParam(name="p") placeId: Int): MiscellaneousCollection {
+    @PreAuthorize("hasAuthority('explore:tours_related')")
+    fun findToursWithPlaces(@RequestParam(name = "p") placeId: Int): MiscellaneousCollection {
 
         //Selecting tours that include given placeId
         val tourIds = tourService.findToursRelatedWithPlace(placeId)
@@ -236,7 +274,6 @@ class ExplorePageController(
         //Returning nearby places in the form of ObjectCollection
         return MiscellaneousCollection("Tours with this place", null, tours.map { CollectionObjectTour.createFromTourInstance(it) })
     }
-
 
 
 }
