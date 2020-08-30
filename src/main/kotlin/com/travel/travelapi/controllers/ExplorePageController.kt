@@ -45,27 +45,40 @@ class ExplorePageController(
             @RequestParam(required = false, defaultValue = "1") p: Int,
             @RequestParam(required = false, defaultValue = "10") s: Int,
             @RequestParam(required = true) categoryId: Int,
-            @RequestParam(required = true) location: String,
-            @RequestParam(required = true) locationType: String
-    ): PageInfoCollectionObject {
+            @RequestParam(required = false) location: String?,
+            @RequestParam(required = false) locationType: String?,
+            @RequestParam(required = false) latitude: Float?,
+            @RequestParam(required = false) longitude: Float?
 
-        //Creating ExploreLocation object so we can verify that locationType is valid (to prevent SQL injection)
-        val exploreLocationObject = ExploreLocation(location, locationType)
-
-        if (!exploreLocationObject.valid())
-            throw InvalidParamsException("Location type is invalid")
+            ): PageInfoCollectionObject {
 
         PageHelper.startPage<CollectionObject>(p, s)
 
-        val objects = explorePageService.selectObjectsByLocationAndCategory(exploreLocationObject.location, exploreLocationObject.type, categoryId)
+        val objects: List<CollectionObject>;
 
-        objects.forEach{ item ->
+        if (location != null && locationType != null) {
+            //Creating ExploreLocation object so we can verify that locationType is valid (to prevent SQL injection)
+            val exploreLocationObject = ExploreLocation(location, locationType)
+
+            if (!exploreLocationObject.valid())
+                throw InvalidParamsException("Location type is invalid")
+
+            objects = explorePageService.selectObjectsByLocationAndCategory(exploreLocationObject.location, exploreLocationObject.type, categoryId)
+
+        } else if (latitude != null && longitude != null) {
+            objects = explorePageService.selectObjectsByCoordsAndCategory(latitude, longitude, categoryId)
+        } else {
+            throw InvalidParamsException("Either location and locationType or latitude and longitude must be specified.")
+        }
+
+        objects.forEach { item ->
             if (item is CollectionObjectPlace) {
                 item.setData(placeController.getPlaceById(id = item.id!!))
             } else if (item is CollectionObjectTour) {
                 item.setData(tourController.tourOverviewById(item.id!!))
             }
         }
+
         return PageInfoCollectionObject(objects)
     }
 
@@ -127,6 +140,14 @@ class ExplorePageController(
             place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
             place.categories = categoryPlaceService.selectByPlaceId(place.placeId)
         }
+    }
+
+    @GetMapping("/locationRadius")
+    @PreAuthorize("hasAuthority('explore:location')")
+    fun getNearbyRadius(@RequestParam("lat") latitude: Float, @RequestParam("lng") longitude: Float): List<CollectionObjectPlace> {
+        val places = placeService.selectAllAdmin(location = listOf(latitude.toString(), longitude.toString()), range = 50.0)
+        extendPlaces(places)
+        return places.map { CollectionObjectPlace.createFromPlaceInstance(it) }
     }
 
     @PostMapping("/location")

@@ -78,6 +78,22 @@
          FROM PLACE
          WHERE ${locationType} = #{location}
            AND placeId IN (SELECT fk_placeId FROM CATEGORY_PLACE WHERE fk_categoryId = #{categoryId})
-            AND isPublic = 1 and isVerified = 1)
+           AND isPublic = 1
+           and isVerified = 1)
     </select>
+
+<!--    <select id="selectObjectsByCoordsAndCategory" resultMap="collectionObjectMap">-->
+<!--        SELECT 'place'                                                              as type,-->
+<!--               placeId                                                              as id,-->
+<!--               (6371 * acos(cos(radians(#{latitude})) * cos(radians(place.latitude)) *-->
+<!--                            cos(radians(place.longitude) - radians(#{longitude})) +-->
+<!--                            sin(radians(#{latitude})) * sin(radians(place.latitude)))) AS distance-->
+<!--        FROM PLACE place WHERE place.placeId IN (SELECT fk_placeId FROM CATEGORY_PLACE WHERE fk_categoryId = #{categoryId})-->
+<!--        UNION ALL-->
+<!--        (SELECT 'tour' as type, td.fk_tourId as id, 0 as distance-->
+<!--         FROM PLACE_TOUR_DAY ptd-->
+<!--                  INNER JOIN TOUR_DAY td ON td.tourDayId = ptd.fk_tourDayId WHERE td.fk_tourId IN (SELECT fk_tourId FROM CATEGORY_TOUR WHERE fk_categoryId = #{categoryId}))-->
+<!--        ORDER BY distance-->
+<!--    </select>-->
+
 </mapper>

@@ -23,7 +23,7 @@ class LogicalPageList<T> : ArrayList<T>() {
 
         val hasNext = page+1 < pagesCount
 
-        return LogicalPage(this.size,page, pagesCount, items.size, hasNext, this as Collection<ObjectCollection>)
+        return LogicalPage(this.size,page, pagesCount, items.size, hasNext, items as Collection<ObjectCollection>)
     }
 
 }
