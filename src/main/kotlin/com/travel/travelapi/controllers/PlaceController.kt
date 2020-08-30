@@ -6,11 +6,11 @@ import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.UnauthorizedException
 import com.travel.travelapi.models.PlaceLocal
-import com.travel.travelapi.services.PlaceReviewService
+import com.travel.travelapi.models.ReviewType
 import com.travel.travelapi.services.PlaceService
+import com.travel.travelapi.services.ReviewService
 import com.travel.travelapi.sphinx.SphinxService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.mobile.device.Device
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
@@ -22,12 +22,12 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val categoryController: CategoryPlaceController,
                       @Autowired private val workingScheduleController: WorkingScheduleController,
                       @Autowired private val parkingPlaceController: ParkingPlaceController,
-                      @Autowired private val placeReviewService: PlaceReviewService,
                       @Autowired private val photoPlaceController: PhotoPlaceController,
                       @Autowired private val tagPlaceController: TagPlaceController,
                       @Autowired private val sourcePlaceController: SourcePlaceController,
                       @Autowired private val dataCollectionController: DataCollectionController,
-                      @Autowired private val sphinxService: SphinxService){
+                      @Autowired private val sphinxService: SphinxService,
+                      @Autowired private val reviewService: ReviewService){
 
 
     /**
@@ -89,27 +89,19 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
 
 
-        val plc = placeService.matchPlacesByLocation("Lithuania", "country")
-
         PageHelper.startPage<PlaceLocal>(p, s)
-        val plc1 = ArrayList<PlaceLocal>()
-
-
-        plc.forEach {
-            plc1.add(it)
-        }
-//        val places = placeService.selectAllAdmin(keyword,
-//                if(o.isNotEmpty()) o.split(",") else ArrayList(),
-//                if(c.isNotEmpty()) c.split(',') else ArrayList(),
-//                if(di.isNotEmpty()) di.split(',') else ArrayList(),
-//                if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
-//                if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
-//                if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
-//                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList(),
-//                if(location.isNotEmpty()) location.split(',') else ArrayList(),
-//                range.toDouble())
-//        extendPlace(full, places)
-        return PageInfo(plc1)
+        val places = placeService.selectAllAdmin(keyword,
+                if(o.isNotEmpty()) o.split(",") else ArrayList(),
+                if(c.isNotEmpty()) c.split(',') else ArrayList(),
+                if(di.isNotEmpty()) di.split(',') else ArrayList(),
+                if(dm.isNotEmpty()) dm.split(',') else ArrayList(),
+                if(countries.isNotEmpty()) countries.split(',') else ArrayList(),
+                if(cities.isNotEmpty()) cities.split(',') else ArrayList(),
+                if(municipalities.isNotEmpty()) municipalities.split(',') else ArrayList(),
+                if(location.isNotEmpty()) location.split(',') else ArrayList(),
+                range.toDouble())
+        extendPlace(full, places)
+        return PageInfo(places)
     }
 
 
@@ -180,12 +172,12 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                 else
                     place.schedule = listOf(relevantSchedule)
             }
-            place.totalReviews = placeReviewService.getReviewsCountsByPlace(id)
+            place.totalReviews = reviewService.getObjectTotalReviewsCount(id, ReviewType.PLACE.reviewType)
             place.photos = photoPlaceController.getPhotosById(id)
             place.tags = tagPlaceController.getTagsById(id)
             place.sources = sourcePlaceController.getSourcesById(id)
         }
-        place.overallStarRating = placeReviewService.getReviewsAverageRating(id)
+        place.overallStarRating = reviewService.getObjectTotalRating(id,ReviewType.PLACE.reviewType).toDouble()
         place.photos = photoPlaceController.getPhotosById(id)
         return place
     }
@@ -214,13 +206,13 @@ class PlaceController(@Autowired private val placeService: PlaceService,
 
     fun extendPlace(full: Boolean, places: Page<PlaceLocal>) {
             for (value: PlaceLocal in places) {
-                value.overallStarRating = placeReviewService.getReviewsAverageRating(value.placeId!!)
-                value.photos = photoPlaceController.getPhotosById(value.placeId!!)
+                value.overallStarRating = reviewService.getObjectTotalRating(value.placeId!!,ReviewType.PLACE.reviewType).toDouble()
+                value.photos = photoPlaceController.getPhotosById(value.placeId)
                 if(full){
-                    value.categories = categoryController.getCategoriesById(value.placeId!!)
+                    value.categories = categoryController.getCategoriesById(value.placeId)
                     value.parking = parkingPlaceController.getParkingLocationsById(value.placeId)
                     value.schedule = workingScheduleController.getWorkingSchedulesById(value.placeId)
-                    value.totalReviews = placeReviewService.getReviewsCountsByPlace(value.placeId)
+                    value.totalReviews = reviewService.getObjectTotalReviewsCount(value.placeId, ReviewType.PLACE.reviewType)
                     value.tags = tagPlaceController.getTagsById(value.placeId)
                     value.sources = sourcePlaceController.getSourcesById(value.placeId)
                 }
