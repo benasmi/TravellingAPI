@@ -18,6 +18,8 @@ interface PlaceService {
 
     fun search(@Param("ids") ids: List<String>): Page<PlaceLocal>
 
+    fun selectByCategoryAndLocation(@Param("categoryId") categoryId: Int, @Param("locationType") locationType: String, @Param("location") location: String): Page<PlaceLocal>
+
     fun selectAll(): Page<PlaceLocal>
 
     fun selectAllAdmin(@Param("keyword") keyword: String = "",

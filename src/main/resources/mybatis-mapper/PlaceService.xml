@@ -8,6 +8,10 @@
         SELECT * FROM PLACE
     </select>
 
+    <select id="selectByCategoryAndLocation" resultType="com.travel.travelapi.models.PlaceLocal">
+        SELECT * FROM PLACE p RIGHT JOIN CATEGORY_PLACE cp ON cp.fk_placeId = p.placeId AND cp.fk_categoryId = #{categoryId} WHERE ${locationType}=#{location}
+    </select>
+
     <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, price FROM PLACE WHERE ${locationType}=#{location} AND isVerified = true AND isPublic =true
     </select>

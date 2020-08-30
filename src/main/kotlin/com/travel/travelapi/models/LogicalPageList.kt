@@ -6,7 +6,7 @@ import java.lang.Math.ceil
  * Logical pagination of objects
  */
 class LogicalPageList<T> : ArrayList<T>() {
-    fun getPage(page: Int, pageSize: Int): LogicalPage<T>{
+    fun getPage(page: Int, pageSize: Int): LogicalPage{
 
         var pagesCount = this.size / pageSize
         pagesCount += (this.size % pageSize).coerceAtMost(1)
@@ -19,21 +19,20 @@ class LogicalPageList<T> : ArrayList<T>() {
 
         val items = this.subList(
                 page*pageSize,
-                lastIndex).toList()
+                lastIndex)
 
         val hasNext = page+1 < pagesCount
 
-        return LogicalPage(this.size,page, pagesCount, items.size, hasNext, items)
+        return LogicalPage(this.size,page, pagesCount, items.size, hasNext, this as Collection<ObjectCollection>)
     }
-
 
 }
 
-data class LogicalPage<T>(
+data class LogicalPage(
         val totalItems: Int = 0,
         val currentPage: Int = 0,
         val totalPages: Int = 0,
         val pageSize: Int = 0,
         val hasNext: Boolean = false,
-        val list: List<T> = ArrayList()
+        val list: Collection<ObjectCollection> = listOf()
 )
