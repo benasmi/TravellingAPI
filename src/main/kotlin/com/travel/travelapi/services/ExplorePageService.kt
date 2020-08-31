@@ -20,5 +20,5 @@ interface ExplorePageService {
 
     fun selectObjectsByLocationAndCategory(@Param("location") location: String, @Param("locationType") locationType: String, @Param("categoryId") categoryId: Int): List<CollectionObject>
 
-    fun selectObjectsByCoordsAndCategory(@Param("latitude") latitude: Float, @Param("longitude") longitude: Float, @Param("categoryId") categoryId: Int): List<CollectionObject>
+    fun selectObjectsByCoordsAndCategory(@Param("latitude") latitude: Float, @Param("longitude") longitude: Float, @Param("categoryId") categoryId: Int, @Param("distance") distance: Float): List<CollectionObject>
 }
