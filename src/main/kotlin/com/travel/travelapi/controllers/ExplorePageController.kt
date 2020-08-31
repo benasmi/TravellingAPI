@@ -248,12 +248,14 @@ class ExplorePageController(
         otherPlaces.addAll(placesFound.map {
             CollectionObjectPlace.createFromPlaceInstance(it)
         })
-        collections.add(MiscellaneousCollection(objects = otherPlaces, name = "Other places", subtitle = ""))
+        if(otherPlaces.count() > 0)
+            collections.add(MiscellaneousCollection(objects = otherPlaces, name = "Other places", subtitle = ""))
 
         //Adding tours to the "others" section, since they did not belong to any popular tag
         val otherTours = arrayListOf<CollectionObject>()
         otherTours.addAll(tours.map { CollectionObjectTour.createFromTourInstance(it) })
-        collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
+        if(otherTours.count() > 0)
+            collections.add(MiscellaneousCollection(objects = otherTours, name = "Other tours", subtitle = ""))
 
 
         return collections.getPage(p, s)
