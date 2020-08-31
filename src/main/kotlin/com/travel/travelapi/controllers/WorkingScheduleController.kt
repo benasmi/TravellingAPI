@@ -64,11 +64,21 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
             return schedules[0]
 
         val format = DateTimeFormatter.ofPattern("uuuu-M-d")
-        schedules.sortedBy { schedule -> Duration.between(LocalDate.parse("0000-" + schedule.from, format).atStartOfDay(), LocalDate.parse("0000-" + schedule.to, format).atStartOfDay())}
+        schedules = schedules.sortedBy { schedule ->
+            val date1 = LocalDate.parse("0000-" + schedule.from, format).atStartOfDay()
+            var date2 = LocalDate.parse("0000-" + schedule.to, format).atStartOfDay()
+            if(date2.isBefore(date1))
+                date2 = date2.plusYears(1)
+            Duration.between(date1, date2)
+        }
         val currentMonthDay = LocalDate.parse("0000-" + LocalDate.now().month.value + "-" + LocalDate.now().dayOfMonth, format)
         schedules.forEach { schedule ->
-            val to = LocalDate.parse("0000-"+schedule.to, format)
+            var to = LocalDate.parse("0000-"+schedule.to, format)
             val from = LocalDate.parse("0000-" + schedule.from, format)
+            if(to.isBefore(from))
+                to = to.plusYears(1)
+            if(currentMonthDay.isBefore(from))
+                currentMonthDay.plusYears(1)
             if(currentMonthDay.isBefore(to) && from.isBefore(currentMonthDay))
                 return schedule
         }
