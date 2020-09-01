@@ -36,7 +36,7 @@
             SELECT * FROM PLACE
         </if>
         <if test="keyword!= ''">
-            WHERE MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
+            WHERE MATCH (name) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE)
         </if>
         <if test="keyword== ''">
             WHERE 1
@@ -94,8 +94,16 @@
         <if test="location.size() != 0">
             HAVING distance &lt; #{range} ORDER BY distance, dateModified DESC
         </if>
+        <if test="keyword!= ''">
+            ORDER BY levenshtein(name, #{keyword})
+        </if>
         <if test="location.size() == 0">
-            ORDER BY dateModified DESC
+            <if test="keyword!=''">
+                , dateModified DESC
+            </if>
+            <if test="keyword==''">
+                ORDER BY dateModified DESC
+            </if>
         </if>
 
     </select>
