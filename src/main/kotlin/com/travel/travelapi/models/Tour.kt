@@ -16,35 +16,34 @@ data class Tour(val tourId: Int? = null,
     var categories: ArrayList<Category>? = null
 }
 
-data class TourDayDetails(val description: String? = null)
-data class TransportFrom(val fk_transportId: Int? = null)
-data class TourDay(val description: String? = null, var data: ArrayList<TourDayInfo>? = null)
 
-data class TourDayInfo(val place: Place? = null,
-                       val transport: ArrayList<TransportFrom>? = null)
+data class TourDay(val description: String? = null,
+                   val tourDayId: Int? = null,
+                   val day: Int? = null,
+                   var totalDistance: Int? = null,
+                   var totalDuration: Int? = null,
+                   var travellingDuration: Int? = null,
+                   var averageTimeSpentDuration: Int? = null,
+                   var data: ArrayList<TourDayInfo>? = null)
 
+data class TourDayInfo(var place: PlaceLocal? = null,
+                       val transport: TransportFrom? = null)
 
-abstract class TourPlace (
+data class TransportFrom(var fk_transportId: Int? = null,
+                         var distance: Int? = null,
+                         var duration: Int? =null)
+
+data class TourPlace (
+        var fk_placeId: Int? = null,
         var id: Int? = null,
         var position: Int? = null,
-        var day: Int? = null
-        ){
-    var transportFrom: ArrayList<TransportFrom>? = null
-    var place: Place? = null
+        var day: Int? = null){
+
+    var transport: TransportFrom? = null
+    var place: PlaceLocal? = null
 }
 
-class TourLocalPlaceInfo(val fk_placeId: Int? = null,
-                              id: Int? = null,
-                              position: Int? = null,
-                              day: Int? = null,
-                              val placeType: Int? = 0): TourPlace(id,position,day){
-}
 
-class TourApiPlaceInfo(val fk_apiPlaceId: String? = null,
-                         id: Int? = null,
-                         position: Int? = null,
-                         day: Int? = null,
-                         val placeType: Int? = 1): TourPlace(id,position,day)
 
 
 

@@ -23,6 +23,9 @@
         </foreach>
     </select>
 
+    <select id="getPlaceLocation" resultType="com.travel.travelapi.models.Location">
+        SELECT latitude, longitude FROM PLACE WHERE placeId=#{id}
+    </select>
     <select id="searchClient" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, latitude, longitude FROM PLACE p WHERE isPublic = 1 AND isVerified = 1 AND MATCH (name,description,city,country) AGAINST (CONCAT(#{keyword},'*') IN BOOLEAN MODE) LIMIT 8
     </select>

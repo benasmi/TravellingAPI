@@ -4,20 +4,12 @@
 <mapper namespace="com.travel.travelapi.services.TourDayService">
 
 
-    <select id="getLocalPlacesByTourId"  resultType="com.travel.travelapi.models.TourLocalPlaceInfo">
-        SELECT * FROM TOUR_DAY td INNER JOIN
-            PLACE_TOUR_DAY ptd ON td.tourDayId = ptd.fk_tourDayId
-            WHERE fk_tourId=#{id}
+    <select id="getLocalPlacesByTourId"  resultType="com.travel.travelapi.models.TourPlace">
+        SELECT * FROM PLACE_TOUR_DAY WHERE fk_tourDayId=#{tourDayId}
     </select>
 
-    <select id="getApiPlacesByTourId"  resultType="com.travel.travelapi.models.TourApiPlaceInfo">
-        SELECT * FROM TOUR_DAY td INNER JOIN
-                      API_PLACE_TOUR apt ON td.tourDayId = apt.fk_tourDayId
-        WHERE fk_tourId=#{id}
-    </select>
-
-    <select id="getTourDaysDetails"  resultType="com.travel.travelapi.models.TourDayDetails">
-        SELECT description FROM TOUR_DAY WHERE fk_tourId=#{id}
+    <select id="getTourDaysDetails"  resultType="com.travel.travelapi.models.TourDay">
+        SELECT description, tourDayId, day FROM TOUR_DAY WHERE fk_tourId=#{id}
     </select>
 
     <delete id="deleteTourDaysById">
@@ -29,25 +21,28 @@
             INSERT INTO TOUR_DAY (day, fk_tourId, description) VALUES (#{i}, #{id}, #{day.description});
             SET @tourDayId = (SELECT LAST_INSERT_ID());
             <foreach item="p" collection="day.data" index="pos">
-                <if test="p.place.type == 0">
                     INSERT INTO PLACE_TOUR_DAY (fk_tourDayId, fk_placeId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
                     SET @placeInsertedId = (SELECT LAST_INSERT_ID());
-                    <foreach item="t" collection="p.transport">
-                        INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId,fk_transportId) VALUES (@placeInsertedId, #{t.fk_transportId});
-                    </foreach>
-                </if>
-                <if test="p.place.type == 1">
-                    INSERT INTO API_PLACE (apiPlaceId, fk_typeId) VALUES (#{p.place.placeId}, 1)
-                    ON DUPLICATE KEY UPDATE apiPlaceId = apiPlaceId;
-                    INSERT INTO API_PLACE_TOUR (fk_tourDayId, fk_apiPlaceId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
-                    SET @placeApiInsertedId = (SELECT LAST_INSERT_ID());
-                    <foreach item="t" collection="p.transport">
-                        INSERT INTO TRANSPORT_API_PLACE_TOUR (fk_placeApiTourId,fk_transportId) VALUES (@placeApiInsertedId, #{t.fk_transportId});
-                    </foreach>
-                </if>
 
+            <if test="p.transport != null">
+                INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId, fk_transportId, duration, distance)
+                VALUES (@placeInsertedId, #{p.transport.fk_transportId}, #{p.transport.duration}, #{p.transport.distance});
+            </if>
             </foreach>
         </foreach>
     </insert>
+
+    <select id="sumPlacesAverageTimeSpent" resultType="int">
+        SELECT SUM(p.averageTimeSpent) as totalTime FROM PLACE p
+        WHERE p.placeId IN (SELECT ptd.fk_placeId FROM PLACE_TOUR_DAY ptd WHERE ptd.fk_tourDayId = #{tourDayId} )
+    </select>
+
+    <select id="dayTotalDistanceAndTime" resultType="com.travel.travelapi.models.TransportFrom">
+        SELECT
+        SUM(IFNULL(tpt.duration,0)) as duration,
+        SUM(IFNULL(tpt.distance,0)) as distance FROM PLACE_TOUR_DAY ptd
+        INNER JOIN TRANSPORT_PLACE_TOUR tpt ON ptd.id = tpt.fk_placeTourId
+        WHERE ptd.fk_tourDayId=#{tourDayId}
+    </select>
 
 </mapper>

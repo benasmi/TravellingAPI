@@ -21,7 +21,10 @@
     </delete>
 
     <update id="updateTour" >
-        UPDATE TOUR SET name=#{tour.name}, description=#{tour.description}, isVerified=#{tour.isVerified}, isPublished=#{tour.isPublished}
+        UPDATE TOUR SET name=#{tour.name},
+         description=#{tour.description},
+          isVerified=#{tour.isVerified},
+           isPublished=#{tour.isPublished}
         WHERE tourId=#{id}
     </update>
 
@@ -61,23 +64,13 @@
              INSERT INTO TOUR_DAY (day, fk_tourId, description) VALUES (#{i}, @tourId, #{day.description});
              SET @tourDayId = (SELECT LAST_INSERT_ID());
         <foreach item="p" collection="day.data" index="pos">
-            <if test="p.place.type == 0">
                 INSERT INTO PLACE_TOUR_DAY (fk_tourDayId, fk_placeId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
                 SET @placeInsertedId = (SELECT LAST_INSERT_ID());
-                <foreach item="t" collection="p.transport">
-                    INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId,fk_transportId) VALUES (@placeInsertedId, #{t.fk_transportId});
-                </foreach>
-            </if>
-            <if test="p.place.type == 1">
-                INSERT INTO API_PLACE (apiPlaceId, fk_typeId) VALUES (#{p.place.placeId}, 1)
-                ON DUPLICATE KEY UPDATE apiPlaceId = apiPlaceId;
-                INSERT INTO API_PLACE_TOUR (fk_tourDayId, fk_apiPlaceId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
-                SET @placeApiInsertedId = (SELECT LAST_INSERT_ID());
-                <foreach item="t" collection="p.transport">
-                    INSERT INTO TRANSPORT_API_PLACE_TOUR (fk_placeApiTourId,fk_transportId) VALUES (@placeApiInsertedId, #{t.fk_transportId});
-                </foreach>
-            </if>
 
+            <if test="p.transport != null">
+                INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId, fk_transportId, duration)
+                VALUES (@placeInsertedId, #{p.transport.fk_transportId}, #{p.transport.duration});
+            </if>
         </foreach>
       </foreach>
     </insert>

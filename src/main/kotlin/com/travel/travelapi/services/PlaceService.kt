@@ -2,6 +2,7 @@ package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
 import com.travel.travelapi.controllers.ExplorePageController
+import com.travel.travelapi.models.Location
 import com.travel.travelapi.models.Parking
 import com.travel.travelapi.models.Place
 
@@ -54,4 +55,6 @@ interface PlaceService {
     fun getAllCountries(): ArrayList<String>
     fun getAllCounties(): ArrayList<String>
     fun getAllMunicipalities(@Param("restrictions") restrictions: List<String>): ArrayList<String>
+
+    fun getPlaceLocation(@Param("id") id: Int): Location
 }

@@ -8,8 +8,5 @@
         SELECT * FROM TRANSPORT_PLACE_TOUR WHERE fk_placeTourId=#{id}
     </select>
 
-    <select id="getApiPlaceTransportFrom"  resultType="com.travel.travelapi.models.TransportFrom">
-        SELECT * FROM TRANSPORT_API_PLACE_TOUR WHERE fk_placeApiTourId=#{id}
-    </select>
 
 </mapper>

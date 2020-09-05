@@ -6,7 +6,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TransportService {
-    fun getLocalPlaceTransportFrom(@Param("id") id: Int): ArrayList<TransportFrom>
-    fun getApiPlaceTransportFrom(@Param("id") id: Int): ArrayList<TransportFrom>
-
+    fun getLocalPlaceTransportFrom(@Param("id") id: Int): TransportFrom
 }

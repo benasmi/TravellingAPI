@@ -19,7 +19,9 @@ class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val tourDayController: TourDayController,
                      @Autowired private val placeController: PlaceController,
                      @Autowired private val dataCollectionController: DataCollectionController,
-                     @Autowired private val apiPlaceController: ApiPlaceController) {
+                     @Autowired private val apiPlaceController: ApiPlaceController,
+                     @Autowired private val transportController: TransportController
+) {
 
     /**
      * Checks if user has permission to modify the tour with a given ID.
@@ -87,42 +89,30 @@ class TourController(@Autowired private val tourService: TourService,
 
         dataCollectionController.searchedTour(id)
 
+        //Get tour info
         val tour: Tour = tourService.getTourById(id)
-        val localPlaces = tourDayController.getPlacesForTourDay(tour.tourId!!)
-        val apiPlaces = tourDayController.getApiPlacesForTourDay(tour.tourId)
-        val tourDaysDetails = tourDayController.getTourDaysDetails(tour.tourId)
+        //Get tour days
+        val days = tourDayController.getTourDaysDetails(tour.tourId!!)
 
-        val places: ArrayList<TourPlace> = ArrayList()
-        places.addAll(localPlaces)
-        places.addAll(apiPlaces)
+        //Get places for every tour day
+        days.forEach{
+            //Get places id's and transport
+            val dayPlacesId = tourDayController.getPlacesForTourDay(it.tourDayId!!)
+            val tourDayPlaces = ArrayList<TourDayInfo>()
 
-        for(p: TourPlace in places){
-            when(p){
-                is TourLocalPlaceInfo ->{
-                    p.place = placeController.getPlaceById(full = false, id = p.fk_placeId!!)
-                }
-                is TourApiPlaceInfo ->{
-                    p.place = apiPlaceController.search(p.fk_apiPlaceId!!)
-                }
+            //Get actual places
+            dayPlacesId.forEach {
+                val place = placeController.getPlaceById(false, it.fk_placeId!!)
+                tourDayPlaces.add(TourDayInfo(place,it.transport))
             }
-        }
-        val days: ArrayList<TourDay> = ArrayList()
-        val grouped = places.groupBy { it.day }.values
-
-        tourDaysDetails.forEach{
-            days.add(TourDay(it.description,ArrayList()))
+            it.data = tourDayPlaces
         }
 
-        grouped.forEachIndexed { index, list ->
-            val tourDay = ArrayList<TourDayInfo>()
-            list.sortedBy {(it.position) }.forEach {
-                tourDay.add(TourDayInfo(it.place!!, it.transportFrom!!))
-            }
-            days[index].data = tourDay
-        }
+        //Set all days with places, transport and duration for tour
         tour.days = days
         return tour
     }
+
 
     /**
      * Update tour info
@@ -137,6 +127,9 @@ class TourController(@Autowired private val tourService: TourService,
 
         //Checking if user has access to modify this tour. If not, this line will throw an exception
         checkModifyAccess(principal, id)
+
+        //Attach travelling info to tour
+        transportController.calculateTourDaysTravellingInfo(tour)
 
         tourService.updateTour(tour, id)
         tourDayController.deleteTourDaysById(id)
@@ -169,6 +162,10 @@ class TourController(@Autowired private val tourService: TourService,
     fun insertTour(@RequestBody tour: Tour): Int{
         //Getting the authenticated user
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
+        //Attach travelling info to tour
+        transportController.calculateTourDaysTravellingInfo(tour)
+
         tour.userId = principal.id!!.toInt()
         tourService.insertTour(tour)
         return tour.tourId!!
@@ -232,7 +229,8 @@ class TourController(@Autowired private val tourService: TourService,
          * Set categories for a tour
          */
         @RequestMapping("/update")
-        fun updateTourCategories(@RequestBody categories: List<Category>, @RequestParam(name="p") tourId: Int){
+        fun updateTourCategories(@RequestBody categories: List<Category>,
+                                 @RequestParam(name="p") tourId: Int){
 
             //Getting the authenticated user
             val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
