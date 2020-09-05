@@ -66,7 +66,7 @@ class ExplorePageController(
             objects = explorePageService.selectObjectsByLocationAndCategory(exploreLocationObject.location, exploreLocationObject.type, categoryId)
 
         } else if (latitude != null && longitude != null) {
-            objects = explorePageService.selectObjectsByCoordsAndCategory(latitude, longitude, categoryId)
+            objects = explorePageService.selectObjectsByCoordsAndCategory(latitude, longitude, categoryId, 50f)
         } else {
             throw InvalidParamsException("Either location and locationType or latitude and longitude must be specified.")
         }
