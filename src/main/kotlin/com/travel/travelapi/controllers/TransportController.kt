@@ -60,8 +60,10 @@ class TransportController(@Autowired private val transportService: TransportServ
 
         //Check all places and find consequent driving modes between places
         for(i in 0 until tourDayPlaces.size){
-          val currentTransport = selectTrueTransport(tourDayPlaces[i].transport?.fk_transportId)
-          placesInfo.add(TourDayInfo(tourDayPlaces[i].place, tourDayPlaces[i].transport))
+            val tourDayInfo = tourDayPlaces[i]
+            val currentTransport = selectTrueTransport(tourDayInfo.transport?.fk_transportId)
+
+          placesInfo.add(TourDayInfo(tourDayInfo.place, tourDayInfo.transport, tourDayInfo.note))
             if(currentTransport != previousTransport){
                 calculateOriginAndDestination(placesInfo)
 
@@ -72,12 +74,13 @@ class TransportController(@Autowired private val transportService: TransportServ
 
                 transportInfo.addAll(placesInfo)
                 placesInfo = ArrayList()
-                placesInfo.add(TourDayInfo(tourDayPlaces[i].place, tourDayPlaces[i].transport))
+                placesInfo.add(TourDayInfo(tourDayInfo.place, tourDayInfo.transport, tourDayInfo.note))
 
             }
 
             previousTransport = currentTransport
         }
+
         return transportInfo
     }
 

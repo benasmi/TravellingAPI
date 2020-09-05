@@ -1,5 +1,6 @@
 package com.travel.travelapi.controllers
 
+import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.FileStorageException
 import com.travel.travelapi.models.Photo
 import com.travel.travelapi.services.FileStorageService
@@ -11,6 +12,7 @@ import org.springframework.core.io.Resource
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
@@ -87,8 +89,11 @@ class PhotoController(
     @PostMapping("/upload")
     @PreAuthorize("hasAuthority('photo:upload')")
     fun insertPhoto(@RequestBody image: MultipartFile): Photo{
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
         val linkToImage = fileStorageService.storeImageFile(image)
-        val photo = Photo(url =  linkToImage)
+        val photo = Photo(url =  linkToImage, userId = principal.id?.toInt())
+
         photoService.insertPhoto(photo)
         return photo
     }

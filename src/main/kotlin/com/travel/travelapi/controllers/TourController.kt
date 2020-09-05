@@ -4,7 +4,6 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.UnauthorizedException
-import com.travel.travelapi.facebook.places.api.ApiPlaceController
 import com.travel.travelapi.models.*
 import com.travel.travelapi.services.TourService
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +18,6 @@ class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val tourDayController: TourDayController,
                      @Autowired private val placeController: PlaceController,
                      @Autowired private val dataCollectionController: DataCollectionController,
-                     @Autowired private val apiPlaceController: ApiPlaceController,
                      @Autowired private val transportController: TransportController
 ) {
 
@@ -103,7 +101,7 @@ class TourController(@Autowired private val tourService: TourService,
             //Get actual places
             dayPlacesId.forEach {
                 val place = placeController.getPlaceById(false, it.fk_placeId!!)
-                tourDayPlaces.add(TourDayInfo(place,it.transport))
+                tourDayPlaces.add(TourDayInfo(place,it.transport, it.note))
             }
             it.data = tourDayPlaces
         }

@@ -45,6 +45,7 @@ class CategoryController(@Autowired private val categoryService: CategoryService
         for(c: Category in categories)
             categoryService.deleteCategory(c)
     }
+
     /**
      * Delete categories
      */

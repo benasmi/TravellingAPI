@@ -30,7 +30,10 @@ class ParkingController(@Autowired private val parkingService: ParkingService,
     @PostMapping("/insert")
     @PreAuthorize("hasAuthority('parking:add')")
     fun insertParkingForPlace(@RequestBody parking: List<Parking>): List<Parking>{
+        val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
+
         for(p: Parking in parking){
+            p.userId = principal.id?.toInt()
             parkingService.insertParking(p)
         }
         return parking
@@ -50,7 +53,7 @@ class ParkingController(@Autowired private val parkingService: ParkingService,
             return
         //Else we check if user has authority to modify their parking(s) and the given parking is created by them
         }else if(parking.userId != null
-                && parking.userId.toLong() == user.id
+                && parking.userId?.toLong() == user.id
                 && user.hasAuthority("parking:modify"))   {
             return
         }else throw UnauthorizedException("Insufficient authority") //If all else fails, we throw an exception

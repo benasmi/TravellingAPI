@@ -18,7 +18,7 @@
     </select>
 
     <insert id="insertParking" useGeneratedKeys = "true" keyColumn = "parkingId" keyProperty = "parkingId">
-        INSERT INTO PARKING (latitude, longitude, address, city, country) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.city}, #{p.country})
+        INSERT INTO PARKING (latitude, longitude, address, city, country, userId) VALUES (#{p.latitude},#{p.longitude}, #{p.address}, #{p.city}, #{p.country}, #{p.userId})
     </insert>
 
     <delete id="deleteParking">
