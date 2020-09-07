@@ -161,7 +161,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             //Collecting data
             dataCollectionController.searchedPlace(id)
 
-            place.categories = categoryController.getCategoriesById(id)
             place.parking = parkingPlaceController.getParkingLocationsById(id)
             if(principal.device == "web")
                 place.schedule = workingScheduleController.getWorkingSchedulesById(id)
@@ -177,6 +176,7 @@ class PlaceController(@Autowired private val placeService: PlaceService,
             place.tags = tagPlaceController.getTagsById(id)
             place.sources = sourcePlaceController.getSourcesById(id)
         }
+        place.categories = categoryController.getCategoriesById(id)
         place.overallStarRating = reviewService.getObjectTotalRating(id,ReviewType.PLACE.reviewType).toDouble()
         place.photos = photoPlaceController.getPhotosById(id)
         return place
