@@ -21,13 +21,8 @@
             INSERT INTO TOUR_DAY (day, fk_tourId, description) VALUES (#{i}, #{id}, #{day.description});
             SET @tourDayId = (SELECT LAST_INSERT_ID());
             <foreach item="p" collection="day.data" index="pos">
-                    INSERT INTO PLACE_TOUR_DAY (fk_tourDayId, fk_placeId, position) VALUES (@tourDayId, #{p.place.placeId}, #{pos});
-                    SET @placeInsertedId = (SELECT LAST_INSERT_ID());
-
-            <if test="p.transport != null">
-                INSERT INTO TRANSPORT_PLACE_TOUR (fk_placeTourId, fk_transportId, duration, distance)
-                VALUES (@placeInsertedId, #{p.transport.fk_transportId}, #{p.transport.duration}, #{p.transport.distance});
-            </if>
+                INSERT INTO PLACE_TOUR_DAY (fk_tourDayId, fk_placeId, position, fk_transportId, duration, distance, note)
+                VALUES (@tourDayId, #{p.place.placeId}, #{pos}, #{p.transport.fk_transportId}, #{p.transport.duration}, #{p.transport.distance}, #{p.note});
             </foreach>
         </foreach>
     </insert>
@@ -39,10 +34,8 @@
 
     <select id="dayTotalDistanceAndTime" resultType="com.travel.travelapi.models.TransportFrom">
         SELECT
-        SUM(IFNULL(tpt.duration,0)) as duration,
-        SUM(IFNULL(tpt.distance,0)) as distance FROM PLACE_TOUR_DAY ptd
-        INNER JOIN TRANSPORT_PLACE_TOUR tpt ON ptd.id = tpt.fk_placeTourId
-        WHERE ptd.fk_tourDayId=#{tourDayId}
+        SUM(IFNULL(ptd.duration,0)) as duration,
+        SUM(IFNULL(ptd.distance,0)) as distance FROM PLACE_TOUR_DAY ptd WHERE ptd.fk_tourDayId=#{tourDayId}
     </select>
 
 </mapper>

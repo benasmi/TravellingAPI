@@ -5,8 +5,7 @@
 
 
     <select id="getLocalPlaceTransportFrom"  resultType="com.travel.travelapi.models.TransportFrom">
-        SELECT * FROM TRANSPORT_PLACE_TOUR WHERE fk_placeTourId=#{id}
+        SELECT distance, duration, fk_transportId FROM PLACE_TOUR_DAY WHERE id=#{id}
     </select>
-
 
 </mapper>

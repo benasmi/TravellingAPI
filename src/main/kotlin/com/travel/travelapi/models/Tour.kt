@@ -27,7 +27,8 @@ data class TourDay(val description: String? = null,
                    var data: ArrayList<TourDayInfo>? = null)
 
 data class TourDayInfo(var place: PlaceLocal? = null,
-                       val transport: TransportFrom? = null)
+                       val transport: TransportFrom? = null,
+                       var note: String? = "")
 
 data class TransportFrom(var fk_transportId: Int? = null,
                          var distance: Int? = null,
@@ -37,7 +38,8 @@ data class TourPlace (
         var fk_placeId: Int? = null,
         var id: Int? = null,
         var position: Int? = null,
-        var day: Int? = null){
+        var day: Int? = null,
+        val note: String? = null){
 
     var transport: TransportFrom? = null
     var place: PlaceLocal? = null

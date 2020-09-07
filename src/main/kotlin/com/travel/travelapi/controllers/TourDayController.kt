@@ -18,7 +18,6 @@ class TourDayController(@Autowired private val tourDayService: TourDayService,
         val places = tourDayService.getLocalPlacesByTourId(tourDayId)
         for(p: TourPlace in places)
             p.transport = transportController.getLocalPlaceTransportFrom(p.id!!)
-
         return places
     }
 

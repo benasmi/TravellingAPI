@@ -69,12 +69,12 @@ class AuthController(@Autowired private val authService: AuthService,
         formedUser.provider = AuthProvider.local
         formedUser.roles.add(Roles.ROLE_LIMBO.id)
 
+        authService.createUser(formedUser)
         if(!user.imageUrl.isNullOrEmpty()){
-            val photo = Photo(null, user.imageUrl, null)
+            val photo = Photo(null, user.imageUrl, null, formedUser.id?.toInt()!!)
             photoService.insertPhoto(photo)
             formedUser.fk_photoId = photo.photoId
         }
-        authService.createUser(formedUser)
 
         return formedUser.id!!
     }

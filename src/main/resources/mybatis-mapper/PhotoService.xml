@@ -4,7 +4,7 @@
 <mapper namespace="com.travel.travelapi.services.PhotoService">
 
     <insert id="insertPhoto" useGeneratedKeys = "true" keyProperty = "photoId" keyColumn = "photoId">
-        INSERT INTO PHOTO (url, date) VALUES (#{p.url}, now())
+        INSERT INTO PHOTO (url, date, userId) VALUES (#{p.url}, now(), #{p.userId})
     </insert>
 
     <update id="updatePhoto">
