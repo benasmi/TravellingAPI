@@ -28,7 +28,7 @@ class FileStorageService @Autowired constructor(fileStorageProperties: FileStora
 
     fun storeImageFile(image: MultipartFile): String{
         val extension = image.originalFilename!!.substring(image.originalFilename!!.lastIndexOf(".") + 1)
-        val allowedExtensions = arrayOf("PNG", "jpg", "png", "bmp", "jpeg")
+        val allowedExtensions = arrayOf("jpg", "png", "bmp", "jpeg", "JPEG", "BMP", "PNG", "JPG")
         if(!allowedExtensions.contains(extension))
             throw FileStorageException("Invalid file extension. Allowed extensions: $allowedExtensions")
         val generatedName = generateUniqueFileName() + '.' + extension

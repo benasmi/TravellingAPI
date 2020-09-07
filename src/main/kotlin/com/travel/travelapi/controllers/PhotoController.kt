@@ -65,7 +65,7 @@ class PhotoController(
                 ImageIO.read(resource.file)
 
             val baos = ByteArrayOutputStream()
-            ImageIO.write(image, "jpg", baos)
+            ImageIO.write(image, resource.file.extension, baos)
             baos.flush()
             val imageInByte: ByteArray = baos.toByteArray()
             baos.close()
