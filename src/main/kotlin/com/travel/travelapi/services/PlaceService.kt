@@ -34,6 +34,11 @@ interface PlaceService {
                        @Param("location") location: List<String> = arrayListOf(),
                        @Param("range") range: Double = 0.toDouble()) : Page<PlaceLocal>
 
+    fun selectPlacesInRadius(@Param("latitude") latitude: Double,
+                             @Param("longitude") longitude: Double,
+                             @Param("range") range: Double,
+                             @Param("limit") limit: Int): ArrayList<PlaceLocal>
+
     fun searchClient(@Param("keyword") keyword: String): List<PlaceLocal>
 
     fun matchPlacesByLocation(@Param("location") location: String, @Param("locationType") locationType: String): List<PlaceLocal>

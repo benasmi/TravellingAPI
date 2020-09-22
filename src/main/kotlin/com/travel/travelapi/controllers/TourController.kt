@@ -20,7 +20,6 @@ class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val dataCollectionController: DataCollectionController,
                      @Autowired private val transportController: TransportController
 ) {
-
     /**
      * Checks if user has permission to modify the tour with a given ID.
      * Throws an exception if user is not permitted
