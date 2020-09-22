@@ -102,7 +102,10 @@ class CollectionObjectTour(
         name: String? = null,
         description: String? = null,
         id: Int? = null,
-        photos: List<Photo>? = null
+        photos: List<Photo>? = null,
+        var numObjects: Int? = null,
+        var numDays: Int? = null,
+        var distanceTotal: Double? = null
 ) : CollectionObject(name, description, id, photos){
 
     fun setData(tour: Tour) {
@@ -110,6 +113,9 @@ class CollectionObjectTour(
         description = tour.description
         id = tour.tourId
         photos = tour.photos
+        numObjects = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf<Any>() ).count() }.sumBy { it }
+        numDays = (tour.days ?: arrayListOf<Any>()).count()
+        distanceTotal = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf() ).sumBy { place -> place.transport?.distance ?: 0 }}.sum().toDouble()
     }
 
     companion object{
