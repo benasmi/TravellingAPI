@@ -63,7 +63,7 @@ class RecommendationController(
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
             val tours = arrayListOf<CollectionObjectTour>()
             for (tour in tourIds)
-                tours.add(CollectionObjectTour.createFromTourInstance(tourController.getTourById(tour.tourId!!)))
+                tours.add(CollectionObjectTour.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
             recommendation.objects = tours
         }
     }

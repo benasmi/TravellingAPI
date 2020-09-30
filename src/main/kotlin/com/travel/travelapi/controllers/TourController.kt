@@ -17,6 +17,7 @@ import kotlin.collections.ArrayList
 class TourController(@Autowired private val tourService: TourService,
                      @Autowired private val tourDayController: TourDayController,
                      @Autowired private val placeController: PlaceController,
+                     @Autowired private val parkingPlaceController: ParkingPlaceController,
                      @Autowired private val dataCollectionController: DataCollectionController,
                      @Autowired private val transportController: TransportController
 ) {
@@ -65,8 +66,17 @@ class TourController(@Autowired private val tourService: TourService,
     fun tourOverviewById(tourId: Int): Tour{
         //Getting tour by ID
         val tour: Tour = tourService.getTourById(tourId)
+
         //Creating a new tour object, with limited amount of information
-        val tourTrimmed = Tour(tourId = tour.tourId, name=tour.name, description=tour.description,userId=tour.userId)
+        val tourTrimmed = Tour(
+                tourId = tour.tourId,
+                name=tour.name,
+                description=tour.description,
+                userId=tour.userId,
+                totalObjects = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf<Any>() ).count() }.sumBy { it } ,
+                totalDays= (tour.days ?: arrayListOf<Any>()).count(),
+                totalDistance = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf() ).sumBy { place -> place.transport?.distance ?: 0 }}.sum().toDouble()
+        )
         //Selecting all photos of all tour places
         val photos = tourService.photosForTour(tourId)
         //Selecting first photo to be the featured photo for this tour. This should be changed to something
@@ -82,7 +92,8 @@ class TourController(@Autowired private val tourService: TourService,
      */
     @GetMapping("")
     @PreAuthorize("hasAuthority('tour:read')")
-    fun getTourById(@RequestParam(name = "id", required = true) id: Int): Tour {
+    fun getTourById(@RequestParam(name = "id", required = true) id: Int,
+                    @RequestParam(required = false) full: Boolean = false): Tour {
 
         dataCollectionController.searchedTour(id)
 
@@ -99,7 +110,8 @@ class TourController(@Autowired private val tourService: TourService,
 
             //Get actual places
             dayPlacesId.forEach {
-                val place = placeController.getPlaceById(false, it.fk_placeId!!)
+                val place = placeController.getPlaceById(full, it.fk_placeId!!)
+                place.parking = parkingPlaceController.getParkingLocationsById(it.fk_placeId!!)
                 tourDayPlaces.add(TourDayInfo(place,it.transport, it.note))
             }
             it.data = tourDayPlaces

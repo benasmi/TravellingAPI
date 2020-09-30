@@ -113,9 +113,9 @@ class CollectionObjectTour(
         description = tour.description
         id = tour.tourId
         photos = tour.photos
-        numObjects = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf<Any>() ).count() }.sumBy { it }
-        numDays = (tour.days ?: arrayListOf<Any>()).count()
-        distanceTotal = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf() ).sumBy { place -> place.transport?.distance ?: 0 }}.sum().toDouble()
+        numObjects = tour.totalObjects
+        numDays = tour.totalDays
+        distanceTotal = tour.totalDistance
     }
 
     companion object{
