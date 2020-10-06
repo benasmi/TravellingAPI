@@ -1,8 +1,6 @@
 package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
-import com.travel.travelapi.controllers.ExplorePageController
-import com.travel.travelapi.controllers.TypeIdPair
 import com.travel.travelapi.models.*
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository

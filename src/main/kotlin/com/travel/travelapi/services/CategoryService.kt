@@ -10,4 +10,5 @@ interface CategoryService {
     fun insertCategory(@Param("c") c: Category): Int
     fun deleteCategory(@Param("c") c: Category)
     fun updateCategory(@Param("c") c: Category)
+    fun allUniqueCategories(): List<Category>
 }

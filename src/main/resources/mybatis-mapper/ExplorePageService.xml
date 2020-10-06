@@ -17,6 +17,8 @@
         ORDER BY explorePage.id
     </select>
 
+
+
     <select id="selectToursForPlace" resultType="com.travel.travelapi.models.Tour">
         SELECT td.fk_tourId as tourId, ptd.fk_tourDayId
         FROM PLACE_TOUR_DAY ptd

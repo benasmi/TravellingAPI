@@ -36,6 +36,8 @@ interface RecommendationService {
                                        @Param("location") location: String,
                                        @Param("latLng") latLng: List<String>,
                                        @Param("range") range: Double): List<Recommendation>
+
+    fun findRecsRelatedWithPlaceIds(@Param("ids") ids: List<Int>): List<Int>
     /**
      * Returns a list of places, that have id's for a recommendation with a given ID
      */

@@ -58,13 +58,13 @@ class RecommendationController(
             val places = arrayListOf<CollectionObjectPlace>()
             for (placeId in placeIds)
                 places.add(CollectionObjectPlace.createFromPlaceInstance(placeController.getPlaceById(false, placeId)))
-            recommendation.objects = places
+            recommendation.objects = places.toMutableList()
         } else if (recommendation.type == RecommendationType.TOUR.id) {
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
             val tours = arrayListOf<CollectionObjectTour>()
             for (tour in tourIds)
                 tours.add(CollectionObjectTour.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
-            recommendation.objects = tours
+            recommendation.objects = tours.toMutableList()
         }
     }
 

@@ -35,6 +35,17 @@
         WHERE ptd.fk_placeId=#{placeId}
     </select>
 
+    <select id="findToursRelatedWithPlaceIds" resultType="int">
+        SELECT DISTINCT tourId FROM TOUR t
+        INNER JOIN TOUR_DAY td on t.tourId = td.fk_tourId
+        INNER JOIN PLACE_TOUR_DAY ptd on td.tourDayId = ptd.fk_tourDayId
+        WHERE ptd.fk_placeId
+        IN
+        <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>
+            #{item}
+        </foreach>
+    </select>
+
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.Tour">
         <if test="keyword!= ''">

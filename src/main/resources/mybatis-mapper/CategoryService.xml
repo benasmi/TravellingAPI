@@ -19,4 +19,17 @@
         UPDATE CATEGORY SET name=#{c.name} WHERE categoryId=#{c.categoryId}
     </update>
 
+    <select id="allUniqueCategories" resultType="com.travel.travelapi.models.Category">
+        SELECT * FROM (
+            SELECT c.name, c.categoryId, COUNT(c.name) as c FROM CATEGORY c
+            INNER JOIN CATEGORY_PLACE cp on c.categoryId = cp.fk_categoryId
+            INNER JOIN PLACE p on cp.fk_placeId = p.placeId
+            GROUP by c.name
+            UNION
+            SELECT cc.name, cc.categoryId, COUNT(cc.name) as c FROM CATEGORY cc
+            INNER JOIN CATEGORY_TOUR ct on cc.categoryId = ct.fk_categoryId
+            INNER JOIN TOUR t on ct.fk_tourId  = t.tourId
+            GROUP by cc.name) as t
+        ORDER BY t.c DESC
+    </select>
 </mapper>

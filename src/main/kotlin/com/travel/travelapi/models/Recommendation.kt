@@ -12,22 +12,22 @@ import kotlin.random.Random
         JsonSubTypes.Type(value = SuggestionByCategory::class, name = "suggestion_category"),
         JsonSubTypes.Type(value = MiscellaneousCollection::class, name = "other"))
 abstract class ObjectCollection(
-    var name: String? = null,
-    var subtitle: String? = null,
-    var objects: Collection<CollectionObject>? = null,
-    var id: Int? = null
+        var name: String? = null,
+        var subtitle: String? = null,
+        var objects: MutableList<CollectionObject>? = null,
+        var id: Int? = null
 )
 
 class SuggestionByCategory(
         val category: Category? = null,
-        objects: Collection<CollectionObject>? = null
+        objects: MutableList<CollectionObject>? = null
 ): ObjectCollection(name=category!!.name, subtitle="", objects=objects, id=category.categoryId)
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 class Recommendation(
         name: String? = null,
         subtitle: String? = null,
-        objects: Collection<CollectionObject>? = null,
+        objects: MutableList<CollectionObject>? = null,
         var description: String? = null,
         var user: Int? = null,
         var type: Int? = null,
@@ -37,7 +37,7 @@ class Recommendation(
 class MiscellaneousCollection(
         name: String? = null,
         subtitle: String? = null,
-        objects: Collection<CollectionObject>? = null,
+        objects: MutableList<CollectionObject>? = null,
         id: Int? = Random.nextInt(1000,1000000)
 ): ObjectCollection(name, subtitle, objects, id){}
 

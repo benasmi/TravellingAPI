@@ -29,4 +29,6 @@ interface TourService {
     fun changePublicityStatus(@Param("tourId") tourId: Int, @Param("public") public: Boolean)
 
     fun findToursRelatedWithPlace(@Param("placeId") placeId: Int): ArrayList<Int>
+
+    fun findToursRelatedWithPlaceIds(@Param("ids") ids: List<Int>): ArrayList<Int>
 }

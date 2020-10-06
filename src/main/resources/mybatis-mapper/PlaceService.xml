@@ -13,7 +13,7 @@
     </select>
 
     <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
-        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE ${locationType}=#{location} AND isVerified = true AND isPublic =true
+        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE ${locationType}=#{location} AND isVerified = true AND isPublic = true
     </select>
 
     <select id="search" resultType="com.travel.travelapi.models.PlaceLocal">
@@ -85,6 +85,7 @@
                 AND isPublic=1
             </if>
         </foreach>
+
         <if test="filterCategories.size() != 0">
             AND placeId IN (SELECT cp.fk_placeId FROM CATEGORY c INNER JOIN CATEGORY_PLACE cp ON c.categoryId =
             cp.fk_categoryId

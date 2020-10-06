@@ -19,6 +19,15 @@
         </if>
     </select>
 
+    <select id="findRecsRelatedWithPlaceIds" resultType="int">
+        SELECT DISTINCT r.id FROM RECOMMENDATION r
+        INNER JOIN PLACE_RECOMMENDATION pr on r.id = pr.fk_recommendationId
+        WHERE pr.fk_placeId IN
+        <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>
+            #{item}
+        </foreach>
+    </select>
+
     <select id="matchRecommendationsByLocation" resultType="com.travel.travelapi.models.Recommendation">
         <if test="latLng.size()!=0">
             SELECT DISTINCT r.* FROM PLACE_RECOMMENDATION pr
