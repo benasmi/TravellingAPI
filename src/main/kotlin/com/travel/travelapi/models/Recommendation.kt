@@ -1,8 +1,11 @@
 package com.travel.travelapi.models
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.google.api.client.util.DateTime
+import java.util.*
 import kotlin.random.Random
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -39,7 +42,16 @@ class MiscellaneousCollection(
         subtitle: String? = null,
         objects: MutableList<CollectionObject>? = null,
         id: Int? = Random.nextInt(1000,1000000)
-): ObjectCollection(name, subtitle, objects, id){}
+): ObjectCollection(name, subtitle, objects, id)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+class TripPlan(
+        name: String? = null,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+        val dateModified: Date? = null,
+        objects: MutableList<CollectionObject>? = null,
+        id: Int? = null
+): ObjectCollection(name, null, objects, id)
 
 enum class RecommendationType(val id: Int){
     PLACE(1),

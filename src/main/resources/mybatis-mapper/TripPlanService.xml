@@ -1,0 +1,54 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.travel.travelapi.services.TripPlanService">
+
+    <insert id="createTripPlan">
+        INSERT INTO `TRIP_PLAN`(`name`, `fk_userId`) VALUES (#{name}, #{userId})
+    </insert>
+
+    <insert id="removeTripPlan">
+        DELETE FROM TRIP_PLAN WHERE id=#{tripPlanId} AND fk_userId=#{userId}
+    </insert>
+
+    <select id="selectTripPlans" resultType="com.travel.travelapi.models.TripPlan">
+        SELECT * FROM TRIP_PLAN WHERE fk_userId = #{userId}
+    </select>
+
+    <select resultType="long" id="getTripPlanOwner">
+        SELECT fk_userId FROM TRIP_PLAN WHERE id=#{tripPlanId}
+    </select>
+
+    <insert id="addTour">
+        INSERT INTO `TOUR_TRIP_PLAN`(`fk_tourId`, `dateAdded`, `fk_tripPlanId`) VALUES (#{tourId}, NOW(), #{tripPlanId})
+    </insert>
+
+    <insert id="addPlace">
+        INSERT INTO `PLACE_TRIP_PLAN`(`fk_placeId`, `dateAdded`, `fk_tripPlanId`) VALUES (#{placeId}, NOW(), #{tripPlanId})
+    </insert>
+
+    <delete id="deleteTour">
+        DELETE FROM TOUR_TRIP_PLAN WHERE fk_tourId = #{tourId} AND fk_tripPlanId = #{tripPlanId}
+    </delete>
+
+    <delete id="deletePlace">
+        DELETE FROM PLACE_TRIP_PLAN WHERE fk_placeId = #{placeId} AND fk_tripPlanId = #{tripPlanId}
+    </delete>
+
+    <select id="tourExistsInTripPlan" resultType="boolean">
+        SELECT EXISTS(SELECT * FROM TOUR_TRIP_PLAN WHERE fk_tripPlanId = #{tripPlanId} AND fk_tourId = #{tourId})
+    </select>
+
+    <select id="placeExistsInTripPlan" resultType="boolean">
+        SELECT EXISTS(SELECT * FROM PLACE_TRIP_PLAN WHERE fk_tripPlanId = #{tripPlanId} AND fk_placeId = #{placeId})
+    </select>
+
+    <select id="toursForTripPlan" resultType="com.travel.travelapi.models.CollectionObjectTour">
+        SELECT fk_tourId as id FROM TOUR_TRIP_PLAN WHERE fk_tripPlanId=#{tripPlanId}
+    </select>
+
+    <select id="placesForTripPlan" resultType="com.travel.travelapi.models.CollectionObjectPlace">
+        SELECT fk_placeId as id FROM PLACE_TRIP_PLAN WHERE fk_tripPlanId=#{tripPlanId}
+    </select>
+
+</mapper>
