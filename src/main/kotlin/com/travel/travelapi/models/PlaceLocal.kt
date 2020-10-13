@@ -22,7 +22,8 @@ class PlaceLocal(val placeId: Int? = null,
                  overallStarRating: Double? = null,
                  price: String? = null,
                  county: String? = null,
-                 municipality: String? = null): Place(name, description, hasSchedule, latitude, longitude, address
+                 municipality: String? = null,
+                 var bookInAdvance: Boolean? = null): Place(name, description, hasSchedule, latitude, longitude, address
         ,country, city, county, municipality, phoneNumber, website, overallStarRating, price)
 
 
