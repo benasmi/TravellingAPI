@@ -20,4 +20,5 @@ interface TripPlanService {
     fun toursForTripPlan(@Param("tripPlanId") tripPlanId: Int): Page<CollectionObjectTour>
     fun placesForTripPlan(@Param("tripPlanId") tripPlanId: Int): Page<CollectionObjectPlace>
     fun selectTripPlans(@Param("userId") userId: Long): Page<TripPlan>
+    fun selectPhotosForTripPlan(@Param("tripPlanId") tripPlanId: Int): List<Photo>
 }

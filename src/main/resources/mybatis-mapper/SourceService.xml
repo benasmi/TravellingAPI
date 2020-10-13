@@ -5,12 +5,11 @@
 
 
     <select id="selectAll"  resultType="com.travel.travelapi.models.Source">
-        SELECT * FROM SOURCE
+        SELECT * FROM SOURCE ORDER BY sourceId DESC
     </select>
 
     <insert id="insertSource" useGeneratedKeys = "true" keyProperty = "sourceId" keyColumn = "sourceId">
         INSERT INTO SOURCE (name,url) VALUES (#{s.name}, #{s.url})
     </insert>
-
 
 </mapper>
