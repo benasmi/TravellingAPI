@@ -12,10 +12,9 @@ class PasswordConstraintValidator : ConstraintValidator<ValidPassword?, String?>
     override fun isValid(password: String?, context: ConstraintValidatorContext): Boolean {
         val validator = PasswordValidator(Arrays.asList( // at least 8 characters
                 LengthRule(8, 30),  // at least one upper-case character
-                CharacterRule(EnglishCharacterData.UpperCase, 1),  // at least one lower-case character
-                CharacterRule(EnglishCharacterData.LowerCase, 1),  // at least one digit character
-                CharacterRule(EnglishCharacterData.Digit, 1),  // at least one symbol (special character)
-//                CharacterRule(EnglishCharacterData.Special, 1),  // no whitespace
+                CharacterRule(EnglishCharacterData.UpperCase, 1),  
+                CharacterRule(EnglishCharacterData.LowerCase, 1),
+                CharacterRule(EnglishCharacterData.Digit, 1),
                 WhitespaceRule()
         ))
         val result: RuleResult = validator.validate(PasswordData(password))

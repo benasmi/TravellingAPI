@@ -39,8 +39,8 @@ class TourDayController(@Autowired private val tourDayService: TourDayService,
             }
             val avgTimeSpent = tourDayService.sumPlacesAverageTimeSpent(it.tourDayId)
             it.averageTimeSpentDuration = avgTimeSpent
-
             it.totalDuration = avgTimeSpent + transportInfo.duration!!
+            it.totalObjects = tourDayService.getDayObjectsCount(it.tourDayId)
         }
         return days
     }

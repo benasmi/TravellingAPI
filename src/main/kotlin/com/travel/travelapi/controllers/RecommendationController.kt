@@ -62,8 +62,10 @@ class RecommendationController(
         } else if (recommendation.type == RecommendationType.TOUR.id) {
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
             val tours = arrayListOf<CollectionObjectTour>()
-            for (tour in tourIds)
-                tours.add(CollectionObjectTour.createFromTourInstance(tourController.tourOverviewById(tour.tourId!!)))
+            for (tour in tourIds){
+                val overview = tourController.tourOverviewById(tour.tourId!!)
+                tours.add(CollectionObjectTour.createFromTourInstance(overview))
+            }
             recommendation.objects = tours.toMutableList()
         }
     }

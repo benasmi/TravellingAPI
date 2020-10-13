@@ -27,6 +27,7 @@ data class TourDay(val description: String? = null,
                    var totalDuration: Int? = null,
                    var travellingDuration: Int? = null,
                    var averageTimeSpentDuration: Int? = null,
+                   var totalObjects: Int? = null,
                    var data: ArrayList<TourDayInfo>? = null)
 
 data class TourDayInfo(var place: PlaceLocal? = null,

@@ -8,6 +8,8 @@
         SELECT * FROM PLACE_TOUR_DAY WHERE fk_tourDayId=#{tourDayId}
     </select>
 
+
+
     <select id="getTourDaysDetails"  resultType="com.travel.travelapi.models.TourDay">
         SELECT description, tourDayId, day FROM TOUR_DAY WHERE fk_tourId=#{id}
     </select>
@@ -30,6 +32,10 @@
     <select id="sumPlacesAverageTimeSpent" resultType="int">
         SELECT SUM(p.averageTimeSpent) as totalTime FROM PLACE p
         WHERE p.placeId IN (SELECT ptd.fk_placeId FROM PLACE_TOUR_DAY ptd WHERE ptd.fk_tourDayId = #{tourDayId} )
+    </select>
+
+    <select id="getDayObjectsCount" resultType="int">
+        SELECT COUNT(*) as c FROM PLACE_TOUR_DAY ptd where ptd.fk_tourDayId = #{tourDayId}
     </select>
 
     <select id="dayTotalDistanceAndTime" resultType="com.travel.travelapi.models.TransportFrom">

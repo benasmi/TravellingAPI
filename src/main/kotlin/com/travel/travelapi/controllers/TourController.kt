@@ -66,6 +66,7 @@ class TourController(@Autowired private val tourService: TourService,
     fun tourOverviewById(tourId: Int): Tour{
         //Getting tour by ID
         val tour: Tour = tourService.getTourById(tourId)
+        val tourDays = tourDayController.getTourDaysDetails(tourId)
 
         //Creating a new tour object, with limited amount of information
         val tourTrimmed = Tour(
@@ -73,9 +74,9 @@ class TourController(@Autowired private val tourService: TourService,
                 name=tour.name,
                 description=tour.description,
                 userId=tour.userId,
-                totalObjects = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf<Any>() ).count() }.sumBy { it } ,
-                totalDays= (tour.days ?: arrayListOf<Any>()).count(),
-                totalDistance = (tour.days ?: arrayListOf()).map { ( it.data ?: arrayListOf() ).sumBy { place -> place.transport?.distance ?: 0 }}.sum().toDouble()
+                totalObjects = tourDays.sumBy { it.totalObjects!! },
+                totalDays= tourDays.size,
+                totalDistance = tourDays.sumBy { it.totalDistance!! }.toDouble()
         )
         //Selecting all photos of all tour places
         val photos = tourService.photosForTour(tourId)
