@@ -51,7 +51,6 @@ class ExplorePageController(
             @RequestParam(required = false) locationType: String?,
             @RequestParam(required = false) latitude: Float?,
             @RequestParam(required = false) longitude: Float?
-
             ): PageInfoCollectionObject {
 
         PageHelper.startPage<CollectionObject>(p, s)
