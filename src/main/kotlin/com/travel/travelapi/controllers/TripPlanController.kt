@@ -46,11 +46,13 @@ class TripPlanController(
     }
 
     @RequestMapping("/create")
-    fun createTripPlan(@RequestBody name: String){
+    fun createTripPlan(@RequestBody name: String): Int{
         //Getting the authenticated user
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
         //Creating a trip plan
-        tripPlanService.createTripPlan(name, principal.id!!)
+        val tripPlan = TripPlan(name=name)
+        tripPlanService.createTripPlan(tripPlan, principal.id!!)
+        return tripPlan.id!!
     }
 
     @RequestMapping("/remove")

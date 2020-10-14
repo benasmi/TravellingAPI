@@ -52,7 +52,9 @@ class TripPlan(
         val dateModified: Date? = null,
         objects: MutableList<CollectionObject>? = null,
         id: Int? = null,
-        var photo: Photo? = null
+        var photo: Photo? = null,
+        var numPlaces: Int? = null,
+        var numTours: Int? = null
         ): ObjectCollection(name, null, objects, id)
 
 enum class RecommendationType(val id: Int){
