@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TripPlanService {
 
-    fun createTripPlan(@Param("name") name: String, @Param("userId") userId: Long)
+    fun createTripPlan(@Param("name") name: String, @Param("userId") userId: Long): Int
     fun removeTripPlan(@Param("tripPlanId") tripPlanId: Int, @Param("userId") userId: Long)
     fun addTour(@Param("tripPlanId") tripPlanId: Int, @Param("tourId") tourId: Int)
     fun deleteTour(@Param("tripPlanId") tripPlanId: Int, @Param("tourId") tourId: Int)
@@ -20,4 +20,6 @@ interface TripPlanService {
     fun toursForTripPlan(@Param("tripPlanId") tripPlanId: Int): Page<CollectionObjectTour>
     fun placesForTripPlan(@Param("tripPlanId") tripPlanId: Int): Page<CollectionObjectPlace>
     fun selectTripPlans(@Param("userId") userId: Long): Page<TripPlan>
+    fun selectPhotosForTripPlan(@Param("tripPlanId") tripPlanId: Int): List<Photo>
+    fun photoForTripPlan(@Param("tripPlanId") tripPlanId: Int): Photo?
 }

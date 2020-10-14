@@ -26,7 +26,8 @@ class ExplorePageController(
         @Autowired private val tourService: TourService,
         @Autowired private val recommendationService: RecommendationService,
         @Autowired private val categoryPlaceService: CategoryPlaceService,
-        @Autowired private val dataCollectionController: DataCollectionController
+        @Autowired private val dataCollectionController: DataCollectionController,
+        @Autowired private val workingScheduleController: WorkingScheduleController
 ) {
 
     @PostMapping("/update")
@@ -222,7 +223,9 @@ class ExplorePageController(
         placesFound.forEach {
             val categoryToAdd = selectCategoryToAdd(hashMap, it.categories!!)
             if(categoryToAdd != ""){
-                hashMap[categoryToAdd]?.objects!!.add(CollectionObjectPlace.createFromPlaceInstance(it))
+                val place = CollectionObjectPlace.createFromPlaceInstance(it)
+                place.scheduleState = workingScheduleController.interpretScheduleState(place.id!!)
+                hashMap[categoryToAdd]?.objects!!.add(place)
             }
         }
 

@@ -17,7 +17,8 @@ import java.sql.SQLException
 class RecommendationController(
         @Autowired private val recommendationService: RecommendationService,
         @Autowired private val placeController: PlaceController,
-        @Autowired private val tourController: TourController
+        @Autowired private val tourController: TourController,
+        @Autowired private val workingScheduleController: WorkingScheduleController
 ) {
 
     @PostMapping("/create")
@@ -56,8 +57,11 @@ class RecommendationController(
         if (recommendation.type == RecommendationType.PLACE.id) {
             val placeIds = recommendationService.selectPlacesForRecommendation(recommendation.id!!)
             val places = arrayListOf<CollectionObjectPlace>()
-            for (placeId in placeIds)
-                places.add(CollectionObjectPlace.createFromPlaceInstance(placeController.getPlaceById(false, placeId)))
+            for (placeId in placeIds){
+                val collectionObjectPlace = CollectionObjectPlace.createFromPlaceInstance(placeController.getPlaceById(false, placeId))
+                collectionObjectPlace.scheduleState = workingScheduleController.interpretScheduleState(placeId)
+                places.add(collectionObjectPlace)
+            }
             recommendation.objects = places.toMutableList()
         } else if (recommendation.type == RecommendationType.TOUR.id) {
             val tourIds = recommendationService.selectToursForRecommendation(recommendation.id!!)
