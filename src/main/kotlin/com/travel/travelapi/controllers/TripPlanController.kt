@@ -35,7 +35,6 @@ class TripPlanController(
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
 
         PageHelper.startPage<TripPlan>(p, s)
-
         val tripPlans = tripPlanService.selectTripPlans(principal.id!!)
 
         return PageInfo(tripPlans)
