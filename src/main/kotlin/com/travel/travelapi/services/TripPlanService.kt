@@ -8,7 +8,8 @@ import org.springframework.stereotype.Repository
 @Repository
 interface TripPlanService {
 
-    fun createTripPlan(@Param("name") name: String, @Param("userId") userId: Long): Int
+
+    fun createTripPlan(@Param("tripPlan") tripPlan: TripPlan, @Param("userId") userId: Long)
     fun removeTripPlan(@Param("tripPlanId") tripPlanId: Int, @Param("userId") userId: Long)
     fun addTour(@Param("tripPlanId") tripPlanId: Int, @Param("tourId") tourId: Int)
     fun deleteTour(@Param("tripPlanId") tripPlanId: Int, @Param("tourId") tourId: Int)
