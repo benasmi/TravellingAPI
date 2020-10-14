@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.google.api.client.util.DateTime
+import com.travel.travelapi.controllers.WorkingScheduleController
 import java.util.*
 import kotlin.random.Random
 
@@ -83,7 +84,8 @@ class CollectionObjectPlace(
         var country: String? = null,
         var county: String? = null,
         var municipality: String? = null,
-        var price: String? = null
+        var price: String? = null,
+        var scheduleState: WorkingScheduleController.ScheduleState? = null
 ): CollectionObject(name, description, id, photos){
 
     fun setData(place: PlaceLocal){

@@ -14,6 +14,7 @@ import java.io.Console
 import java.sql.SQLException
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -40,6 +41,37 @@ class WorkingScheduleController(@Autowired private val workingScheduleService: W
                 && user.hasAuthority("workingschedule:modify")){
             return
         }else throw UnauthorizedException("User does not have permission to modify schedule for this place") //Denying access to user
+    }
+
+    enum class ScheduleState(val message: String, val type: Int) {
+        OPEN("Open", 0),
+        CLOSED ("Closed", 1),
+        CLOSING_SOON ("Closing soon", 2),
+        OPENS_SOON ("Opens soon", 3),
+    }
+
+    fun interpretScheduleState(placeId: Int): ScheduleState?{
+        //TODO: support time zones
+        val schedule = getRelevantSchedule(placeId) ?: return null
+        val calendar = Calendar.getInstance();
+        val weekdayIndex: Int
+        weekdayIndex = when(calendar.get(Calendar.DAY_OF_WEEK)){
+            Calendar.MONDAY -> 0
+            Calendar.TUESDAY -> 1
+            Calendar.WEDNESDAY -> 2
+            Calendar.THURSDAY -> 3
+            Calendar.FRIDAY -> 4
+            Calendar.SATURDAY -> 5
+            Calendar.SUNDAY -> 6
+            else -> -1
+        }
+        val currentPeriod = schedule.periods?.firstOrNull { it.openDay == weekdayIndex && LocalTime.parse(it.openTime, DateTimeFormatter.ofPattern("HH:mm")) <= LocalTime.now().plusHours(1) && LocalTime.now() <= LocalTime.parse(it.closeTime, DateTimeFormatter.ofPattern("HH:mm"))}
+                ?: return ScheduleState.CLOSED
+        if(LocalTime.parse(currentPeriod.openTime, DateTimeFormatter.ofPattern("HH:mm")) >= LocalTime.now())
+            return ScheduleState.OPENS_SOON
+        else if(LocalTime.now().plusHours(1) >= LocalTime.parse(currentPeriod.closeTime, DateTimeFormatter.ofPattern("HH:mm")))
+            return ScheduleState.CLOSING_SOON
+        else return ScheduleState.OPEN
     }
 
     /**

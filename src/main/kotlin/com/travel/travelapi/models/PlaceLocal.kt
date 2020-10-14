@@ -1,5 +1,7 @@
 package com.travel.travelapi.models
 
+import com.travel.travelapi.controllers.WorkingScheduleController
+
 
 class PlaceLocal(val placeId: Int? = null,
                  var totalReviews: Int? = null,
