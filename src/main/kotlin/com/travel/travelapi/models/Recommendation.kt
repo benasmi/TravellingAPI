@@ -50,8 +50,9 @@ class TripPlan(
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
         val dateModified: Date? = null,
         objects: MutableList<CollectionObject>? = null,
-        id: Int? = null
-): ObjectCollection(name, null, objects, id)
+        id: Int? = null,
+        var photo: Photo? = null
+        ): ObjectCollection(name, null, objects, id)
 
 enum class RecommendationType(val id: Int){
     PLACE(1),

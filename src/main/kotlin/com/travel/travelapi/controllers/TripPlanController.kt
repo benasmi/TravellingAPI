@@ -5,10 +5,7 @@ import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.ObjectExistsInTripPlanException
 import com.travel.travelapi.exceptions.UnauthorizedException
-import com.travel.travelapi.models.CollectionObject
-import com.travel.travelapi.models.ObjectCollection
-import com.travel.travelapi.models.Tour
-import com.travel.travelapi.models.TripPlan
+import com.travel.travelapi.models.*
 import com.travel.travelapi.services.TourService
 import com.travel.travelapi.services.TripPlanService
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,6 +34,13 @@ class TripPlanController(
         PageHelper.startPage<TripPlan>(p, s)
 
         val tripPlans = tripPlanService.selectTripPlans(principal.id!!)
+
+        tripPlans.forEach{
+            var photo = tripPlanService.photoForTripPlan(it.id!!)
+            if (photo == null)
+                photo = Photo(2544, "https://www.traveldirection.ax.lt:8080/api/v1/photo/view?photoreference=d2b281f8-d0ae-46d7-9a96-616286f9f720_14Oct2020070758GMT_1602659278117.jpg")
+            it.photo = photo
+        }
 
         return PageInfo(tripPlans)
     }
