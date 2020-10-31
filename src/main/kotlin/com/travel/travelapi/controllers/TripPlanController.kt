@@ -44,18 +44,18 @@ class TripPlanController(
         return PageInfo(tripPlans)
     }
 
-    @RequestMapping("/create")
-    fun createTripPlan(@RequestBody name: String): Int{
+    @PostMapping("/create")
+    fun createTripPlan(@RequestBody name: String): TripPlan{
         //Getting the authenticated user
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
         //Creating a trip plan
         val tripPlan = TripPlan(name=name)
         tripPlanService.createTripPlan(tripPlan, principal.id!!)
-        return tripPlan.id!!
+        return tripPlan
     }
 
-    @RequestMapping("/remove")
-    fun createTripPlan(@RequestBody id: Int){
+    @GetMapping("/remove")
+    fun remove(@RequestParam id: Int){
         //Getting the authenticated user
         val principal = SecurityContextHolder.getContext().authentication.principal as TravelUserDetails
         //Removing the trip plan
@@ -174,7 +174,7 @@ class TripPlanController(
 
     @GetMapping("/viewPlaces")
     fun viewPlaces(
-            @RequestParam("tripPlanId") tripPlanId: Int,
+            @RequestParam(name="tripPlanId") tripPlanId: Int,
             @RequestParam(required = false, defaultValue = "1") p: Int,
             @RequestParam(required = false, defaultValue = "10") s: Int
     ): ExplorePageController.PageInfoCollectionObject{

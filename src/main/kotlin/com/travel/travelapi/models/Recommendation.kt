@@ -52,9 +52,9 @@ class TripPlan(
         val dateModified: Date? = null,
         objects: MutableList<CollectionObject>? = null,
         id: Int? = null,
-        var photo: Photo? = null,
-        var numPlaces: Int? = null,
-        var numTours: Int? = null
+        var photo: Photo = Photo(2544, "https://www.traveldirection.ax.lt:8080/api/v1/photo/view?photoreference=d2b281f8-d0ae-46d7-9a96-616286f9f720_14Oct2020070758GMT_1602659278117.jpg"),
+        var numPlaces: Int = 0,
+        var numTours: Int = 0
         ): ObjectCollection(name, null, objects, id)
 
 enum class RecommendationType(val id: Int){
