@@ -25,14 +25,14 @@ interface PlaceService {
 
     fun selectAllAdmin(@Param("keyword") keyword: String = "",
                        @Param("filterOptions") filterOptions: List<String> = arrayListOf(),
-                       @Param("filterCategories") filterCategories: List<String>  = arrayListOf(),
-                       @Param("filterDateAdded") filterDateAdded: List<String>  = arrayListOf(),
-                       @Param("filterDateModified") filterDateModified: List<String>  = arrayListOf(),
+                       @Param("filterCategories") filterCategories: List<String> = arrayListOf(),
+                       @Param("filterDateAdded") filterDateAdded: List<String> = arrayListOf(),
+                       @Param("filterDateModified") filterDateModified: List<String> = arrayListOf(),
                        @Param("filterCountries") filterCountries: List<String> = arrayListOf(),
                        @Param("filterCities") filterCities: List<String> = arrayListOf(),
                        @Param("filterMunicipalities") filterMunicipalities: List<String> = arrayListOf(),
                        @Param("location") location: List<String> = arrayListOf(),
-                       @Param("range") range: Double = 0.toDouble()) : Page<PlaceLocal>
+                       @Param("range") range: Double = 0.toDouble()): Page<PlaceLocal>
 
     fun selectPlacesInRadius(@Param("latitude") latitude: Double,
                              @Param("longitude") longitude: Double,
@@ -41,7 +41,7 @@ interface PlaceService {
 
     fun searchClient(@Param("keyword") keyword: String): List<PlaceLocal>
 
-    fun matchPlacesByLocation(@Param("location") location: String, @Param("locationType") locationType: String): List<PlaceLocal>
+    fun matchPlacesByLocation(@Param("location") location: String, @Param("locationType") locationType: String, @Param("distanceMax") distanceMax: Double?, @Param("sourceLat") sourceLat: Double?, @Param("sourceLon") sourceLon: Double?): List<PlaceLocal>
 
     fun selectById(@Param("id") id: Int): PlaceLocal
     fun updatePlace(@Param("p") p: PlaceLocal)

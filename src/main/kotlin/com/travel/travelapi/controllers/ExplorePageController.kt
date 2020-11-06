@@ -180,6 +180,7 @@ class ExplorePageController(
     @PreAuthorize("hasAuthority('explore:location')")
     fun getByLocation1(@RequestBody(required = false) exploreLocationRequest: ExploreLocation,
                        @RequestParam(required = false, defaultValue = "") latLng: String,
+                       @RequestParam(required = false, defaultValue = "") radiusMax: Double?,
                        @RequestParam(required = false, defaultValue = "0") p: Int,
                        @RequestParam(required = false, defaultValue = "10") s: Int): LogicalPage{
         if (latLng.isEmpty() && !exploreLocationRequest.valid())
@@ -196,11 +197,16 @@ class ExplorePageController(
             hashMap[it.name!!] = SuggestionByCategory(it, objects = ArrayList())
         }
 
-        //Get places
-        val placesFound = if (latLng.isEmpty())
-            placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type)
-        else
+        val placesFound = if (latLng.isEmpty()){
+            if(radiusMax != null){
+                val averageCoords = explorePageService.averageCoordinatesForLocation(exploreLocationRequest.location, exploreLocationRequest.type)
+                placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type, radiusMax, averageCoords.lat, averageCoords.lon)
+            }else{
+                placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type, null, null, null)
+            }
+        }else{
             placeService.selectAllAdmin(location = latLng.split(','), range = 50.0)
+        }
 
         placesFound.forEach {
             it.categories = categoryPlaceService.selectByPlaceId(it.placeId!!)

@@ -108,4 +108,8 @@
         ORDER BY distance
     </select>
 
+    <select id="averageCoordinatesForLocation" resultType="com.travel.travelapi.models.LatLng">
+        SELECT AVG(latitude) as lat, AVG(longitude) as lon FROM PLACE WHERE ${locationType}=#{location};
+    </select>
+
 </mapper>
