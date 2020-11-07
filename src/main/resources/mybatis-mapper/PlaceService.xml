@@ -38,6 +38,10 @@
      AS distance FROM PLACE WHERE isPublic=1 AND isVerified=1 HAVING distance &lt; #{range} ORDER BY distance LIMIT #{limit}
     </select>
 
+    <select id="selectPlacesInBounds" resultType="com.travel.travelapi.models.PlaceLocal">
+     SELECT * FROM PLACE WHERE isPublic=1 AND isVerified=1 AND latitude &lt; #{maxLat} AND longitude &lt; #{maxLng} AND latitude > #{minLat} AND longitude > #{minLng} ORDER BY grade DESC LIMIT #{limit}
+    </select>
+
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
         <if test="location.size() != 0">
