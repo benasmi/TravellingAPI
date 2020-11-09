@@ -2,6 +2,8 @@ package com.travel.travelapi.services
 
 import com.github.pagehelper.Page
 import com.travel.travelapi.models.*
+import com.travel.travelapi.models.search.CategoryAbstractionInfo
+import com.travel.travelapi.models.search.SearchRequest
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
 
@@ -21,4 +23,14 @@ interface ExplorePageService {
     fun selectObjectsByCoordsAndCategory(@Param("latitude") latitude: Float, @Param("longitude") longitude: Float, @Param("categoryId") categoryId: Int, @Param("distance") distance: Float): List<CollectionObject>
 
     fun averageCoordinatesForLocation(@Param("location") location: String, @Param("locationType") locationType: String): LatLng
+
+    fun previewCategories(
+            @Param("request") searchPreviewRequest: SearchRequest,
+            @Param("centerCoords") centerCoords: LatLng?
+    ): List<CategoryAbstractionInfo>?
+
+    fun searchPlaces(
+            @Param("request") searchRequest: SearchRequest,
+            @Param("centerCoords") centerCoords: LatLng
+    ): List<PlaceLocal>
 }

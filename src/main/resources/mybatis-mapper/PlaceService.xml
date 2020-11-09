@@ -12,9 +12,12 @@
     </select>
 
     <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
-        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE ${locationType}=#{location} AND isVerified = true AND isPublic = true
+        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE isVerified = true AND isPublic = true
         <if test="distanceMax != null">
-            AND getDistance(${sourceLat}, ${sourceLon}, latitude, longitude) &lt; #{distanceMax}
+            AND getDistance(#{sourceLat}, #{sourceLon}, latitude, longitude) &lt; #{distanceMax}
+        </if>
+        <if test="distanceMax = null">
+            AND ${locationType}=#{location}
         </if>
     </select>
 
@@ -36,6 +39,10 @@
     <select id="selectPlacesInRadius" resultType="com.travel.travelapi.models.PlaceLocal">
      SELECT *, ( 6371 * acos( cos( radians(#{latitude}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{longitude}) ) + sin( radians(#{latitude}) ) * sin(radians(latitude)) ) )
      AS distance FROM PLACE WHERE isPublic=1 AND isVerified=1 HAVING distance &lt; #{range} ORDER BY distance LIMIT #{limit}
+    </select>
+
+    <select id="selectPlacesInBounds" resultType="com.travel.travelapi.models.PlaceLocal">
+     SELECT * FROM PLACE WHERE isPublic=1 AND isVerified=1 AND latitude &lt; #{maxLat} AND longitude &lt; #{maxLng} AND latitude > #{minLat} AND longitude > #{minLng} ORDER BY grade DESC LIMIT #{limit}
     </select>
 
 

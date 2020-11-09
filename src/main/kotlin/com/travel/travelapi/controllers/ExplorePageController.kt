@@ -2,15 +2,17 @@ package com.travel.travelapi.controllers
 
 import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
-import com.google.api.gax.rpc.InvalidArgumentException
 import com.travel.travelapi.exceptions.InvalidParamsException
 import com.travel.travelapi.models.*
+import com.travel.travelapi.models.search.CategoryAbstractionInfo
+import com.travel.travelapi.models.search.SearchPreview
+import com.travel.travelapi.models.search.SearchRequest
 import com.travel.travelapi.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
-import java.lang.Exception
 import java.util.HashMap
+import java.util.stream.Collectors
 
 
 @RestController
@@ -52,7 +54,7 @@ class ExplorePageController(
             @RequestParam(required = false) locationType: String?,
             @RequestParam(required = false) latitude: Float?,
             @RequestParam(required = false) longitude: Float?
-            ): PageInfoCollectionObject {
+    ): PageInfoCollectionObject {
 
         PageHelper.startPage<CollectionObject>(p, s)
 
@@ -121,10 +123,10 @@ class ExplorePageController(
     }
 
 
-    fun getToursAssociatedWithPlacesIdx(ids: List<Int>): ArrayList<Tour>{
+    fun getToursAssociatedWithPlacesIdx(ids: List<Int>): ArrayList<Tour> {
         val tourIdx = tourService.findToursRelatedWithPlaceIds(ids)
         val tours = ArrayList<Tour>()
-        tourIdx.forEach {
+        tourIdx.parallelStream().forEach {
             tours.add(tourController.tourOverviewById(it))
         }
         return tours
@@ -155,7 +157,7 @@ class ExplorePageController(
         }
     }
 
-    fun extendPlace(place: CollectionObject){
+    fun extendPlace(place: CollectionObject) {
         val photos = photoPlaceService.selectPhotosById(place.id!!)
         place.photos = if (photos.count() > 0) arrayListOf(photos[0]) else arrayListOf()
     }
@@ -174,18 +176,45 @@ class ExplorePageController(
         return places.map { CollectionObjectPlace.createFromPlaceInstance(it) }
     }
 
+    @GetMapping("/locationBounds")
+    @PreAuthorize("hasAuthority('explore:location')")
+    fun getNearbyBounds(
+            @RequestParam("minLat") minLat: Float,
+            @RequestParam("maxLat") maxLat: Float,
+            @RequestParam("minLng") minLng: Float,
+            @RequestParam("maxLng") maxLng: Float): List<CollectionObjectPlace> {
+        val places = placeService.selectPlacesInBounds(
+                minLat = minLat,
+                maxLat = maxLat,
+                minLng = minLng,
+                maxLng = maxLng,
+                limit = 10)
 
+        extendPlaces(places)
+        return places.map { CollectionObjectPlace.createFromPlaceInstance(it) }
+    }
+
+
+    @PostMapping("/searchPreview")
+    fun searchPreview(@RequestBody request: SearchRequest): SearchPreview {
+        if (!request.exploreLocation.valid())
+            throw InvalidParamsException("Explore location type is not valid")
+        val averageCoords = explorePageService.averageCoordinatesForLocation(request.exploreLocation.location, request.exploreLocation.type)
+        val categoryInfo = explorePageService.previewCategories(request, averageCoords)
+        return SearchPreview(explorePageService.searchPlaces(request, averageCoords).count(), categoryInfo)
+    }
 
     @PostMapping("/location")
     @PreAuthorize("hasAuthority('explore:location')")
-    fun getByLocation1(@RequestBody(required = false) exploreLocationRequest: ExploreLocation,
-                       @RequestParam(required = false, defaultValue = "") latLng: String,
-                       @RequestParam(required = false, defaultValue = "") radiusMax: Double?,
+    fun getByLocation1(@RequestParam(required = false, defaultValue = "") latLng: String,
                        @RequestParam(required = false, defaultValue = "0") p: Int,
-                       @RequestParam(required = false, defaultValue = "10") s: Int): LogicalPage{
-        if (latLng.isEmpty() && !exploreLocationRequest.valid())
+                       @RequestParam(required = false, defaultValue = "10") s: Int,
+                       @RequestBody searchRequest: SearchRequest?
+    ): LogicalPage {
+
+        if (latLng.isEmpty() && !searchRequest!!.exploreLocation.valid())
             throw InvalidParamsException("Type specified is invalid")
-        if (latLng.isEmpty() && exploreLocationRequest.location == "")
+        if (latLng.isEmpty() && searchRequest!!.exploreLocation.location == "")
             throw InvalidParamsException("No location specified")
 
         //Get unique categories
@@ -197,38 +226,34 @@ class ExplorePageController(
             hashMap[it.name!!] = SuggestionByCategory(it, objects = ArrayList())
         }
 
-        val placesFound = if (latLng.isEmpty()){
-            if(radiusMax != null){
-                val averageCoords = explorePageService.averageCoordinatesForLocation(exploreLocationRequest.location, exploreLocationRequest.type)
-                placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type, radiusMax, averageCoords.lat, averageCoords.lon)
-            }else{
-                placeService.matchPlacesByLocation(exploreLocationRequest.location, exploreLocationRequest.type, null, null, null)
-            }
-        }else{
+        val placesFound = if (latLng.isEmpty()) {
+            val averageCoords = explorePageService.averageCoordinatesForLocation(searchRequest!!.exploreLocation.location, searchRequest.exploreLocation.type)
+            explorePageService.searchPlaces(searchRequest, averageCoords)
+        } else {
             placeService.selectAllAdmin(location = latLng.split(','), range = 50.0)
         }
 
-        placesFound.forEach {
+        placesFound.parallelStream().forEach {
             it.categories = categoryPlaceService.selectByPlaceId(it.placeId!!)
         }
-        val ids = placesFound.map { it.placeId!! }
+        val ids = placesFound.parallelStream().map { it.placeId!! }.collect(Collectors.toList())
 
         //Match tours
-        val tours = if(ids.isNotEmpty()) getToursAssociatedWithPlacesIdx(ids = ids) else ArrayList()
+        val tours = if (ids.isNotEmpty()) getToursAssociatedWithPlacesIdx(ids = ids) else ArrayList()
 
         //Add tours to hashTable
-        tours.map { it ->
+        tours.parallelStream().map { it ->
             it.categories = tourService.getCategoriesForTour(it.tourId!!)
             val categoryToAdd = selectCategoryToAdd(hashMap, it.categories!!)
-            if(categoryToAdd != ""){
+            if (categoryToAdd != "") {
                 hashMap[categoryToAdd]?.objects!!.add(CollectionObjectTour.createFromTourInstance(it))
             }
-        }
+        }.collect(Collectors.toList())
 
         //Add places to hashTable
         placesFound.forEach {
             val categoryToAdd = selectCategoryToAdd(hashMap, it.categories!!)
-            if(categoryToAdd != ""){
+            if (categoryToAdd != "") {
                 val place = CollectionObjectPlace.createFromPlaceInstance(it)
                 place.scheduleState = workingScheduleController.interpretScheduleState(place.id!!)
                 hashMap[categoryToAdd]?.objects!!.add(place)
@@ -237,8 +262,8 @@ class ExplorePageController(
 
         //Matching recommendations
         val recommendationsFound = recommendationService.matchRecommendationsByLocation(
-                locationType = exploreLocationRequest.type,
-                location = exploreLocationRequest.location,
+                locationType = searchRequest!!.exploreLocation.type,
+                location = searchRequest.exploreLocation.location,
                 latLng = if (latLng.isNotEmpty()) latLng.split(',') else ArrayList(),
                 range = 50.0
         )
@@ -248,8 +273,8 @@ class ExplorePageController(
 
         val collections = LogicalPageList<ObjectCollection>()
         collections.addAll(recommendationsFound)
-        hashMap.forEach{
-            if(it.value.objects?.size!! > 0){
+        hashMap.forEach {
+            if (it.value.objects?.size!! > 0) {
                 collections.add(it.value)
             }
         }
@@ -258,7 +283,7 @@ class ExplorePageController(
         val requiredCollection = collections.getPage(p, s);
         requiredCollection.list.forEach {
             it.objects?.forEach {
-                if(it is CollectionObjectPlace){
+                if (it is CollectionObjectPlace) {
                     extendPlace(it)
                 }
             }
@@ -269,13 +294,13 @@ class ExplorePageController(
     }
 
 
-    private fun selectCategoryToAdd(hashMap: HashMap<String, ObjectCollection>, categories: List<Category>): String{
+    private fun selectCategoryToAdd(hashMap: HashMap<String, ObjectCollection>, categories: List<Category>): String {
         var count = Integer.MAX_VALUE
         var target = ""
-        if(categories.isNotEmpty()){
+        if (categories.isNotEmpty()) {
             categories.forEach {
                 val count1 = hashMap[it.name]?.objects?.size!!
-                if(count1<count && count1 < 5){
+                if (count1 < count && count1 < 5) {
                     target = it.name!!
                     count = count1
                 }
@@ -303,7 +328,7 @@ class ExplorePageController(
         //Mapping photos and other stuff to place object
         extendPlaces(placesNearby)
         //Returning nearby places in the form of ObjectCollection
-        return MiscellaneousCollection("Places nearby", null, placesNearby.map { CollectionObjectPlace.createFromPlaceInstance(it)}.toMutableList())
+        return MiscellaneousCollection("Places nearby", null, placesNearby.map { CollectionObjectPlace.createFromPlaceInstance(it) }.toMutableList())
     }
 
     @GetMapping("/relatedTours")

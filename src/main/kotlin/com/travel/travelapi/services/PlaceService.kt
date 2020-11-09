@@ -62,4 +62,6 @@ interface PlaceService {
     fun getAllMunicipalities(@Param("restrictions") restrictions: List<String>): ArrayList<String>
 
     fun getPlaceLocation(@Param("id") id: Int): Location
+
+    fun selectPlacesInBounds(@Param("minLat") minLat: Float,@Param("maxLat") maxLat: Float,@Param("minLng") minLng: Float,@Param("maxLng") maxLng: Float, @Param("limit") limit: Int): ArrayList<PlaceLocal>
 }
