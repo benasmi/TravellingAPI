@@ -7,6 +7,37 @@
         SELECT * FROM CATEGORY ORDER BY name ASC
     </select>
 
+    <resultMap id="selectAllAbstractionCategoriesMap" type="com.travel.travelapi.models.Category">
+        <result column="id" property="categoryId"/>
+    </resultMap>
+
+    <select  id="selectAllAbstractionCategories" resultMap="selectAllAbstractionCategoriesMap" resultType="com.travel.travelapi.models.Category">
+        SELECT * FROM CATEGORY_ABSTRACTION ORDER BY name ASC
+    </select>
+
+    <select  id="getCategoriesForAbstracted" resultType="com.travel.travelapi.models.Category">
+        SELECT * FROM CATEGORY c
+        INNER JOIN CATEGORY_ABSTRACTION_CATEGORY cac on  c.categoryId = cac.fk_categoryId
+        WHERE cac.fk_categoryAbstractionId = #{id} ORDER BY name ASC
+    </select>
+
+    <select id="getAbstractionCategoryLeftOver" resultType="com.travel.travelapi.models.Category">
+        SELECT c.name, c.categoryId
+        FROM CATEGORY c
+        LEFT JOIN CATEGORY_ABSTRACTION_CATEGORY cac ON cac.fk_categoryId = c.categoryId
+        WHERE cac.fk_categoryId IS NULL
+    </select>
+
+
+    <update  id="updateAbstractionCategory">
+        UPDATE CATEGORY_ABSTRACTION SET name=#{categoryAbstraction.name} WHERE id=#{categoryAbstraction.categoryId};
+        DELETE FROM CATEGORY_ABSTRACTION_CATEGORY WHERE fk_categoryAbstractionId=#{categoryAbstraction.categoryId};
+
+        <foreach item='item' index='index' collection='categoryAbstraction.mappedCategories'>
+            INSERT INTO CATEGORY_ABSTRACTION_CATEGORY (fk_categoryId, fk_categoryAbstractionId) VALUES (#{item.categoryId}, #{categoryAbstraction.categoryId});
+        </foreach>
+    </update>
+
     <insert id="insertCategory" useGeneratedKeys = "true" keyProperty = "categoryId" keyColumn = "categoryId">
         INSERT INTO CATEGORY (name) VALUES (#{c.name})
     </insert>

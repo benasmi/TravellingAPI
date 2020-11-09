@@ -1,5 +1,6 @@
 package com.travel.travelapi.controllers
 
+import com.travel.travelapi.models.AbstractionCategory
 import com.travel.travelapi.models.Category
 import com.travel.travelapi.services.CategoryService
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,6 +21,40 @@ class CategoryController(@Autowired private val categoryService: CategoryService
     @PreAuthorize("hasAuthority('category:read')")
     fun getAllCategories() : List<Category>{
         return categoryService.selectAllCategories()
+    }
+
+    /**
+     * @return all abstraction categories
+     */
+    @GetMapping("/all/abstracted")
+    @PreAuthorize("hasAuthority('category:read')")
+    fun getAllAbstractionCategories() : List<AbstractionCategory>{
+        val cats = categoryService.selectAllAbstractionCategories()
+        val abstractedCategories = ArrayList<AbstractionCategory>()
+        cats.forEach {
+            val mappedCategories = categoryService.getCategoriesForAbstracted(it.categoryId!!)
+            abstractedCategories.add(AbstractionCategory(it.name, it.categoryId, mappedCategories))
+        }
+        return abstractedCategories
+    }
+
+    /**
+     * @return all abstraction categories
+     */
+    @PostMapping("/update/abstracted")
+    @PreAuthorize("hasAuthority('category:write')")
+    fun updateAbstractionCategories(@RequestBody abstractionCategory: AbstractionCategory){
+        categoryService.updateAbstractionCategory(abstractionCategory)
+    }
+
+
+    /**
+     * @return all abstraction categories
+     */
+    @GetMapping("/abstracted/left")
+    @PreAuthorize("hasAuthority('category:write')")
+    fun getAbstractionsCatsLeftOvers() : List<Category>{
+        return categoryService.getAbstractionCategoryLeftOver()
     }
 
     /**
