@@ -18,7 +18,6 @@
     </select>
 
 
-
     <select id="selectToursForPlace" resultType="com.travel.travelapi.models.Tour">
         SELECT td.fk_tourId as tourId, ptd.fk_tourDayId
         FROM PLACE_TOUR_DAY ptd
@@ -86,8 +85,9 @@
 
     <select id="selectObjectsByCoordsAndCategory" resultMap="collectionObjectMap">
         SELECT T.id, T.type
-        FROM (SELECT place.placeId as id,
-                     'place'       as type, (6371 * acos(cos(radians(#{latitude})) * cos(radians(latitude)) *
+        FROM (SELECT place.placeId                                                     as id,
+                     'place'                                                           as type,
+                     (6371 * acos(cos(radians(#{latitude})) * cos(radians(latitude)) *
                                   cos(radians(longitude) - radians(#{longitude})) +
                                   sin(radians(#{latitude})) * sin(radians(latitude)))) as distance
               FROM PLACE place
@@ -109,7 +109,68 @@
     </select>
 
     <select id="averageCoordinatesForLocation" resultType="com.travel.travelapi.models.LatLng">
-        SELECT AVG(latitude) as lat, AVG(longitude) as lon FROM PLACE WHERE ${locationType}=#{location};
+        SELECT AVG(latitude) as lat, AVG(longitude) as lon
+        FROM PLACE
+        WHERE ${locationType} = #{location};
+    </select>
+
+    <select id="previewCategories" resultType="com.travel.travelapi.models.search.CategoryAbstractionInfo">
+        SELECT id as `categoryId`,
+        (SELECT COUNT(*)
+        FROM placesByAbstractions
+        WHERE categoryAbstractionId = id
+        AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
+        <if test="request.freePlacesOnly == true">
+            AND price = ''
+        </if>
+        AND placeId NOT IN (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
+        <foreach
+                collection="request.categoriesSelected" item="catSelected">
+            OR categoryAbstractionId = #{catSelected}
+        </foreach>
+        )
+        ) as numPlaces
+        FROM CATEGORY_ABSTRACTION WHERE 1 = 1
+        <foreach collection="request.categoriesSelected" item="catSelected">
+            AND id != #{catSelected}
+        </foreach>
+    </select>
+
+    <select id="searchPlaces" resultType="com.travel.travelapi.models.PlaceLocal">
+        SELECT name,
+        averageTimeSpent,
+        address,
+        country,
+        city,
+        county,
+        municipality,
+        price,
+        placeId,
+        description,
+        latitude,
+        longitude,
+        price
+        FROM PLACE
+        WHERE isVerified = true
+        AND isPublic = true
+          <if test="request.distance != null">
+              AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
+          </if>
+        <if test="request.distance == null">
+            AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
+        </if>
+        <if test="request.freePlacesOnly == true">
+            AND price = ''
+        </if>
+        AND placeId IN (SELECT placeId FROM placesByAbstractions
+        <if test="request.categoriesSelected.size() != 0">
+            WHERE 1 != 1
+            <foreach collection="request.categoriesSelected" item="cat">
+                OR categoryAbstractionId = #{cat}
+            </foreach>
+        </if>
+        )
+
     </select>
 
 </mapper>

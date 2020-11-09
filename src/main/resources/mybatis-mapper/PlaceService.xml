@@ -12,9 +12,12 @@
     </select>
 
     <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
-        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE ${locationType}=#{location} AND isVerified = true AND isPublic = true
+        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE isVerified = true AND isPublic = true
         <if test="distanceMax != null">
-            AND getDistance(${sourceLat}, ${sourceLon}, latitude, longitude) &lt; #{distanceMax}
+            AND getDistance(#{sourceLat}, #{sourceLon}, latitude, longitude) &lt; #{distanceMax}
+        </if>
+        <if test="distanceMax = null">
+            AND ${locationType}=#{location}
         </if>
     </select>
 
