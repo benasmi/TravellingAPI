@@ -10,4 +10,6 @@ interface TagService {
     fun insertTag(@Param("t") t: Tag)
     fun deleteTag(@Param("t") t: Tag)
     fun updateTag(@Param("t") t: Tag)
+    fun updateFeaturedTags(@Param("ids") ids: List<Tag>)
+
 }

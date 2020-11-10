@@ -18,4 +18,18 @@
     <update id="updateTag">
         UPDATE TAG SET name=#{t.name} WHERE tagId=#{t.tagId}
     </update>
+
+    <update id="updateFeaturedTags">
+        UPDATE TAG SET isFeatured = 0 WHERE tagId NOT IN
+        <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>
+            #{item.tagId}
+        </foreach>;
+
+        UPDATE TAG SET isFeatured = 1 WHERE tagId IN
+        <foreach item='item' index='index' collection='ids' open='(' separator=',' close=')'>
+            #{item.tagId}
+        </foreach>;
+
+    </update>
+
 </mapper>

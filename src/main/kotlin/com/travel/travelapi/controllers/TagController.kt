@@ -38,7 +38,7 @@ class TagController(@Autowired private val tagService: TagService) {
     }
 
     /**
-     * Delete tags
+     * Update tags
      */
     @PostMapping("/update")
     @PreAuthorize("hasAuthority('tag:write')")
@@ -46,6 +46,17 @@ class TagController(@Autowired private val tagService: TagService) {
         for(c: Tag in tags)
             tagService.updateTag(c)
     }
+
+    /**
+     * Update tags
+     */
+    @PostMapping("/featured/update")
+    @PreAuthorize("hasAuthority('tag:write')")
+    fun updateFeaturedTags(@RequestBody ids: List<Tag>){
+        tagService.updateFeaturedTags(ids)
+    }
+
+
 
     /**
      * Delete tags

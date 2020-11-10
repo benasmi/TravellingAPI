@@ -24,7 +24,7 @@ class CategoryController(@Autowired private val categoryService: CategoryService
     }
 
     /**
-     * @return all abstraction categories
+     * @return all abstraction categories with mapped categories
      */
     @GetMapping("/all/abstracted")
     @PreAuthorize("hasAuthority('category:read')")
@@ -37,6 +37,16 @@ class CategoryController(@Autowired private val categoryService: CategoryService
         }
         return abstractedCategories
     }
+
+    /**
+     * @return all abstraction categories
+     */
+    @GetMapping("/all/abstracted/client")
+    @PreAuthorize("hasAuthority('category:read')")
+    fun getAllAbstractedCategories() : List<Category>{
+        return categoryService.selectAllAbstractionCategories()
+    }
+
 
     /**
      * @return all abstraction categories

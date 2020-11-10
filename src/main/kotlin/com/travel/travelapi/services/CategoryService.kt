@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository
 interface CategoryService {
     fun selectAllCategories(): List<Category>
     fun getCategoriesForAbstracted(@Param("id") id: Int): List<Category>
+
     fun updateAbstractionCategory(@Param("categoryAbstraction") categoryAbstraction: AbstractionCategory)
     fun getAbstractionCategoryLeftOver(): List<Category>
     fun selectAllAbstractionCategories(): ArrayList<Category>
