@@ -7,6 +7,10 @@
         SELECT * FROM TAG ORDER BY name ASC
     </select>
 
+    <select id="selectAllFeaturedTags" resultType="com.travel.travelapi.models.Tag">
+        SELECT * FROM TAG WHERE isFeatured = 1 ORDER BY name ASC
+    </select>
+
     <insert id="insertTag" useGeneratedKeys = "true" keyProperty = "tagId" keyColumn = "tagId">
         INSERT INTO TAG (name) VALUES (#{t.name})
     </insert>

@@ -116,20 +116,20 @@
 
     <select id="previewCategories" resultType="com.travel.travelapi.models.search.CategoryAbstractionInfo">
         SELECT id as `categoryId`,
-        (SELECT COUNT(*)
-        FROM placesByAbstractions
-        WHERE categoryAbstractionId = id
-        AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
-        <if test="request.freePlacesOnly == true">
-            AND price = ''
-        </if>
-        AND placeId NOT IN (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
-        <foreach
-                collection="request.categoriesSelected" item="catSelected">
-            OR categoryAbstractionId = #{catSelected}
-        </foreach>
-        )
-        ) as numPlaces
+            ( SELECT COUNT(*) FROM placesByAbstractions WHERE categoryAbstractionId = categoryId
+                <if test="request.distance != null and request.exploreLocation.type != 'country'">
+                    AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
+                </if>
+                <if test="request.freePlacesOnly == true">
+                    AND price = ''
+                </if>
+                    AND placeId NOT IN
+                    (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
+                        <foreach collection="request.categoriesSelected" item="catSelected">
+                                OR categoryAbstractionId = #{catSelected}
+                        </foreach>
+                    )
+            ) as numPlaces
         FROM CATEGORY_ABSTRACTION WHERE 1 = 1
         <foreach collection="request.categoriesSelected" item="catSelected">
             AND id != #{catSelected}
@@ -153,10 +153,10 @@
         FROM PLACE
         WHERE isVerified = true
         AND isPublic = true
-          <if test="request.distance != null">
+          <if test="request.distance != null and request.exploreLocation.type != 'country'">
               AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
           </if>
-        <if test="request.distance == null">
+        <if test="request.distance == null or request.exploreLocation.type == 'country'">
             AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
         </if>
         <if test="request.freePlacesOnly == true">

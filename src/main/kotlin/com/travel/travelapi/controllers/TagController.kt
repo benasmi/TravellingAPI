@@ -24,6 +24,16 @@ class TagController(@Autowired private val tagService: TagService) {
     }
 
     /**
+     * Get all tags
+     */
+    @GetMapping("/featured/all")
+    @PreAuthorize("hasAuthority('tag:read')")
+    fun getAllTagsFeatured(): List<Tag>{
+        return tagService.selectAllFeaturedTags()
+    }
+
+
+    /**
      * Insert tags
      */
     @PostMapping("/insert")
