@@ -120,6 +120,10 @@
                 <if test="request.distance != null and request.exploreLocation.type != 'country'">
                     AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
                 </if>
+                <if test="request.distance == null || request.exploreLocation.type == 'country'">
+                    AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
+                </if>
+                AND isPublic = true AND isVerified = true
                 <if test="request.freePlacesOnly == true">
                     AND price = ''
                 </if>
@@ -130,7 +134,8 @@
                         </foreach>
                     )
             ) as numPlaces
-        FROM CATEGORY_ABSTRACTION WHERE 1 = 1
+        FROM CATEGORY_ABSTRACTION
+        WHERE 1 = 1
         <foreach collection="request.categoriesSelected" item="catSelected">
             AND id != #{catSelected}
         </foreach>
@@ -153,10 +158,10 @@
         FROM PLACE
         WHERE isVerified = true
         AND isPublic = true
-          <if test="request.distance != null and request.exploreLocation.type != 'country'">
+          <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
               AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
           </if>
-        <if test="request.distance == null or request.exploreLocation.type == 'country'">
+        <if test="request.distance == null || request.exploreLocation.type == 'country'">
             AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
         </if>
         <if test="request.freePlacesOnly == true">
