@@ -4,6 +4,7 @@ import com.github.pagehelper.Page
 import com.travel.travelapi.models.*
 import com.travel.travelapi.models.search.CategoryAbstractionInfo
 import com.travel.travelapi.models.search.SearchRequest
+import com.travel.travelapi.models.search.TagInfo
 import org.apache.ibatis.annotations.Param
 import org.springframework.stereotype.Repository
 
@@ -28,6 +29,11 @@ interface ExplorePageService {
             @Param("request") searchPreviewRequest: SearchRequest,
             @Param("centerCoords") centerCoords: LatLng?
     ): List<CategoryAbstractionInfo>?
+
+    fun previewTags(
+            @Param("request") searchPreviewRequest: SearchRequest,
+            @Param("centerCoords") centerCoords: LatLng?
+    ): List<TagInfo>?
 
     fun searchPlaces(
             @Param("request") searchRequest: SearchRequest,

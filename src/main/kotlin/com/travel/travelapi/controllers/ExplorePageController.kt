@@ -201,7 +201,9 @@ class ExplorePageController(
             throw InvalidParamsException("Explore location type is not valid")
         val averageCoords = explorePageService.averageCoordinatesForLocation(request.exploreLocation.location, request.exploreLocation.type)
         val categoryInfo = explorePageService.previewCategories(request, averageCoords)
-        return SearchPreview(explorePageService.searchPlaces(request, averageCoords).count(), categoryInfo)
+        val tagInfo = explorePageService.previewTags(request, averageCoords)
+        val placesCount = explorePageService.searchPlaces(request, averageCoords).count()
+        return SearchPreview(placesCount, categoryInfo, tagInfo)
     }
 
     @PostMapping("/location")

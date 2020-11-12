@@ -114,26 +114,75 @@
         WHERE ${locationType} = #{location};
     </select>
 
+    <select id="previewTags" resultType="com.travel.travelapi.models.search.TagInfo">
+        SELECT tagId,
+        (
+        SELECT COUNT(*) FROM PLACE p LEFT JOIN TAG_PLACE tp ON tp.fk_placeId = p.placeId
+        WHERE isPublic = true AND isVerified = true AND tp.fk_tagId = tagId
+        <if test="request.distance != null and request.exploreLocation.type != 'country'">
+            AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, p.latitude, p.longitude) &lt; #{request.distance}
+        </if>
+        <if test="request.freePlacesOnly == true">
+            AND price = ''
+        </if>
+        <if test="request.distance == null || request.exploreLocation.type == 'country'">
+            AND p.${request.exploreLocation.type} = #{request.exploreLocation.location}
+        </if>
+        AND p.placeId NOT IN(
+            SELECT placeId FROM PLACE p LEFT JOIN TAG_PLACE tpp
+                ON tpp.fk_placeId = p.placeId
+            WHERE 0
+             <foreach collection="request.tagsSelected" item="tag">
+                 OR tpp.fk_tagId = #{tag}
+             </foreach>
+        )
+        <if test="request.categoriesSelected.size() != 0">
+        AND p.placeId IN
+        (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
+        <foreach collection="request.categoriesSelected" item="catSelected">
+            OR categoryAbstractionId = #{catSelected}
+        </foreach>
+        )
+        </if>
+        ) as numPlaces
+        FROM TAG
+        WHERE isFeatured
+        <foreach collection="request.tagsSelected" item="tag">
+            AND tagId != #{tag}
+        </foreach>
+    </select>
+
     <select id="previewCategories" resultType="com.travel.travelapi.models.search.CategoryAbstractionInfo">
         SELECT id as `categoryId`,
-            ( SELECT COUNT(*) FROM placesByAbstractions WHERE categoryAbstractionId = categoryId
-                <if test="request.distance != null and request.exploreLocation.type != 'country'">
-                    AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
-                </if>
-                <if test="request.distance == null || request.exploreLocation.type == 'country'">
-                    AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
-                </if>
-                AND isPublic = true AND isVerified = true
-                <if test="request.freePlacesOnly == true">
-                    AND price = ''
-                </if>
-                    AND placeId NOT IN
-                    (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
-                        <foreach collection="request.categoriesSelected" item="catSelected">
-                                OR categoryAbstractionId = #{catSelected}
-                        </foreach>
-                    )
-            ) as numPlaces
+        ( SELECT COUNT(*) FROM placesByAbstractions WHERE categoryAbstractionId = categoryId
+        <if test="request.distance != null and request.exploreLocation.type != 'country'">
+            AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
+        </if>
+        <if test="request.distance == null || request.exploreLocation.type == 'country'">
+            AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
+        </if>
+        AND isPublic = true AND isVerified = true
+        <if test="request.freePlacesOnly == true">
+            AND price = ''
+        </if>
+        AND placeId NOT IN
+        (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
+        <foreach collection="request.categoriesSelected" item="catSelected">
+            OR categoryAbstractionId = #{catSelected}
+        </foreach>
+        )
+        <if test="request.tagsSelected.size() != 0">
+            AND placeId IN(
+            SELECT placeId FROM PLACE p LEFT JOIN TAG_PLACE tpp
+            ON tpp.fk_placeId = p.placeId
+            WHERE 0
+            <foreach collection="request.tagsSelected" item="tag">
+                OR tpp.fk_tagId = #{tag}
+            </foreach>
+            )
+        </if>
+
+        ) as numPlaces
         FROM CATEGORY_ABSTRACTION
         WHERE 1 = 1
         <foreach collection="request.categoriesSelected" item="catSelected">
@@ -158,24 +207,32 @@
         FROM PLACE
         WHERE isVerified = true
         AND isPublic = true
-          <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
-              AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
-          </if>
+        <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
+            AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
+        </if>
         <if test="request.distance == null || request.exploreLocation.type == 'country'">
             AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
         </if>
         <if test="request.freePlacesOnly == true">
             AND price = ''
         </if>
-        AND placeId IN (SELECT placeId FROM placesByAbstractions
         <if test="request.categoriesSelected.size() != 0">
+            AND placeId IN (SELECT placeId FROM placesByAbstractions
             WHERE 1 != 1
             <foreach collection="request.categoriesSelected" item="cat">
                 OR categoryAbstractionId = #{cat}
             </foreach>
+            )
         </if>
-        )
 
+        <if test="request.tagsSelected.size() != 0">
+            AND placeId IN (
+            SELECT fk_placeId FROM TAG_PLACE WHERE 0
+            <foreach collection="request.tagsSelected" item="tag">
+                OR fk_tagId = #{tag}
+            </foreach>
+            )
+        </if>
     </select>
 
 </mapper>
