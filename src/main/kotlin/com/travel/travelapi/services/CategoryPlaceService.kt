@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository
 interface CategoryPlaceService {
 
 
-    fun selectByPlaceId(@Param("id") id: Int): List<Category>
+    fun selectByPlaceId(@Param("placeId") id: Int): List<Category>
 
     fun insertCategoryForPlace(@Param("c") c: CategoryPlace)
 

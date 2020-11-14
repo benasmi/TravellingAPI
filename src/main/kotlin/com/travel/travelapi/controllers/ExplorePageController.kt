@@ -7,6 +7,7 @@ import com.travel.travelapi.models.*
 import com.travel.travelapi.models.search.CategoryAbstractionInfo
 import com.travel.travelapi.models.search.SearchPreview
 import com.travel.travelapi.models.search.SearchRequest
+import com.travel.travelapi.models.search.SearchRequestLocation
 import com.travel.travelapi.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -197,9 +198,12 @@ class ExplorePageController(
 
     @PostMapping("/searchPreview")
     fun searchPreview(@RequestBody request: SearchRequest): SearchPreview {
-        if (!request.exploreLocation.valid())
+        if (request is SearchRequestLocation && !request.exploreLocation.valid())
             throw InvalidParamsException("Explore location type is not valid")
-        val averageCoords = explorePageService.averageCoordinatesForLocation(request.exploreLocation.location, request.exploreLocation.type)
+        val averageCoords = if (request is SearchRequestLocation)
+            explorePageService.averageCoordinatesForLocation(request.exploreLocation.location, request.exploreLocation.type)
+        else null
+
         val categoryInfo = explorePageService.previewCategories(request, averageCoords)
         val tagInfo = explorePageService.previewTags(request, averageCoords)
         val placesCount = explorePageService.searchPlaces(request, averageCoords).count()
@@ -208,15 +212,14 @@ class ExplorePageController(
 
     @PostMapping("/location")
     @PreAuthorize("hasAuthority('explore:location')")
-    fun getByLocation1(@RequestParam(required = false, defaultValue = "") latLng: String,
-                       @RequestParam(required = false, defaultValue = "0") p: Int,
+    fun getByLocation1(@RequestParam(required = false, defaultValue = "0") p: Int,
                        @RequestParam(required = false, defaultValue = "10") s: Int,
-                       @RequestBody searchRequest: SearchRequest?
+                       @RequestBody searchRequest: SearchRequest
     ): LogicalPage {
 
-        if (latLng.isEmpty() && !searchRequest!!.exploreLocation.valid())
+        if (searchRequest is SearchRequestLocation && !searchRequest.exploreLocation.valid())
             throw InvalidParamsException("Type specified is invalid")
-        if (latLng.isEmpty() && searchRequest!!.exploreLocation.location == "")
+        if (searchRequest is SearchRequestLocation && searchRequest.exploreLocation.location == "")
             throw InvalidParamsException("No location specified")
 
         //Get unique categories
@@ -228,16 +231,12 @@ class ExplorePageController(
             hashMap[it.name!!] = SuggestionByCategory(it, objects = ArrayList())
         }
 
-        val placesFound = if (latLng.isEmpty()) {
-            val averageCoords = explorePageService.averageCoordinatesForLocation(searchRequest!!.exploreLocation.location, searchRequest.exploreLocation.type)
-            explorePageService.searchPlaces(searchRequest, averageCoords)
-        } else {
-            placeService.selectAllAdmin(location = latLng.split(','), range = 50.0)
-        }
+        val averageCoords = if (searchRequest is SearchRequestLocation)
+            explorePageService.averageCoordinatesForLocation(searchRequest.exploreLocation.location, searchRequest.exploreLocation.type)
+        else null
 
-        placesFound.parallelStream().forEach {
-            it.categories = categoryPlaceService.selectByPlaceId(it.placeId!!)
-        }
+        val placesFound = explorePageService.searchPlaces(searchRequest, averageCoords)
+
         val ids = placesFound.parallelStream().map { it.placeId!! }.collect(Collectors.toList())
 
         //Match tours
@@ -263,18 +262,17 @@ class ExplorePageController(
         }
 
         //Matching recommendations
-        val recommendationsFound = recommendationService.matchRecommendationsByLocation(
-                locationType = searchRequest!!.exploreLocation.type,
-                location = searchRequest.exploreLocation.location,
-                latLng = if (latLng.isNotEmpty()) latLng.split(',') else ArrayList(),
-                range = 50.0
-        )
+        val recommendationsFound = recommendationService.matchRecommendationsByLocation(searchRequest)
         recommendationsFound.forEach { recommendation ->
             recommendationController.extendRecommendation(recommendation)
         }
 
         val collections = LogicalPageList<ObjectCollection>()
-        collections.addAll(recommendationsFound)
+
+        //Disabling recommendations if filtering is enabled
+        if (!searchRequest.filterEnabled())
+            collections.addAll(recommendationsFound)
+
         hashMap.forEach {
             if (it.value.objects?.size!! > 0) {
                 collections.add(it.value)

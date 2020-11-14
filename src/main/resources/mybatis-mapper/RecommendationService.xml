@@ -29,24 +29,21 @@
     </select>
 
     <select id="matchRecommendationsByLocation" resultType="com.travel.travelapi.models.Recommendation">
-        <if test="latLng.size()!=0">
+        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestCoordinates">
             SELECT DISTINCT r.* FROM PLACE_RECOMMENDATION pr
             INNER JOIN RECOMMENDATION r ON pr.fk_recommendationId = r.id
             INNER JOIN
-            (SELECT *, ( 6371 * acos( cos( radians(#{latLng[0]}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{latLng[1]}) ) + sin( radians(#{latLng[0]}) ) * sin(radians(latitude)) ) )
+            (SELECT *, ( 6371 * acos( cos( radians(#{request.coordinates.lat}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{request.coordinates.lon}) ) + sin( radians(#{request.coordinates.lat}) ) * sin(radians(latitude)) ) )
             AS distance FROM PLACE
-            <if test="locationType != '' and location != ''">
-                WHERE ${locationType}=#{location}
-            </if>
-            HAVING distance &lt; #{range} ORDER BY distance) p
+            HAVING distance &lt; #{request.distance} ORDER BY distance) p
             ON pr.fk_placeId = p.placeId
         </if>
 
-        <if test="latLng.size()==0">
+        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestLocation">
             SELECT DISTINCT r.* FROM PLACE_RECOMMENDATION pr
             INNER JOIN RECOMMENDATION r ON pr.fk_recommendationId = r.id
             INNER JOIN PLACE p ON pr.fk_placeId = p.placeId
-            WHERE ${locationType}=#{location}
+            WHERE ${request.exploreLocation.type}=#{request.exploreLocation.location}
         </if>
 
     </select>

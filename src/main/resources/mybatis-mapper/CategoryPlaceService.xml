@@ -5,7 +5,7 @@
 <mapper namespace="com.travel.travelapi.services.CategoryPlaceService">
 
     <select id="selectByPlaceId" resultType="com.travel.travelapi.models.Category">
-        SELECT * FROM CATEGORY c WHERE c.categoryId IN (SELECT cp.fk_categoryId FROM CATEGORY_PLACE cp WHERE cp.fk_placeId=#{id})
+        SELECT * FROM CATEGORY c WHERE c.categoryId IN (SELECT cp.fk_categoryId FROM CATEGORY_PLACE cp WHERE cp.fk_placeId=#{placeId})
     </select>
 
     <!--    NOT TESTED-->

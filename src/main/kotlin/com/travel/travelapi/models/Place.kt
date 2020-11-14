@@ -24,9 +24,10 @@ abstract class Place (
         var website: String? = null,
         var overallStarRating: Double? = null,
         var price: String? = null,
-        var userId: Int? = null){
+        var userId: Int? = null,
+        var categories: List<Category>? = null){
 
-    var categories: List<Category>? = null
+
     var parking: List<Parking>? = null
     var schedule: List<WorkingSchedule>? = null
     var photos: List<Photo>? = null
