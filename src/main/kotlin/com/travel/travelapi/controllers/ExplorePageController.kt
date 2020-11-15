@@ -206,7 +206,7 @@ class ExplorePageController(
 
         val categoryInfo = explorePageService.previewCategories(request, averageCoords)
         val tagInfo = explorePageService.previewTags(request, averageCoords)
-        val placesCount = explorePageService.searchPlaces(request, averageCoords).count()
+        val placesCount = explorePageService.placesCount(request, averageCoords)
         return SearchPreview(placesCount, categoryInfo, tagInfo)
     }
 

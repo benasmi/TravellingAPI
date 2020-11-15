@@ -119,39 +119,14 @@
         SELECT tagId,
         (
         SELECT COUNT(*) FROM PLACE p LEFT JOIN TAG_PLACE tp ON tp.fk_placeId = p.placeId
-        WHERE isPublic = true AND isVerified = true AND tp.fk_tagId = tagId
-        <if test="request.freePlacesOnly == true">
-            AND price = ''
-        </if>
-
-        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestLocation">
-            <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
-                AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
-            </if>
-            <if test="request.distance == null || request.exploreLocation.type == 'country'">
-                AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
-            </if>
-        </if>
-        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestCoordinates">
-            AND getDistance(#{request.coordinates.lat}, #{request.coordinates.lon}, latitude, longitude) &lt;
-            #{request.distance}
-        </if>
-
-        AND p.placeId NOT IN(
-        SELECT placeId FROM PLACE p LEFT JOIN TAG_PLACE tpp
-        ON tpp.fk_placeId = p.placeId
-        WHERE 0
-        <foreach collection="request.tagsSelected" item="tag">
-            OR tpp.fk_tagId = #{tag}
-        </foreach>
-        )
+        WHERE isPublic = true
+        AND isVerified = true
+        AND tp.fk_tagId = tagId
+        AND <include refid="priceCondition"/>
+        <include refid="placeLocationConditions"/>
+        AND NOT (<include refid="isolateSelectedTagsCondition"/>)
         <if test="request.categoriesSelected.size() != 0">
-            AND p.placeId IN
-            (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
-            <foreach collection="request.categoriesSelected" item="catSelected">
-                OR categoryAbstractionId = #{catSelected}
-            </foreach>
-            )
+            AND <include refid="isolateSelectedCategoriesCondition"/>
         </if>
         ) as numPlaces
         FROM TAG
@@ -161,11 +136,62 @@
         </foreach>
     </select>
 
+    <sql id="priceCondition">
+        <if test="request.freePlacesOnly == true">
+            price = ''
+        </if>
+        <if test="request.freePlacesOnly == false">
+            1
+        </if>
+    </sql>
+
+    <sql id="isolateSelectedTagsCondition">
+            placeId IN(
+            SELECT placeId FROM PLACE p LEFT JOIN TAG_PLACE tpp
+            ON tpp.fk_placeId = p.placeId
+            WHERE 0
+            <foreach collection="request.tagsSelected" item="tag">
+                OR tpp.fk_tagId = #{tag}
+            </foreach>
+            )
+    </sql>
+
+    <sql id="isolateSelectedCategoriesCondition">
+        placeId IN
+            (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
+            <foreach collection="request.categoriesSelected" item="catSelected">
+                OR categoryAbstractionId = #{catSelected}
+            </foreach>
+            )
+    </sql>
 
     <select id="previewCategories" resultType="com.travel.travelapi.models.search.CategoryAbstractionInfo">
         SELECT id as `categoryId`,
         ( SELECT COUNT(*) FROM placesByAbstractions WHERE categoryAbstractionId = categoryId
+        AND isPublic = true AND isVerified = true
+        <include refid="placeLocationConditions"/>
+        AND <include refid="priceCondition"/>
+        AND NOT(<include refid="isolateSelectedCategoriesCondition"/>)
+        <if test="request.tagsSelected.size() != 0">
+            AND <include refid="isolateSelectedTagsCondition"/>
+        </if>
+        ) as numPlaces
+        FROM CATEGORY_ABSTRACTION
+        WHERE 1 = 1
+        <foreach collection="request.categoriesSelected" item="catSelected">
+            AND id != #{catSelected}
+        </foreach>
+    </select>
 
+    <resultMap id="searchPlacesMap" type="com.travel.travelapi.models.PlaceLocal">
+        <id property="placeId" column="placeId"/>
+        <collection
+                property="categories" ofType="com.travel.travelapi.models.Category"
+                select="com.travel.travelapi.services.CategoryPlaceService.selectByPlaceId"
+                column="placeId"/>
+    </resultMap>
+
+    <sql id="placeLocationConditions">
         <if test="request instanceof com.travel.travelapi.models.search.SearchRequestLocation">
             <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
                 AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
@@ -178,97 +204,43 @@
             AND getDistance(#{request.coordinates.lat}, #{request.coordinates.lon}, latitude, longitude) &lt;
             #{request.distance}
         </if>
-        AND isPublic = true AND isVerified = true
-        <if test="request.freePlacesOnly == true">
-            AND price = ''
-        </if>
-        AND placeId NOT IN
-        (SELECT placeId FROM placesByAbstractions WHERE 1 != 1
-        <foreach collection="request.categoriesSelected" item="catSelected">
-            OR categoryAbstractionId = #{catSelected}
-        </foreach>
-        )
-        <if test="request.tagsSelected.size() != 0">
-            AND placeId IN(
-            SELECT placeId FROM PLACE p LEFT JOIN TAG_PLACE tpp
-            ON tpp.fk_placeId = p.placeId
-            WHERE 0
-            <foreach collection="request.tagsSelected" item="tag">
-                OR tpp.fk_tagId = #{tag}
-            </foreach>
-            )
-        </if>
+    </sql>
 
-        ) as numPlaces
-        FROM CATEGORY_ABSTRACTION
-        WHERE 1 = 1
-        <foreach collection="request.categoriesSelected" item="catSelected">
-            AND id != #{catSelected}
-        </foreach>
+    <select id="placesCount" resultType="Integer">
+        SELECT COUNT(*) FROM PLACE <include refid="searchPlacesConditions"/>
     </select>
-
-    <resultMap id="searchPlacesMap" type="com.travel.travelapi.models.PlaceLocal">
-
-        <id property="placeId" column="placeId"/>
-        <!--        <result property="name" column="t_name" />-->
-
-        <collection
-                property="categories" ofType="com.travel.travelapi.models.Category"
-                select="com.travel.travelapi.services.CategoryPlaceService.selectByPlaceId"
-                column="placeId"/>
-    </resultMap>
 
     <select id="searchPlaces" resultMap="searchPlacesMap">
-        SELECT p.name,
-        p.averageTimeSpent,
-        p.address,
-        p.country,
-        p.city,
-        p.county,
-        p.municipality,
-        p.price,
-        p.placeId,
-        p.description,
-        p.latitude,
-        p.longitude,
-        p.price
-        FROM PLACE p
+        SELECT
+        name,
+        averageTimeSpent,
+        address,
+        country,
+        city,
+        county,
+        municipality,
+        price,
+        placeId,
+        description,
+        latitude,
+        longitude,
+        price
+        FROM PLACE
+        <include refid="searchPlacesConditions"/>
+    </select>
+
+    <sql id="searchPlacesConditions">
         WHERE isVerified = true
         AND isPublic = true
-
-        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestLocation">
-            <if test="request.distance != null &amp;&amp; request.exploreLocation.type != 'country'">
-                AND getDistance(#{centerCoords.lat}, #{centerCoords.lon}, latitude, longitude) &lt; #{request.distance}
-            </if>
-            <if test="request.distance == null || request.exploreLocation.type == 'country'">
-                AND ${request.exploreLocation.type} = #{request.exploreLocation.location}
-            </if>
-        </if>
-        <if test="request instanceof com.travel.travelapi.models.search.SearchRequestCoordinates">
-            AND getDistance(#{request.coordinates.lat}, #{request.coordinates.lon}, p.latitude, p.longitude) &lt;
-            #{request.distance}
-        </if>
-
-        <if test="request.freePlacesOnly == true">
-            AND p.price = ''
-        </if>
+        <include refid="placeLocationConditions"/>
+        AND
+        <include refid="priceCondition"/>
         <if test="request.categoriesSelected.size() != 0">
-            AND p.placeId IN (SELECT placeId FROM placesByAbstractions
-            WHERE 1 != 1
-            <foreach collection="request.categoriesSelected" item="cat">
-                OR categoryAbstractionId = #{cat}
-            </foreach>
-            )
+            AND <include refid="isolateSelectedCategoriesCondition"/>
         </if>
-
         <if test="request.tagsSelected.size() != 0">
-            AND p.placeId IN (
-            SELECT fk_placeId FROM TAG_PLACE WHERE 0
-            <foreach collection="request.tagsSelected" item="tag">
-                OR fk_tagId = #{tag}
-            </foreach>
-            )
+            AND <include refid="isolateSelectedTagsCondition"/>
         </if>
-    </select>
+    </sql>
 
 </mapper>

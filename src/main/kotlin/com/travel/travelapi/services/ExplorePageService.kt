@@ -40,4 +40,7 @@ interface ExplorePageService {
             @Param("request") searchRequest: SearchRequest,
             @Param("centerCoords") centerCoords: LatLng?
     ): List<PlaceLocal>
+
+    fun placesCount(@Param("request") searchRequest: SearchRequest,
+                    @Param("centerCoords") centerCoords: LatLng?): Int
 }
