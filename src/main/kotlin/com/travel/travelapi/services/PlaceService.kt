@@ -9,6 +9,7 @@ import com.travel.travelapi.models.Place
 import org.apache.ibatis.annotations.*
 
 import com.travel.travelapi.models.PlaceLocal
+import com.travel.travelapi.models.search.SearchRequestBounds
 import org.apache.ibatis.annotations.Select
 
 import org.springframework.stereotype.Repository
@@ -63,5 +64,5 @@ interface PlaceService {
 
     fun getPlaceLocation(@Param("id") id: Int): Location
 
-    fun selectPlacesInBounds(@Param("minLat") minLat: Float,@Param("maxLat") maxLat: Float,@Param("minLng") minLng: Float,@Param("maxLng") maxLng: Float, @Param("limit") limit: Int): ArrayList<PlaceLocal>
+    fun selectPlacesInBounds(@Param("request") searchRequest: SearchRequestBounds, @Param("limit") limit: Int): ArrayList<PlaceLocal>
 }

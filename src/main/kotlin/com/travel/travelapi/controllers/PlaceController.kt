@@ -29,7 +29,6 @@ class PlaceController(@Autowired private val placeService: PlaceService,
                       @Autowired private val sphinxService: SphinxService,
                       @Autowired private val reviewService: ReviewService){
 
-
     /**
      * @return all places that match given query
      * @param full if given true returns places mapped with categories, parking, reviews, schedule otherwise just general info

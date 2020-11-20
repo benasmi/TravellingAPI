@@ -7,6 +7,6 @@ class SearchRequestCoordinates(
         categoriesSelected: List<Int> = listOf(),
         tagsSelected: List<Int> = listOf(),
         freePlacesOnly: Boolean = false,
-        distance: Int? = 50,
+        var distance: Int? = null,
         val coordinates: LatLng
-): SearchRequest(categoriesSelected, tagsSelected, freePlacesOnly, distance)
+): SearchRequest(categoriesSelected, tagsSelected, freePlacesOnly)

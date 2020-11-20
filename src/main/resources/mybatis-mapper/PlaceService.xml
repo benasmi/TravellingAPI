@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.travel.travelapi.services.PlaceService">
 
-    <select id="selectAll"  resultType="com.travel.travelapi.models.PlaceLocal">
+    <select id="selectAll" resultType="com.travel.travelapi.models.PlaceLocal">
         SELECT * FROM PLACE
     </select>
 
@@ -12,7 +12,8 @@
     </select>
 
     <select id="matchPlacesByLocation" resultType="com.travel.travelapi.models.PlaceLocal">
-        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description, latitude, longitude, price FROM PLACE WHERE isVerified = true AND isPublic = true
+        SELECT name, averageTimeSpent, address, country, city, county, municipality, price, placeId, description,
+        latitude, longitude, price FROM PLACE WHERE isVerified = true AND isPublic = true
         <if test="distanceMax != null">
             AND getDistance(#{sourceLat}, #{sourceLon}, latitude, longitude) &lt; #{distanceMax}
         </if>
@@ -42,13 +43,28 @@
     </select>
 
     <select id="selectPlacesInBounds" resultType="com.travel.travelapi.models.PlaceLocal">
-     SELECT * FROM PLACE WHERE isPublic=1 AND isVerified=1 AND latitude &lt; #{maxLat} AND longitude &lt; #{maxLng} AND latitude > #{minLat} AND longitude > #{minLng} ORDER BY grade DESC LIMIT #{limit}
+        SELECT * FROM PLACE WHERE
+        isPublic=1 AND isVerified=1
+        AND <include refid="com.travel.travelapi.services.ExplorePageService.priceCondition"/>
+        <if test="request.categoriesSelected.size() != 0">
+            AND
+            <include refid="com.travel.travelapi.services.ExplorePageService.isolateSelectedCategoriesCondition"/>
+        </if>
+        <if test="request.tagsSelected.size() != 0">
+            AND
+            <include refid="com.travel.travelapi.services.ExplorePageService.isolateSelectedTagsCondition"/>
+        </if>
+        AND latitude &lt; #{request.rightEdge.lat} AND longitude &lt; #{request.rightEdge.lon} AND latitude >
+        #{request.leftEdge.lat} AND longitude > #{request.leftEdge.lon}
+        ORDER BY grade DESC LIMIT #{limit}
     </select>
 
 
     <select id="selectAllAdmin" resultType="com.travel.travelapi.models.PlaceLocal">
         <if test="location.size() != 0">
-            SELECT *, ( 6371 * acos( cos( radians(#{location[0]}) ) * cos( radians( latitude ) )* cos( radians( longitude ) - radians(#{location[1]}) ) + sin( radians(#{location[0]}) ) * sin(radians(latitude)) ) ) AS distance FROM PLACE
+            SELECT *, ( 6371 * acos( cos( radians(#{location[0]}) ) * cos( radians( latitude ) )* cos( radians(
+            longitude ) - radians(#{location[1]}) ) + sin( radians(#{location[0]}) ) * sin(radians(latitude)) ) ) AS
+            distance FROM PLACE
         </if>
         <if test="location.size() == 0">
             SELECT * FROM PLACE
@@ -104,7 +120,7 @@
             </foreach>)
         </if>
         <if test="filterDateAdded.size() == 2">
-                AND timeAdded BETWEEN #{filterDateAdded[0]} AND #{filterDateAdded[1]}
+            AND timeAdded BETWEEN #{filterDateAdded[0]} AND #{filterDateAdded[1]}
         </if>
         <if test="filterDateModified.size() == 2">
             AND dateModified BETWEEN #{filterDateModified[0]} AND #{filterDateModified[1]}
@@ -131,7 +147,7 @@
         SELECT * FROM PLACE WHERE placeId=#{id}
     </select>
 
-    <update id="updatePlace" >
+    <update id="updatePlace">
         UPDATE PLACE SET county=#{p.county}, bookInAdvance=#{p.bookInAdvance}, municipality=#{p.municipality}, averageTimeSpent=#{p.averageTimeSpent}, price=#{p.price}, name=#{p.name}, description=#{p.description}, city=#{p.city}, country=#{p.country}, latitude=#{p.latitude},
         longitude=#{p.longitude}, address=#{p.address}, phoneNumber=#{p.phoneNumber}, website=#{p.website}, hasSchedule=#{p.hasSchedule}, isPublic=#{p.isPublic}, isVerified=#{p.isVerified}
         WHERE placeId=#{p.placeId}

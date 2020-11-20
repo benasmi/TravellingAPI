@@ -1,12 +1,11 @@
 package com.travel.travelapi.models.search
 
-import com.travel.travelapi.controllers.ExplorePageController
 import com.travel.travelapi.models.LatLng
 
-class SearchRequestLocation(
+class SearchRequestBounds(
         categoriesSelected: List<Int> = listOf(),
         tagsSelected: List<Int> = listOf(),
         freePlacesOnly: Boolean = false,
-        var distance: Int? = null,
-        val exploreLocation: ExplorePageController.ExploreLocation
+        var leftEdge: LatLng,
+        var rightEdge: LatLng
 ): SearchRequest(categoriesSelected, tagsSelected, freePlacesOnly)

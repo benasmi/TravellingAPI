@@ -4,10 +4,7 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.exceptions.InvalidParamsException
 import com.travel.travelapi.models.*
-import com.travel.travelapi.models.search.CategoryAbstractionInfo
-import com.travel.travelapi.models.search.SearchPreview
-import com.travel.travelapi.models.search.SearchRequest
-import com.travel.travelapi.models.search.SearchRequestLocation
+import com.travel.travelapi.models.search.*
 import com.travel.travelapi.services.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -180,15 +177,9 @@ class ExplorePageController(
     @GetMapping("/locationBounds")
     @PreAuthorize("hasAuthority('explore:location')")
     fun getNearbyBounds(
-            @RequestParam("minLat") minLat: Float,
-            @RequestParam("maxLat") maxLat: Float,
-            @RequestParam("minLng") minLng: Float,
-            @RequestParam("maxLng") maxLng: Float): List<CollectionObjectPlace> {
+            @RequestBody searchRequestBounds: SearchRequestBounds): List<CollectionObjectPlace> {
         val places = placeService.selectPlacesInBounds(
-                minLat = minLat,
-                maxLat = maxLat,
-                minLng = minLng,
-                maxLng = maxLng,
+                searchRequestBounds,
                 limit = 10)
 
         extendPlaces(places)
@@ -216,7 +207,8 @@ class ExplorePageController(
                        @RequestParam(required = false, defaultValue = "10") s: Int,
                        @RequestBody searchRequest: SearchRequest
     ): LogicalPage {
-
+        if(!(searchRequest is SearchRequestLocation || searchRequest is SearchRequestCoordinates))
+            throw InvalidParamsException("Unsupported request type")
         if (searchRequest is SearchRequestLocation && !searchRequest.exploreLocation.valid())
             throw InvalidParamsException("Type specified is invalid")
         if (searchRequest is SearchRequestLocation && searchRequest.exploreLocation.location == "")
