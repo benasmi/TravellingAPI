@@ -174,7 +174,7 @@ class ExplorePageController(
         return places.map { CollectionObjectPlace.createFromPlaceInstance(it) }
     }
 
-    @GetMapping("/locationBounds")
+    @PostMapping("/locationBounds")
     @PreAuthorize("hasAuthority('explore:location')")
     fun getNearbyBounds(
             @RequestBody searchRequestBounds: SearchRequestBounds): List<CollectionObjectPlace> {
