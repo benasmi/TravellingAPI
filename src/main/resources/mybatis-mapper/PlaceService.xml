@@ -114,11 +114,21 @@
         <if test="filterCategories.size() != 0">
             AND placeId IN (SELECT cp.fk_placeId FROM CATEGORY c INNER JOIN CATEGORY_PLACE cp ON c.categoryId =
             cp.fk_categoryId
-            WHERE c.name IN
+            WHERE c.categoryId IN
             <foreach item='item' index='index' collection='filterCategories' open='(' separator=',' close=')'>
                 #{item}
             </foreach>)
         </if>
+
+        <if test="filterTags.size() != 0">
+            AND placeId IN (SELECT tp.fk_placeId FROM TAG t INNER JOIN TAG_PLACE tp ON t.tagId =
+            tp.fk_tagId
+            WHERE t.tagId IN
+            <foreach item='item' index='index' collection='filterTags' open='(' separator=',' close=')'>
+                #{item}
+            </foreach>)
+        </if>
+
         <if test="filterDateAdded.size() == 2">
             AND timeAdded BETWEEN #{filterDateAdded[0]} AND #{filterDateAdded[1]}
         </if>

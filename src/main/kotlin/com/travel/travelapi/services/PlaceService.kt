@@ -27,6 +27,7 @@ interface PlaceService {
     fun selectAllAdmin(@Param("keyword") keyword: String = "",
                        @Param("filterOptions") filterOptions: List<String> = arrayListOf(),
                        @Param("filterCategories") filterCategories: List<String> = arrayListOf(),
+                       @Param("filterTags") filterTags: List<String> = arrayListOf(),
                        @Param("filterDateAdded") filterDateAdded: List<String> = arrayListOf(),
                        @Param("filterDateModified") filterDateModified: List<String> = arrayListOf(),
                        @Param("filterCountries") filterCountries: List<String> = arrayListOf(),
