@@ -100,8 +100,10 @@ class TourController(@Autowired private val tourService: TourService,
 
         //Get tour info
         val tour: Tour = tourService.getTourById(id)
+        tour.categories = tourService.getCategoriesForTour(tour.tourId!!);
+
         //Get tour days
-        val days = tourDayController.getTourDaysDetails(tour.tourId!!)
+        val days = tourDayController.getTourDaysDetails(tour.tourId)
 
         //Get places for every tour day
         days.forEach{
