@@ -42,7 +42,7 @@ class UserController(
     @PostMapping("/changePassword")
     @PreAuthorize("hasAuthority('user:change_password')")
     fun changePassword(@RequestBody changePasswordRequest: ChangePasswordRequest){
-        authService.updatePassword(changePasswordRequest.userId, changePasswordRequest.newPassword);
+        authService.updatePassword(changePasswordRequest.userId, passwordEncoder.encode(changePasswordRequest.newPassword))
     }
 
     /**
