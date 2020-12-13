@@ -27,7 +27,8 @@ class PlaceLocal(val placeId: Int? = null,
                  municipality: String? = null,
                  var bookInAdvance: Boolean? = null,
                  userId: Int? = null,
-                 categories: List<Category>? = null): Place(name, description, hasSchedule, latitude, longitude, address
-        ,country, city, county, municipality, phoneNumber, website, overallStarRating, price, userId, categories)
+                 categories: List<Category>? = null,
+                 grade: Int? = null): Place(name, description, hasSchedule, latitude, longitude, address
+        ,country, city, county, municipality, phoneNumber, website, overallStarRating, price, userId, categories, grade)
 
 

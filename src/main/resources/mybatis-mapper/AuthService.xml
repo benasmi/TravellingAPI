@@ -10,6 +10,14 @@
          </if>
     </select>
 
+    <delete id="removeUserById">
+        DELETE FROM USERS WHERE id=#{id}
+    </delete>
+
+    <update id="updatePassword">
+        UPDATE USERS SET `password` = #{password} WHERE id=#{id}
+    </update>
+
     <select id="getUserByRefreshToken" resultType="com.travel.travelapi.models.User">
         SELECT * FROM USERS WHERE refreshToken=#{token}
     </select>

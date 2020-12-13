@@ -4,6 +4,7 @@ import com.github.pagehelper.PageHelper
 import com.github.pagehelper.PageInfo
 import com.travel.travelapi.auth.TravelUserDetails
 import com.travel.travelapi.exceptions.InvalidUserDataException
+import com.travel.travelapi.exceptions.UnauthorizedException
 import com.travel.travelapi.models.*
 import com.travel.travelapi.services.AuthService
 import com.travel.travelapi.services.PhotoService
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 
@@ -23,8 +25,25 @@ class UserController(
         @Autowired private val authService: AuthService,
         @Autowired private val authController: AuthController,
         @Lazy @Autowired private val photoController: PhotoController,
-        @Lazy @Autowired private val photoService: PhotoService
+        @Lazy @Autowired private val photoService: PhotoService,
+        @Lazy private val passwordEncoder: PasswordEncoder
 ){
+
+    @PostMapping("/remove")
+    @PreAuthorize("hasAuthority('user:remove')")
+    fun remove(@RequestBody id: Int){
+        if(id == 46)
+            throw UnauthorizedException("This user cannot be removed");
+        authService.removeUserById(id)
+    }
+
+    data class ChangePasswordRequest(val userId: Int, val newPassword: String);
+
+    @PostMapping("/changePassword")
+    @PreAuthorize("hasAuthority('user:change_password')")
+    fun changePassword(@RequestBody changePasswordRequest: ChangePasswordRequest){
+        authService.updatePassword(changePasswordRequest.userId, changePasswordRequest.newPassword);
+    }
 
     /**
      * Returns profile information of the currently logged in user

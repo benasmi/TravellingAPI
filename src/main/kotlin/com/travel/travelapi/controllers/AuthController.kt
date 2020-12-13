@@ -231,6 +231,7 @@ class AuthController(@Autowired private val authService: AuthService,
         user.roles.add(Roles.ROLE_LIMBO.id)
         authService.createUser(user)
     }
+
 //
 //    /**
 //     * Updates existing OAuth2 user
